@@ -4,8 +4,8 @@
 This project uses Playwright for End-to-End (E2E) testing to ensure the system works correctly across real browser environments, including Chromium
 
 # Playwright Installation
-npm install
-npx playwright install
+  - npm install
+  - npx playwright install
 
 # Common Playwright Commands
   Run all tests
@@ -35,14 +35,14 @@ npx playwright install
 # Test File Naming (Scenario ID)
 Test files are named using the Scenario ID, making the test scope immediately clear from the file name.
   
-  Format : <scenario-id>.spec.ts
-  Examples : TS-Login-01.spec.ts
+  - Format : <scenario-id>.spec.ts
+  - Examples : TS-Login-01.spec.ts
 
 # Test Case Structure Within a Scenario File
 Inside each scenario file, multiple test cases are defined to cover different paths or conditions of the same scenario.
 Each test case includes a unique sub-ID for clear identification.
 
-  Example : 
+  - Example : 
   test.describe("TS-Login-01: User Login Scenario", () => {
   
   test("TS-Login-01.1: User login successfully", async ({ page }) => {
