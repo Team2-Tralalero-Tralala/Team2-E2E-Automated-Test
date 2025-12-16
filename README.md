@@ -3,7 +3,7 @@
 🧪 Playwright – End-to-End Testing
 This project uses Playwright for End-to-End (E2E) testing to ensure the system works correctly across real browser environments, including Chromium
 
-# Installation Playwright
+📦 Playwright Installation
 npm install
 npx playwright install
 
