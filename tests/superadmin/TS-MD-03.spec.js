@@ -30,12 +30,12 @@ test.describe("SuperAdmin - Banner", () => {
     await loginAs(page, "superadmin");
     await goToUploadBannersPage(page);
   });
-  
+
   /**
-   * TC-MD-02.1
+   * TC-MD-03.1
    * ลบรูปสำเร็จ
    */
-test("TS-MD-02.1: SuperAdmin can delete banner image (image #2)", async ({ page }) => {
+test("TS-MD-03.1: SuperAdmin can delete banner image (image #2)", async ({ page }) => {
   const deleteButtons = page.getByRole("button", {
     name: /ลบรูปที่ \d+/,
   });
@@ -55,40 +55,28 @@ test("TS-MD-02.1: SuperAdmin can delete banner image (image #2)", async ({ page 
 });
 
 /**
- * TC-MD-02.2
+ * TC-MD-03.2
  * เเก้ไขโลโก้สำเร็จ
  */
-test("TS-MD-02.2: SuperAdmin can edit banner image", async ({ page }) => {
-  const editButton = page.getByRole("button", { name: /^แก้ไขรูปที่ \d+/ });
+test("TS-MD-03.2: SuperAdmin can edit banner image", async ({ page }) => {
+const editButton = page .getByRole("button", { name: /^แก้ไขรูปที่ \d+/ }) .first(); 
 
-    await editButton.nth(0).click();
+await editButton.click(); const bannerImg = page.locator("img").first(); 
 
-  const bannerImg = page.locator("img").first();
+const oldSrc = await bannerImg.getAttribute("src"); 
 
-  const fileInput = page.locator('input[type="file"]').first();
-  const imagePath = path.resolve(
-    process.cwd(),
-    "assets/photo/banner-edit.jpg"
-  );
+const fileInput = page.locator('input[type="file"]').first(); 
+const imagePath = path.resolve( process.cwd(), "assets/photo/banner-edit.jpg" ); 
+await fileInput.setInputFiles(imagePath); 
 
-  await fileInput.setInputFiles(imagePath);
+const confirmDialog = page.getByRole("dialog").filter({ hasText: /ยืนยัน/i, }); 
+const confirmBtn = confirmDialog.getByRole("button", { name: /ยืนยัน/i, }); 
 
-  const confirmDialog = page.getByRole("dialog").filter({
-    hasText: /ยืนยัน/i,
-  });
+await expect(confirmBtn).toBeVisible(); 
 
-  const confirmBtn = confirmDialog.getByRole("button", {
-    name: /ยืนยัน/i,
-  });
+await confirmBtn.click(); 
 
-  await expect(confirmBtn).toBeVisible();
-  await confirmBtn.click();
-
-  const successDialog = page.getByRole("dialog").filter({
-    hasText: /สำเร็จ/i,
-  });
-
-  await expect(successDialog).toBeVisible();
+const successDialog = page.getByRole("dialog").filter({ hasText: /สำเร็จ/i, }); 
+await expect(successDialog).toBeVisible(); 
 });
-
 });
