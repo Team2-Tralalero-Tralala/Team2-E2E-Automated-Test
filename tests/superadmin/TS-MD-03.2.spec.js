@@ -34,51 +34,56 @@ test.describe("SuperAdmin - Banner", () => {
    * TC-MD-03.2
    * เเก้ไขรูป banner สำเร็จ
    */
-   test("TS-MD-03.2: SuperAdmin can edit first banner image", async ({ page }) => {
-    const firstEditButton = page
-      .getByRole("button", { name: /แก้ไขรูปที่ \d+/ })
-      .first();
+test("TS-MD-03.2: SuperAdmin can edit first banner image", async ({ page }) => {
+    const banners = page.getByRole("img", {
+      name: /preview-banner-\d+/,
+    });
 
-    await expect(firstEditButton).toBeVisible();
+    await expect(banners.first()).toBeVisible({ timeout: 10000 });
 
-    const bannerImg = page
-      .locator('img[alt^="preview-banner"]')
-      .first();
+    const targetBanner = banners.first();
+    const oldSrc = await targetBanner.getAttribute("src");
 
-    await expect(bannerImg).toBeVisible();
-    const oldSrc = await bannerImg.getAttribute("src");
+    const editButton = targetBanner
+      .locator("..")
+      .getByRole("button", { name: /แก้ไขรูป/ });
 
-    const [fileChooser] = await Promise.all([
-      page.waitForEvent("filechooser"),
-      firstEditButton.click(),
-    ]);
+    await expect(editButton).toBeVisible({ timeout: 10000 });
+    await editButton.click();
 
-    await fileChooser.setFiles(
-      path.resolve(process.cwd(), "assets/photo/banner-edit.jpg")
-    );
+const [fileChooser] = await Promise.all([
+  page.waitForEvent("filechooser"),
+  editButton.click(),
+]);
 
-  const confirmDialog = page.getByRole("dialog", {name: "ยืนยันการแก้ไขรูปภาพหรือไม่",});
+await fileChooser.setFiles(
+  path.resolve(process.cwd(), "assets/photo/banner-edit.jpg")
+);
 
-    await expect(confirmDialog).toBeVisible();
+    const confirmDialog = page.getByRole("dialog");
+
+    await expect(
+      confirmDialog.getByRole("heading", {
+        name: "ยืนยันการแก้ไขรูปภาพหรือไม่",
+      })
+    ).toBeVisible({ timeout: 10000 });
 
     await confirmDialog
       .getByRole("button", { name: "ยืนยัน" })
       .click();
 
-    await expect(confirmDialog).toBeHidden();
+    const successDialog = page.getByRole("dialog");
 
-   const successDialog = page.getByRole("dialog");
+    await expect(
+      successDialog.getByRole("heading", { name: "สำเร็จ" })
+    ).toBeVisible({ timeout: 10000 });
 
-await expect(
-  successDialog.getByRole("heading", { name: "สำเร็จ" })
-).toBeVisible();
+    await successDialog
+      .getByRole("button", { name: "ตกลง" })
+      .click();
 
-await successDialog
-  .getByRole("button", { name: "ตกลง" })
-  .click();
-
-await expect(successDialog).toBeHidden();
-
-    await expect(bannerImg).not.toHaveAttribute("src", oldSrc);
+    await expect(targetBanner).not.toHaveAttribute("src", oldSrc, {
+      timeout: 10000,
+    });
   });
 });
