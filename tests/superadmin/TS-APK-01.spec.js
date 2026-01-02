@@ -8,7 +8,7 @@ test.describe("SuperAdmin - Create Account", () => {
   });
 
   /**
-   * TS-APK-01
+   * TS-APK-01.1
    * ค้นหาแพ็กเกจในคำขออนุมัติ
    */
   test("TS-APK-01.1: SuperAdmin search package on approval requests", async ({
