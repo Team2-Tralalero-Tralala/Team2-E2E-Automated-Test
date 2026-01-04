@@ -85,9 +85,9 @@ test.describe("SuperAdmin - Edit Store", () => {
 
   /**
    * TC-ECT-01.1
-   * แก้ไขร้านค้าสำเร็จ
+   * 
    */
-  test("TC-ECT-01.1: SuperAdmin Edit Store Successfully", async ({ page }) => {
+  test("TC-ECT-01.1: กรอกข้อมูลครบถ้วน", async ({ page }) => {
     await goToPageEditStore(page);
 
     await page.getByRole("textbox", { name: "ชื่อร้านค้า *" }).click();
@@ -163,10 +163,9 @@ test.describe("SuperAdmin - Edit Store", () => {
   });
   /**
    * TC-ECT-01.2
-   * ข้อมูลร้านค้ากรอกไม่ครบถ้วน
    *
    */
-  test("TC-ECT-01.2: SuperAdmin Edit Store Unsuccessfull", async ({ page }) => {
+  test("TC-ECT-01.2: กรอกข้อมูลไม่ครบถ้วนหลายจุด", async ({ page }) => {
     await goToPageEditStore(page);
     await page.getByRole("textbox", { name: "รายละเอียดร้านค้า *" }).click();
     await page.getByRole("textbox", { name: "รายละเอียดร้านค้า *" }).fill("");
@@ -189,10 +188,9 @@ test.describe("SuperAdmin - Edit Store", () => {
   });
   /**
    * TC-ECT-01.3
-   * ปักหมุดหากไม่พบสถานที่
-   *
+   * 
    */
-  test("TC-ECT-01.3: SuperAdmin Edit Store Successfull", async ({ page }) => {
+  test("TC-ECT-01.3: ปักหมุดหากไม่พบสถานที่", async ({ page }) => {
     await goToPageEditStore(page);
     await page.getByText("ปักหมุด", { exact: true }).click();
     await page.getByRole("button", { name: "บันทึก" }).click();
@@ -202,10 +200,9 @@ test.describe("SuperAdmin - Edit Store", () => {
 
   /**
    * TC-ECT-01.4
-   *  เพิ่มหรือลบแท็ก
    *
    */
-  test("TC-ECT-01.4: SuperAdmin Edit Store Successfull", async ({ page }) => {
+  test("TC-ECT-01.4: เพิ่มหรือลบแท็ก", async ({ page }) => {
     await goToPageEditStore(page);
     await page
       .getByRole("combobox", { name: "ค้นหาแท็ก เช่น เดินป่า ทะเล ภูเขา" })
@@ -220,10 +217,9 @@ test.describe("SuperAdmin - Edit Store", () => {
 
   /**
    * TC-ECT-01.5
-   *  ไม่เพิ่มแท็ก
    *
    */
-  test("TC-ECT-01.5: SuperAdmin Edit Store Successfull", async ({ page }) => {
+  test("TC-ECT-01.5: ไม่เพิ่มแท็ก", async ({ page }) => {
     await goToPageEditStore(page);
     await page.getByRole("button", { name: "✕" }).click();
     await page.getByRole("button", { name: "บันทึก" }).click();
@@ -231,18 +227,16 @@ test.describe("SuperAdmin - Edit Store", () => {
   });
   /**
    * TC-ECT-01.6
-   *  อัพโหลดรูปภาพหน้าปก
    *
    */
-  test("TC-ECT-01.6: SuperAdmin Edit Store Successfull", async ({ page }) => {
+  test("TC-ECT-01.6: อัพโหลดรูปภาพหน้าปก", async ({ page }) => {
     await goToPageEditStore(page);
   });
   /**
    * TC-ECT-01.7
-   * ไม่อัพโหลดรูปภาพหน้าปก
    *
    */
-  test("TC-ECT-01.7: SuperAdmin Edit Store Successfull", async ({ page }) => {
+  test("TC-ECT-01.7: ไม่อัพโหลดรูปภาพหน้าปก", async ({ page }) => {
     await goToPageEditStore(page);
     await page.getByRole("button", { name: "ลบไฟล์ลำดับที่" }).first().click();
     await page.getByRole("button", { name: "บันทึก" }).click();
@@ -251,19 +245,17 @@ test.describe("SuperAdmin - Edit Store", () => {
   });
   /**
    * TC-ECT-01.8
-   * อัพโหลดรูปภาพเพิ่มเติม
    *
    */
-  test("TC-ECT-01.8: SuperAdmin Edit Store Successfull", async ({ page }) => {
+  test("TC-ECT-01.8: อัพโหลดรูปภาพเพิ่มเติม", async ({ page }) => {
     await goToPageEditStore(page);
   });
 
   /**
    * TC-ECT-01.9
-   * ไม่อัพโหลดรูปภาพเพิ่มเติม
    *
    */
-  test("TC-ECT-01.9: SuperAdmin Edit Store Unsuccessfull", async ({ page }) => {
+  test("TC-ECT-01.9: ไม่อัพโหลดรูปภาพเพิ่มเติม", async ({ page }) => {
     await goToPageEditStore(page);
     await page.getByRole("button", { name: "ลบไฟล์ลำดับที่" }).nth(1).click();
     await page.getByRole("button", { name: "บันทึก" }).click();
@@ -272,9 +264,8 @@ test.describe("SuperAdmin - Edit Store", () => {
   });
   /**
    * TC-ECT-01.10
-   * แก้ไขร้านค้าสำเร็จ
    */
-  test("TC-ECT-01.10: SuperAdmin Edit Store Successfully", async ({ page }) => {
+  test("TC-ECT-01.10: กรอกข้อมูลครบถ้วนและยืนยันการสร้างร้านค้า\n(แบบ Modal)", async ({ page }) => {
     await goToPageEditStore(page);
 
     await page.getByRole("textbox", { name: "ชื่อร้านค้า *" }).click();
@@ -315,9 +306,8 @@ test.describe("SuperAdmin - Edit Store", () => {
   });
   /**
    * TC-ECT-01.11
-   * แก้ไขร้านค้าสำเร็จ
    */
-  test("TC-ECT-01.11: SuperAdmin Edit Store Successfully", async ({ page }) => {
+  test("กรอกข้อมูลไม่ครบถ้วนและบันทึกการสร้างร้านค้า", async ({ page }) => {
     await goToPageEditStore(page);
 
     await page.getByRole("textbox", { name: "ชื่อร้านค้า *" }).click();
@@ -358,9 +348,8 @@ test.describe("SuperAdmin - Edit Store", () => {
   });
   /**
    * TC-ECT-01.12
-   * แก้ไขร้านค้าสำเร็จ
    */
-  test("TC-ECT-01.12: SuperAdmin Edit Store Successfully", async ({ page }) => {
+  test("TC-ECT-01.12: ยกเลิกการแก้ไขร้านค้า (แบบ Modal)", async ({ page }) => {
     await goToPageEditStore(page);
 
     await page.getByRole("textbox", { name: "ชื่อร้านค้า *" }).click();
@@ -397,5 +386,48 @@ test.describe("SuperAdmin - Edit Store", () => {
     await page.getByRole("option", { name: "Tag-3-Food" }).click();
     await page.getByRole("button", { name: "ยกเลิก" }).click();
     await page.getByRole("button", { name: "ยืนยัน" }).click();
+  });
+  /**
+   * TC-ECT-01.13
+   *
+   */
+  test("TC-ECT-01.12: ยกเลิกการแก้ไขร้านค้า (แบบ Modal)", async ({ page }) => {
+    await goToPageEditStore(page);
+
+    await page.getByRole("textbox", { name: "ชื่อร้านค้า *" }).click();
+    await page
+      .getByRole("textbox", { name: "ชื่อร้านค้า *" })
+      .fill("ป้านกน้อย");
+    await page.getByRole("textbox", { name: "รายละเอียดร้านค้า *" }).click();
+    await page.getByRole("textbox", { name: "รายละเอียดร้านค้า *" }).fill("");
+    await page
+      .getByRole("textbox", { name: "รายละเอียดร้านค้า *" })
+      .fill("ป้านกน้อยขายส้มตำแซ่บ ๆ");
+    await page.getByRole("textbox", { name: "บ้านเลขที่ *" }).click();
+    await page.getByRole("textbox", { name: "บ้านเลขที่ *" }).fill("11");
+    await page.getByRole("textbox", { name: "หมู่ที่" }).click();
+    await page.getByRole("textbox", { name: "หมู่ที่" }).fill("6");
+    await page.getByRole("combobox", { name: "จังหวัด *" }).click();
+    await page.getByRole("option", { name: "ชลบุรี" }).click();
+    await page.getByRole("combobox", { name: "อำเภอ / เขต *" }).click();
+    await page.getByRole("option", { name: "เมืองชลบุรี" }).click();
+    await page.getByRole("combobox", { name: "ตำบล/แขวง *" }).click();
+    await page.getByRole("option", { name: "แสนสุข" }).click();
+    await page.getByRole("textbox", { name: "คำอธิบายที่อยู่" }).click();
+    await page
+      .getByRole("textbox", { name: "คำอธิบายที่อยู่" })
+      .fill("บ้านเลขที่ 11 หมู่ 6");
+    await page.getByRole("spinbutton", { name: "ละติจูด *" }).click();
+    await page.getByRole("spinbutton", { name: "ละติจูด *" }).fill("13.2838");
+    await page.getByRole("spinbutton", { name: "ลองจิจูด *" }).click();
+    await page.getByRole("spinbutton", { name: "ลองจิจูด *" }).fill("100.9157");
+    await page.getByRole("button", { name: "✕" }).click();
+    await page
+      .getByRole("combobox", { name: "ค้นหาแท็ก เช่น เดินป่า ทะเล ภูเขา" })
+      .click();
+    await page.getByRole("option", { name: "Tag-3-Food" }).click();
+    await page.getByRole("button", { name: "บันทึก" }).click();
+    await page.getByRole("button", { name: "ยกเลิก" }).click();
+    await page.getByRole("button", { name: "ยกเลิก" }).click();
   });
 });
