@@ -1164,7 +1164,7 @@ test.describe("SuperAdmin - Create Community", () => {
 
     await page
       .getByRole("textbox", { name: "ชื่อผู้ประสานงาน" })
-      .fill("สมหญิง ใจงาม");
+      .fill("สมหญิง ใจงามนัก");
 
     await page
       .getByPlaceholder("กรอกเบอร์โทรศัพท์ของผู้ประสานงาน")
