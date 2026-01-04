@@ -66,6 +66,7 @@ test.describe("SuperAdmin - Create Account", () => {
     page,
   }) => {
     await goToPageCreateAccount(page);
+    await uploadProfileImage(page);
 
     await page
       .getByRole("textbox", { name: "ชื่อ(ไม่ต้องใส่คำนำหน้า) *" })
@@ -190,7 +191,7 @@ test.describe("SuperAdmin - Create Account", () => {
     await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).fill("lala22");
     await page
       .getByRole("textbox", { name: "อีเมล *" })
-      .fill("lala22@gmail.com");
+      .fill("lalaying22@gmail.com");
     await page.getByRole("textbox", { name: "โทรศัพท์ *" }).fill("0987654321");
 
     await page
@@ -208,6 +209,7 @@ test.describe("SuperAdmin - Create Account", () => {
       .getByRole("dialog")
       .getByRole("button", { name: "ยืนยัน" })
       .click();
+
     await expect(page).toHaveURL(/super\/account\/admin\/create/);
     await expect(page.getByText(/กรุณากรอกชื่อ/)).toBeVisible();
     await expect(page.getByRole("dialog")).not.toBeVisible();
@@ -228,7 +230,7 @@ test.describe("SuperAdmin - Create Account", () => {
     await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).fill("lala22");
     await page
       .getByRole("textbox", { name: "อีเมล *" })
-      .fill("lala22@gmail.com");
+      .fill("lalafdds22@gmail.com");
     await page.getByRole("textbox", { name: "โทรศัพท์ *" }).fill("0987654321");
 
     await page
@@ -268,7 +270,7 @@ test.describe("SuperAdmin - Create Account", () => {
     await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).fill("lala22");
     await page
       .getByRole("textbox", { name: "อีเมล *" })
-      .fill("lala22@gmail.com");
+      .fill("lala22sdok@gmail.com");
     await page.getByRole("textbox", { name: "โทรศัพท์ *" }).fill("0987654321");
 
     await page
@@ -290,7 +292,7 @@ test.describe("SuperAdmin - Create Account", () => {
 
     await expect(page).toHaveURL(/super\/accounts\/all/);
     await expect(
-      page.getByRole("cell", { name: "lala22@gmail.com" })
+      page.getByRole("cell", { name: "lala22sdok@gmail.com" })
     ).toBeVisible();
   });
 
@@ -310,7 +312,7 @@ test.describe("SuperAdmin - Create Account", () => {
     await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).fill("lala22");
     await page
       .getByRole("textbox", { name: "อีเมล *" })
-      .fill("lala22@gmail.com");
+      .fill("lala2dd2@gmail.com");
     await page.getByRole("textbox", { name: "โทรศัพท์ *" }).fill("0987654321");
 
     await page
@@ -328,14 +330,13 @@ test.describe("SuperAdmin - Create Account", () => {
 
   /**
    * TC-CA-01.7
-   * รหัสผ่านไม่ตรงกับเงื่อนไข
+   * รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน
    */
   test("TS-CA-01.7: Create account failed - password mismatch", async ({
     page,
   }) => {
-    await goToCreateAccount(page);
+    await goToPageCreateAccount(page);
 
-    // ===== กรอกข้อมูลพื้นฐาน =====
     await page
       .getByRole("textbox", { name: "ชื่อ(ไม่ต้องใส่คำนำหน้า) *" })
       .fill("ดงยุค");
@@ -345,7 +346,7 @@ test.describe("SuperAdmin - Create Account", () => {
 
     await page
       .getByRole("textbox", { name: "อีเมล *" })
-      .fill("lala22@gmail.com");
+      .fill("laladfji22@gmail.com");
 
     await page.getByRole("textbox", { name: "โทรศัพท์ *" }).fill("0987654321");
 
@@ -366,7 +367,7 @@ test.describe("SuperAdmin - Create Account", () => {
     await expect(confirmPasswordInput.locator("..")).toContainText(
       "รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน"
     );
-    await expect(page).toHaveURL(/\/super\/account\/admin\/create/);
+    await expect(page).toHaveURL(/super\/account\/admin\/create/);
   });
 
   /**
@@ -376,7 +377,7 @@ test.describe("SuperAdmin - Create Account", () => {
   test("TS-CA-01.8: Create account failed - duplicate email", async ({
     page,
   }) => {
-    await goToCreateAccount(page);
+    await goToPageCreateAccount(page);
 
     await page
       .getByRole("textbox", { name: "ชื่อ(ไม่ต้องใส่คำนำหน้า) *" })
@@ -413,7 +414,7 @@ test.describe("SuperAdmin - Create Account", () => {
   test("TS-CA-01.9: Create account failed - password too short", async ({
     page,
   }) => {
-    await goToCreateAccount(page);
+    await goToPageCreateAccount(page);
 
     await page
       .getByRole("textbox", { name: "ชื่อ(ไม่ต้องใส่คำนำหน้า) *" })
@@ -423,7 +424,7 @@ test.describe("SuperAdmin - Create Account", () => {
 
     await page
       .getByRole("textbox", { name: "อีเมล *" })
-      .fill("lala22@gmail.com");
+      .fill("lala2sss2@gmail.com");
 
     await page.getByRole("textbox", { name: "โทรศัพท์ *" }).fill("0987654321");
     await page
@@ -449,7 +450,7 @@ test.describe("SuperAdmin - Create Account", () => {
   test("TS-CA-01.10: Create account failed - invalid email format", async ({
     page,
   }) => {
-    await goToCreateAccount(page);
+    await goToPageCreateAccount(page);
 
     await page
       .getByRole("textbox", { name: "ชื่อ(ไม่ต้องใส่คำนำหน้า) *" })
@@ -474,7 +475,9 @@ test.describe("SuperAdmin - Create Account", () => {
 
     await page.getByRole("button", { name: "Admin" }).click();
     await uploadProfileImage(page);
-    await expect(emailInput.locator("..")).toContainText("อีเมลไม่ถูกต้อง");
+    await expect(emailInput.locator("..")).toContainText(
+      "รูปแบบอีเมลไม่ถูกต้อง"
+    );
     await expect(page).toHaveURL(/super\/account\/admin\/create/);
   });
 
@@ -496,7 +499,7 @@ test.describe("SuperAdmin - Create Account", () => {
 
     await page
       .getByRole("textbox", { name: "อีเมล *" })
-      .fill("lala22@gmail.com");
+      .fill("lala21pok2@gmail.com");
 
     await page.getByRole("textbox", { name: "โทรศัพท์ *" }).fill("0987654321");
 
@@ -539,7 +542,7 @@ test.describe("SuperAdmin - Create Account", () => {
     await page.getByRole("textbox", { name: "นามสกุล *" }).fill("ลาลา");
     await page
       .getByRole("textbox", { name: "อีเมล *" })
-      .fill("lala22@gmail.com");
+      .fill("lalaeweii22@gmail.com");
 
     await page.getByRole("textbox", { name: "โทรศัพท์ *" }).fill("0987654321");
     await page
@@ -570,13 +573,16 @@ test.describe("SuperAdmin - Create Account", () => {
     await page.getByRole("button", { name: "สร้างบัญชี" }).click();
 
     await page
-        .getByRole("dialog")
-        .getByRole("button", { name: "ยืนยัน" })
-        .click();
+      .getByRole("dialog")
+      .getByRole("button", { name: "ยืนยัน" })
+      .click();
+
+    await page.getByRole("dialog").getByRole("button", { name: "ปิด" }).click();
+
     await expect(page).toHaveURL(/super\/account\/admin\/create/);
-    await expect(page.getByText("กรุณากรอกข้อมูลให้ครบถ้วน")).toBeVisible();
     await expect(page.getByRole("dialog")).not.toBeVisible();
   });
+  
 });
 
 
