@@ -123,7 +123,40 @@ test.describe("SuperAdmin - Edit Store", () => {
       .click();
     await page.getByRole("option", { name: "Tag-3-Food" }).click();
     await page.keyboard.press("Escape");
-  
+    
+    const imagePath = path.join(process.cwd(), "assets/photo/profile.jpg");
+
+    // --- 1. จัดการล้าง "ภาพหน้าปก" (ส่วนบน) ---
+    const coverArea = page.locator('div').filter({ has: page.getByText('อัพโหลดภาพหน้าปก') }).last();
+    // ค้นหาปุ่มทุกลูกในโซนหน้าปก (ซึ่งปกติจะมีแค่ปุ่มลบรูป)
+    const coverDeleteBtn = coverArea.locator('button'); 
+    if (await coverDeleteBtn.count() > 0) {
+        await coverDeleteBtn.first().click();
+        // รอจนกว่าจะเห็นข้อความ "0 / 1" เพื่อยืนยันว่าลบเกลี้ยงแล้ว
+        await expect(coverArea).toContainText("0 / 1", { timeout: 10000 });
+    }
+    // เริ่มอัปโหลดใหม่
+    await coverArea.locator('input[type="file"]').setInputFiles(imagePath);
+    await expect(coverArea).toContainText("1 / 1", { timeout: 15000 });
+
+    // --- 2. จัดการล้าง "รูปภาพเพิ่มเติม" (ส่วนล่าง) ---
+    const extraArea = page.locator('div').filter({ has: page.getByText('อัพโหลดรูปภาพเพิ่มเติม') }).last();
+    const extraDeleteBtns = extraArea.locator('button');
+    
+    // ลูปกดปุ่มลบที่มีทั้งหมดในโซนนี้จนกว่าตัวเลขจะกลายเป็น "0 / 5"
+    while (await extraDeleteBtns.count() > 0) {
+        await extraDeleteBtns.first().click();
+        await page.waitForTimeout(500); // เว้นจังหวะให้ UI ขยับ
+    }
+    await expect(extraArea).toContainText("0 / 5", { timeout: 10000 });
+
+    // อัปโหลด 2 รูปใหม่ตามตรรกะของเพื่อน (วน loop เพื่อความเสถียร)
+    const extraInput = extraArea.locator('input[type="file"]');
+    for (let i = 1; i <= 2; i++) {
+        await extraInput.setInputFiles(imagePath);
+        // รอให้ตัวเลขเปลี่ยนเป็น 1/5 และ 2/5 ตามลำดับ
+        await expect(extraArea).toContainText(`${i} / 5`, { timeout: 15000 });
+    }
     await page.getByRole("button", { name: "บันทึก" }).click();
     await page.getByRole("button", { name: "ยืนยัน" }).click();
     await page.getByRole("button", { name: "ปิด" }).click();
