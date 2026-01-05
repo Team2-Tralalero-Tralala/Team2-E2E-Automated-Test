@@ -192,7 +192,8 @@ test.describe("SuperAdmin - Edit Store", () => {
    */
   test("TC-ECT-01.3: ปักหมุดหากไม่พบสถานที่", async ({ page }) => {
     await goToPageEditStore(page);
-    await page.getByText("ปักหมุด", { exact: true }).click();
+    await page.locator('div').filter({ hasText: /^\+− Leaflet \| © OpenStreetMap contributors$/ }).nth(1).dblclick();
+    await page.getByText('ปักหมุด', { exact: true }).click();
     await page.getByRole("button", { name: "บันทึก" }).click();
     await page.getByRole("button", { name: "ยืนยัน" }).click();
     await page.getByRole("button", { name: "ปิด" }).click();
@@ -307,7 +308,7 @@ test.describe("SuperAdmin - Edit Store", () => {
   /**
    * TC-ECT-01.11
    */
-  test("กรอกข้อมูลไม่ครบถ้วนและบันทึกการสร้างร้านค้า", async ({ page }) => {
+  test("TC-ECT-01.12: กรอกข้อมูลไม่ครบถ้วนและบันทึกการสร้างร้านค้า", async ({ page }) => {
     await goToPageEditStore(page);
 
     await page.getByRole("textbox", { name: "ชื่อร้านค้า *" }).click();
@@ -391,7 +392,7 @@ test.describe("SuperAdmin - Edit Store", () => {
    * TC-ECT-01.13
    *
    */
-  test("TC-ECT-01.12: ยกเลิกการแก้ไขร้านค้า (แบบ Modal)", async ({ page }) => {
+  test("TC-ECT-01.13: ยกเลิกการแก้ไขร้านค้า (แบบ Modal)", async ({ page }) => {
     await goToPageEditStore(page);
 
     await page.getByRole("textbox", { name: "ชื่อร้านค้า *" }).click();
