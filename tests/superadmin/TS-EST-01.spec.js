@@ -21,60 +21,119 @@ async function goToPageEditStore(page) {
   await page.getByRole("button", { name: "จัดการ" }).click();
   await page.getByRole("button", { name: "แก้ไข" }).click();
 }
+
 /**
- * uploadExtraImages - ฟังก์ชันสำหรับอัปโหลดรูปภาพเพิ่มเติม
- * เจาะจงไปที่ส่วน "อัพโหลดรูปภาพเพิ่มเติม *" เพื่อไม่ให้ชนกับ input ตัวอื่น
+ * ฟังก์ชันสำหรับอัปโหลดรูปภาพหน้าปก (Cover Image)
+ * ปรับปรุง: แก้ไขปัญหาหาปุ่มลบไม่เจอ โดยการหาปุ่มที่มองเห็นได้แทนการอิงชื่อปุ่ม
  */
-async function uploadExtraImages(page, filesRelativePaths) {
-  // 1. แปลง path ให้เป็น absolute path
-  const files = filesRelativePaths.map((p) => path.join(process.cwd(), p));
+async function uploadCoverImage(page, fileRelativePath) {
+  const filePath = path.join(process.cwd(), fileRelativePath);
 
-  // 2. เจาะจง section โดยหาจากหัวข้อ "อัพโหลดรูปภาพเพิ่มเติม *"
+  // 1. หา Section ของ "อัพโหลดภาพหน้าปก"
   const section = page
-    .getByRole("heading", { name: "อัพโหลดรูปภาพเพิ่มเติม *" })
-    .locator("..");
+    .locator("div")
+    .filter({
+      has: page.getByRole("heading", { name: /อัพโหลดภาพหน้าปก/ }),
+    })
+    .last();
 
-  // 3. หา input file ภายใน section นั้นๆ เท่านั้น
-  const fileInput = section.locator('input[type="file"]');
+  // 2. ระบุปุ่ม "เพิ่มไฟล์" เอาไว้เช็คสถานะ
+  // (ใช้ .first() เผื่อเจอหลายอัน แต่ปกติใน section นี้จะมีอันเดียว)
+  const addBtn = section.getByRole("button", { name: "เพิ่มไฟล์" }).first();
 
-  // 4. นับจำนวนปุ่ม "ลบ" เดิมที่มีอยู่ เพื่อใช้ตรวจสอบว่ารูปใหม่ขึ้นหรือยัง
-  const removeBtns = section.getByRole("button", { name: /ลบไฟล์ลำดับที่/ });
-  const beforeCount = await removeBtns.count();
+  // 3. ตรวจสอบว่ามีรูปคาอยู่ไหม?
+  // ถ้าปุ่มเพิ่มไฟล์ "ไม่แสดง" (Hidden) หรือหาไม่เจอ -> แปลว่าสล็อตเต็ม -> ต้องลบรูปเก่าก่อน
+  if (!(await addBtn.isVisible())) {
+    console.log("Cover image detected. Searching for delete button...");
 
-  // 5. อัปโหลดไฟล์ทีละไฟล์ (รองรับกรณี UI ไม่อนุญาตให้เลือกพร้อมกันหลายรูป)
-  for (const filePath of files) {
-    await fileInput.setInputFiles(filePath);
+    // Trick: เอาเมาส์ไปชี้ที่กลาง Section ก่อน เผื่อปุ่มลบซ่อนอยู่ (Hover state)
+    await section.hover();
+
+    // --- วิธีใหม่: หาปุ่มลบโดยไม่อิงชื่อ (Generic Search) ---
+    // ดึงปุ่มทั้งหมดใน Section นี้ออกมา
+    const allBtns = await section.getByRole("button").all();
+    let deleteClicked = false;
+
+    for (const btn of allBtns) {
+      // เงื่อนไข: เป็นปุ่มที่ "มองเห็นได้" และ "ไม่ใช่ปุ่มเพิ่มไฟล์"
+      if (await btn.isVisible()) {
+        const text = await btn.innerText(); // ดึงข้อความปุ่ม (ถ้ามี)
+
+        // ถ้าข้อความไม่มีคำว่า "เพิ่มไฟล์" ให้สันนิษฐานว่าเป็นปุ่มลบ (X)
+        if (!text.includes("เพิ่มไฟล์")) {
+          console.log("Found a visible button (likely Delete/X). Clicking...");
+          await btn.click();
+          deleteClicked = true;
+          break; // ลบแค่รูปเดียวแล้วหยุด loop
+        }
+      }
+    }
+
+    // ถ้ากดลบไปแล้ว ต้องรอให้ปุ่ม "เพิ่มไฟล์" เด้งกลับมา
+    if (deleteClicked) {
+      await expect(addBtn).toBeVisible({ timeout: 5000 });
+    } else {
+      console.log("Warning: Could not find any delete button!");
+    }
   }
 
-  // 6. ตรวจสอบว่ารูปถูกเพิ่มเข้าไปครบตามจำนวนที่อัปโหลดหรือไม่
-  const expectedCount = beforeCount + files.length;
-  await expect(removeBtns).toHaveCount(expectedCount, { timeout: 30000 });
+  // 4. อัปโหลดรูปใหม่ (ถึงตรงนี้ปุ่มเพิ่มไฟล์ควรจะพร้อมแล้ว)
+  const [fileChooser] = await Promise.all([
+    page.waitForEvent("filechooser"),
+    addBtn.click(),
+  ]);
+  await fileChooser.setFiles(filePath);
+
+  // 5. รอและตรวจสอบว่าอัปโหลดสำเร็จ
+  // เมื่ออัปโหลดเสร็จ ปุ่มเพิ่มไฟล์ต้องหายไป (ถูกแทนที่ด้วยรูป preview)
+  await expect(addBtn).toBeHidden({ timeout: 10000 });
+
+  // รอให้ UI นิ่งสักครู่
+  await page.waitForTimeout(500);
 }
-
 /**
- * uploadProfileImage - ฟังก์ชันสำหรับอัพโหลดรูปโปรไฟล์
- * Input:
- *   - page: Playwright Page object
- * Action:
- *   1. กำหนด path ของรูปโปรไฟล์
- *   2. อัพโหลดไฟล์ผ่าน input[type="file"]
- *   3. ตรวจสอบว่า dialog สำหรับรูปภาพแสดงขึ้น
- *   4. กดปุ่ม "ใช้รูปเดิม" เพื่อยืนยันรูป
- * Output:
- *   - ไม่มี return value, แต่ browser จะแสดง dialog และอัพโหลดรูปสำเร็จ
+ * ฟังก์ชันสำหรับอัปโหลดรูปภาพเพิ่มเติม (Extra Images)
+ * รองรับการอัปโหลดหลายไฟล์ โดยจะเพิ่มต่อจากรูปที่มีอยู่เดิม
  */
-async function uploadProfileImage(page) {
-  const imagePath = path.join(process.cwd(), "assets/photo/profile.jpg");
-  await page.locator('input[type="file"]').setInputFiles(imagePath);
+/**
+ * ฟังก์ชันสำหรับอัปโหลดรูปภาพเพิ่มเติม (Extra Images)
+ * ปรับปรุง: ล้างรูปเดิมออกให้หมดก่อนเพื่อให้เป็น Clean State
+ */
+async function uploadExtraImages(page, filesRelativePaths) {
+  const section = page.locator('div').filter({
+    has: page.getByRole("heading", { name: /อัพโหลดรูปภาพเพิ่มเติม/ }),
+  }).last();
 
-  const imageDialog = page.getByRole("dialog");
-  await expect(imageDialog).toBeVisible();
+  const removeBtns = section.getByRole("button", { name: /ลบไฟล์ลำดับที่/ });
 
-  const useOriginalBtn = imageDialog.getByRole("button", {
-    name: "ใช้รูปเดิม",
-  });
-  await expect(useOriginalBtn).toBeEnabled();
-  await useOriginalBtn.click();
+  // 1. ลบรูปเดิมออกให้หมดก่อน (ถ้ามี)
+  // วนลูปคลิกปุ่มลบตัวแรกจนกว่าปุ่มลบจะหมดไปจากหน้าจอ
+  while (await removeBtns.count() > 0) {
+    await removeBtns.first().click();
+    // รอให้จำนวนปุ่มลดลงจริงๆ ก่อนวนลูปต่อ
+    await page.waitForTimeout(500); 
+  }
+  
+  // ตรวจสอบให้มั่นใจว่าสะอาดแล้วจริงๆ
+  await expect(removeBtns).toHaveCount(0);
+
+  const addBtn = section.getByRole("button", { name: "เพิ่มไฟล์" })
+    .filter({ hasText: /\/ 5/ })
+    .last();
+
+  // 2. เริ่มอัปโหลดรูปใหม่ทีละไฟล์
+  for (const relativePath of filesRelativePaths) {
+    const filePath = path.join(process.cwd(), relativePath);
+    const [fileChooser] = await Promise.all([
+      page.waitForEvent('filechooser'),
+      addBtn.click(),
+    ]);
+    await fileChooser.setFiles(filePath);
+    await page.waitForTimeout(1000); // รอให้ UI อัปเดตสถานะ (เช่น 1 / 5)
+  }
+
+  // 3. ยืนยันผล: จำนวนปุ่มลบต้องเท่ากับจำนวนไฟล์ที่เพิ่งอัปโหลดไป
+  await expect(removeBtns).toHaveCount(filesRelativePaths.length, { timeout: 20000 });
 }
 
 test.describe("SuperAdmin - Edit Store", () => {
@@ -85,7 +144,7 @@ test.describe("SuperAdmin - Edit Store", () => {
 
   /**
    * TC-ECT-01.1
-   * 
+   * กรอกข้อมูลครบถ้วน
    */
   test("TC-ECT-01.1: กรอกข้อมูลครบถ้วน", async ({ page }) => {
     await goToPageEditStore(page);
@@ -123,47 +182,38 @@ test.describe("SuperAdmin - Edit Store", () => {
       .click();
     await page.getByRole("option", { name: "Tag-3-Food" }).click();
     await page.keyboard.press("Escape");
-    
-    const imagePath = path.join(process.cwd(), "assets/photo/profile.jpg");
 
-    // --- 1. จัดการล้าง "ภาพหน้าปก" (ส่วนบน) ---
-    const coverArea = page.locator('div').filter({ has: page.getByText('อัพโหลดภาพหน้าปก') }).last();
-    // ค้นหาปุ่มทุกลูกในโซนหน้าปก (ซึ่งปกติจะมีแค่ปุ่มลบรูป)
-    const coverDeleteBtn = coverArea.locator('button'); 
-    if (await coverDeleteBtn.count() > 0) {
-        await coverDeleteBtn.first().click();
-        // รอจนกว่าจะเห็นข้อความ "0 / 1" เพื่อยืนยันว่าลบเกลี้ยงแล้ว
-        await expect(coverArea).toContainText("0 / 1", { timeout: 10000 });
-    }
-    // เริ่มอัปโหลดใหม่
-    await coverArea.locator('input[type="file"]').setInputFiles(imagePath);
-    await expect(coverArea).toContainText("1 / 1", { timeout: 15000 });
+    // กำหนดไฟล์รูปที่จะใช้ (profile.jpg)
+    const profileImgPath = "assets/photo/profile.jpg";
 
-    // --- 2. จัดการล้าง "รูปภาพเพิ่มเติม" (ส่วนล่าง) ---
-    const extraArea = page.locator('div').filter({ has: page.getByText('อัพโหลดรูปภาพเพิ่มเติม') }).last();
-    const extraDeleteBtns = extraArea.locator('button');
-    
-    // ลูปกดปุ่มลบที่มีทั้งหมดในโซนนี้จนกว่าตัวเลขจะกลายเป็น "0 / 5"
-    while (await extraDeleteBtns.count() > 0) {
-        await extraDeleteBtns.first().click();
-        await page.waitForTimeout(500); // เว้นจังหวะให้ UI ขยับ
-    }
-    await expect(extraArea).toContainText("0 / 5", { timeout: 10000 });
+    // 1. อัปโหลดรูปปก (จะทำการลบรูปเก่าให้อัตโนมัติในฟังก์ชัน)
+    await test.step("อัปโหลดรูปภาพหน้าปก (ลบเก่า-เพิ่มใหม่)", async () => {
+      await uploadCoverImage(page, profileImgPath);
+    });
 
-    // อัปโหลด 2 รูปใหม่ตามตรรกะของเพื่อน (วน loop เพื่อความเสถียร)
-    const extraInput = extraArea.locator('input[type="file"]');
-    for (let i = 1; i <= 2; i++) {
-        await extraInput.setInputFiles(imagePath);
-        // รอให้ตัวเลขเปลี่ยนเป็น 1/5 และ 2/5 ตามลำดับ
-        await expect(extraArea).toContainText(`${i} / 5`, { timeout: 15000 });
-    }
-    await page.getByRole("button", { name: "บันทึก" }).click();
-    await page.getByRole("button", { name: "ยืนยัน" }).click();
-    await page.getByRole("button", { name: "ปิด" }).click();
+    // 2. อัปโหลดรูปเพิ่มเติม (ส่วนนี้เหมือนเดิม)
+    await test.step("อัปโหลดรูปภาพเพิ่มเติม", async () => {
+      await uploadExtraImages(page, [profileImgPath]);
+    });
+
+    // 3. บันทึกและยืนยัน
+    await test.step("บันทึกข้อมูล", async () => {
+      const saveBtn = page.getByRole("button", { name: "บันทึก" });
+      await expect(saveBtn).toBeEnabled();
+      await saveBtn.click();
+
+      await page.getByRole("button", { name: "ยืนยัน" }).click();
+
+      const closeBtn = page.getByRole("button", { name: "ปิด" });
+      await expect(closeBtn).toBeVisible({ timeout: 15000 });
+      await closeBtn.click();
+
+      await expect(page).toHaveURL(/\/stores\/all/);
+    });
   });
   /**
    * TC-ECT-01.2
-   *
+   * กรอกข้อมูลไม่ครบถ้วนหลายจุด
    */
   test("TC-ECT-01.2: กรอกข้อมูลไม่ครบถ้วนหลายจุด", async ({ page }) => {
     await goToPageEditStore(page);
@@ -188,12 +238,16 @@ test.describe("SuperAdmin - Edit Store", () => {
   });
   /**
    * TC-ECT-01.3
-   * 
+   * ปักหมุดหากไม่พบสถานที่
    */
   test("TC-ECT-01.3: ปักหมุดหากไม่พบสถานที่", async ({ page }) => {
     await goToPageEditStore(page);
-    await page.locator('div').filter({ hasText: /^\+− Leaflet \| © OpenStreetMap contributors$/ }).nth(1).dblclick();
-    await page.getByText('ปักหมุด', { exact: true }).click();
+    await page
+      .locator("div")
+      .filter({ hasText: /^\+− Leaflet \| © OpenStreetMap contributors$/ })
+      .nth(1)
+      .dblclick();
+    await page.getByText("ปักหมุด", { exact: true }).click();
     await page.getByRole("button", { name: "บันทึก" }).click();
     await page.getByRole("button", { name: "ยืนยัน" }).click();
     await page.getByRole("button", { name: "ปิด" }).click();
@@ -201,7 +255,7 @@ test.describe("SuperAdmin - Edit Store", () => {
 
   /**
    * TC-ECT-01.4
-   *
+   * เพิ่มหรือลบแท็ก
    */
   test("TC-ECT-01.4: เพิ่มหรือลบแท็ก", async ({ page }) => {
     await goToPageEditStore(page);
@@ -218,7 +272,7 @@ test.describe("SuperAdmin - Edit Store", () => {
 
   /**
    * TC-ECT-01.5
-   *
+   * ไม่เพิ่มแท็ก
    */
   test("TC-ECT-01.5: ไม่เพิ่มแท็ก", async ({ page }) => {
     await goToPageEditStore(page);
@@ -228,14 +282,21 @@ test.describe("SuperAdmin - Edit Store", () => {
   });
   /**
    * TC-ECT-01.6
-   *
+   * อัพโหลดรูปภาพหน้าปก
    */
   test("TC-ECT-01.6: อัพโหลดรูปภาพหน้าปก", async ({ page }) => {
     await goToPageEditStore(page);
+    // กำหนดไฟล์รูปที่จะใช้ (profile.jpg)
+    const profileImgPath = "assets/photo/profile.jpg";
+    await uploadCoverImage(page, profileImgPath);
+    await page.getByRole("button", { name: "บันทึก" }).click();
+    await page.getByRole("button", { name: "ยืนยัน" }).click();
+    await page.getByRole("button", { name: "ปิด" }).click();
+    
   });
   /**
    * TC-ECT-01.7
-   *
+   * ไม่อัพโหลดรูปภาพหน้าปก
    */
   test("TC-ECT-01.7: ไม่อัพโหลดรูปภาพหน้าปก", async ({ page }) => {
     await goToPageEditStore(page);
@@ -246,15 +307,42 @@ test.describe("SuperAdmin - Edit Store", () => {
   });
   /**
    * TC-ECT-01.8
-   *
+   * อัพโหลดรูปภาพเพิ่มเติม
    */
   test("TC-ECT-01.8: อัพโหลดรูปภาพเพิ่มเติม", async ({ page }) => {
     await goToPageEditStore(page);
+    // กำหนดไฟล์รูปที่จะใช้ (profile.jpg)
+    const profileImgPath = "assets/photo/profile.jpg";
+
+    // 1. อัปโหลดรูปปก (จะทำการลบรูปเก่าให้อัตโนมัติในฟังก์ชัน)
+    await test.step("อัปโหลดรูปภาพหน้าปก (ลบเก่า-เพิ่มใหม่)", async () => {
+      await uploadCoverImage(page, profileImgPath);
+    });
+
+    // 2. อัปโหลดรูปเพิ่มเติม (ส่วนนี้เหมือนเดิม)
+    await test.step("อัปโหลดรูปภาพเพิ่มเติม", async () => {
+      await uploadExtraImages(page, [profileImgPath]);
+    });
+
+    // 3. บันทึกและยืนยัน
+    await test.step("บันทึกข้อมูล", async () => {
+      const saveBtn = page.getByRole("button", { name: "บันทึก" });
+      await expect(saveBtn).toBeEnabled();
+      await saveBtn.click();
+
+      await page.getByRole("button", { name: "ยืนยัน" }).click();
+
+      const closeBtn = page.getByRole("button", { name: "ปิด" });
+      await expect(closeBtn).toBeVisible({ timeout: 15000 });
+      await closeBtn.click();
+
+      await expect(page).toHaveURL(/\/stores\/all/);
+    });
   });
 
   /**
    * TC-ECT-01.9
-   *
+   * ไม่อัพโหลดรูปภาพเพิ่มเติม
    */
   test("TC-ECT-01.9: ไม่อัพโหลดรูปภาพเพิ่มเติม", async ({ page }) => {
     await goToPageEditStore(page);
@@ -265,8 +353,11 @@ test.describe("SuperAdmin - Edit Store", () => {
   });
   /**
    * TC-ECT-01.10
+   * กรอกข้อมูลครบถ้วนและยืนยันการสร้างร้านค้า
    */
-  test("TC-ECT-01.10: กรอกข้อมูลครบถ้วนและยืนยันการสร้างร้านค้า\n(แบบ Modal)", async ({ page }) => {
+  test("TC-ECT-01.10: กรอกข้อมูลครบถ้วนและยืนยันการสร้างร้านค้า\n(แบบ Modal)", async ({
+    page,
+  }) => {
     await goToPageEditStore(page);
 
     await page.getByRole("textbox", { name: "ชื่อร้านค้า *" }).click();
@@ -308,7 +399,9 @@ test.describe("SuperAdmin - Edit Store", () => {
   /**
    * TC-ECT-01.11
    */
-  test("TC-ECT-01.12: กรอกข้อมูลไม่ครบถ้วนและบันทึกการสร้างร้านค้า", async ({ page }) => {
+  test("TC-ECT-01.12: กรอกข้อมูลไม่ครบถ้วนและบันทึกการสร้างร้านค้า", async ({
+    page,
+  }) => {
     await goToPageEditStore(page);
 
     await page.getByRole("textbox", { name: "ชื่อร้านค้า *" }).click();
@@ -343,9 +436,8 @@ test.describe("SuperAdmin - Edit Store", () => {
       .getByRole("combobox", { name: "ค้นหาแท็ก เช่น เดินป่า ทะเล ภูเขา" })
       .click();
     await page.getByRole("option", { name: "Tag-3-Food" }).click();
-    await page.getByRole('button', { name: 'บันทึก' }).click();
-  await page.getByRole('button', { name: 'ยกเลิก' }).click();
-
+    await page.getByRole("button", { name: "บันทึก" }).click();
+    await page.getByRole("button", { name: "ยกเลิก" }).click();
   });
   /**
    * TC-ECT-01.12
@@ -431,4 +523,5 @@ test.describe("SuperAdmin - Edit Store", () => {
     await page.getByRole("button", { name: "ยกเลิก" }).click();
     await page.getByRole("button", { name: "ยกเลิก" }).click();
   });
+
 });
