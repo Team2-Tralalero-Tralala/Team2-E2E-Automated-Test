@@ -20,17 +20,16 @@ async function goToManagePackagePage(page) {
 test.describe("Admin - pagination Package", () => {
   test.beforeEach(async ({ page }) => {
     await loginAs(page, "admin");
-    await expect(page).toHaveURL(/admin\/communities/);
+    await expect(page).toHaveURL(/admin\/community\/own/);
   });
 
-/**
-    * TS-DPK-04.1
-    * pagination
-    */
-    test("TS-DPK-04.1: pagination", async ({ page }) => {
-        await goToManagePackagePage(page);
-        await page.getByRole('link', { name: 'รายงาน' }).click();
-        await page.getByRole('button', { name: 'ถัดไป' }).click();
-        await page.getByRole('button', { name: 'ก่อนหน้า' }).click();
-    });
+  /**
+      * TS-DPK-04.1
+      * pagination
+      */
+  test("TS-DPK-04.1: pagination", async ({ page }) => {
+    await goToManagePackagePage(page);
+    await expect(page.getByRole('button', { name: 'ถัดไป' })).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'ก่อนหน้า' })).toBeDisabled();
+  });
 });
