@@ -59,7 +59,7 @@ test.describe("SuperAdmin - Create Account", () => {
   });
 
   /**
-   * TC-CA-01.1.1
+   * TS-CA-01.1.1
    * สร้างบัญชีสำเร็จ Admin สำเร็จ
    */
   test("TS-CA-01.1.1: SuperAdmin create Admin successfully", async ({
@@ -102,7 +102,7 @@ test.describe("SuperAdmin - Create Account", () => {
   });
 
   /**
-   * TC-CA-01.1.2
+   * TS-CA-01.1.2
    * สร้างบัญชีสำเร็จ Member สำเร็จ
    */
   test("TS-CA-01.1.2: SuperAdmin create Member successfully", async ({
@@ -163,7 +163,7 @@ test.describe("SuperAdmin - Create Account", () => {
   });
 
   /**
-   * TC-CA-01.2
+   * TS-CA-01.2
    * กดยกเลิกสร้าง Admin และ Member สำเร็จ (จากหน้าสร้างบัญชี)
    */
   test("TS-CA-01.2: cancel create account from create page", async ({
@@ -179,7 +179,7 @@ test.describe("SuperAdmin - Create Account", () => {
   });
 
   /**
-   * TC-CA-01.3
+   * TS-CA-01.3
    * กรอกข้อมูลไม่ครบ (ชื่อว่าง)
    */
   test("TS-CA-01.3: Create account failed - name is required", async ({
@@ -216,7 +216,7 @@ test.describe("SuperAdmin - Create Account", () => {
   });
 
   /**
-   * TC-CA-01.4
+   * TS-CA-01.4
    * กรอกข้อมูลไม่ครบ (นามสกุลว่าง)
    */
   test("TS-CA-01.4: Create account failed - lastname is required", async ({
@@ -255,7 +255,7 @@ test.describe("SuperAdmin - Create Account", () => {
   });
 
   /**
-   * TC-CA-01.5
+   * TS-CA-01.5
    * กรอกรหัสผ่านถูกต้องครบทุกเงื่อนไข
    */
   test("TS-CA-01.5: Create account success - valid password", async ({
@@ -297,7 +297,7 @@ test.describe("SuperAdmin - Create Account", () => {
   });
 
   /**
-   * TC-CA-01.6
+   * TS-CA-01.6
    * กรอกรหัสผ่านไม่ครบทุกเงื่อนไข
    */
   test("TS-CA-01.6: Create account failed - password does not meet requirements", async ({
@@ -329,7 +329,7 @@ test.describe("SuperAdmin - Create Account", () => {
   });
 
   /**
-   * TC-CA-01.7
+   * TS-CA-01.7
    * รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน
    */
   test("TS-CA-01.7: Create account failed - password mismatch", async ({
@@ -371,7 +371,7 @@ test.describe("SuperAdmin - Create Account", () => {
   });
 
   /**
-   * TC-CA-01.8
+   * TS-CA-01.8
    * อีเมลซ้ำกับในระบบ
    */
   test("TS-CA-01.8: Create account failed - duplicate email", async ({
@@ -408,7 +408,7 @@ test.describe("SuperAdmin - Create Account", () => {
   });
 
   /**
-   * TC-CA-01.9
+   * TS-CA-01.9
    * รหัสผ่านสั้นกว่าที่กำหนด
    */
   test("TS-CA-01.9: Create account failed - password too short", async ({
@@ -444,7 +444,7 @@ test.describe("SuperAdmin - Create Account", () => {
   });
 
   /**
-   * TC-CA-01.10
+   * TS-CA-01.10
    * อีเมลรูปแบบผิด
    */
   test("TS-CA-01.10: Create account failed - invalid email format", async ({
