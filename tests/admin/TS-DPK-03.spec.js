@@ -30,7 +30,7 @@ test.describe("Admin - จำนวนแถวต่อหน้า", () => {
     test("TS-DPK-03.1: เลือกจำนวนแถวต่อหน้า", async ({ page }) => {
         await goToManagePackagePage(page);
 
-        await page.getByRole('link', { name: 'รายงาน' }).click();
+        await page.getByRole('link', { name: 'จัดการแพ็กเกจ' }).click();
         await page.getByRole('button', { name: '10' }).click();
         await page.getByRole('option', { name: '30' }).click();
         await page.getByRole('button', { name: '30' }).click();
