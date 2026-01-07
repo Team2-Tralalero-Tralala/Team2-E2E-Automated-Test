@@ -4,33 +4,37 @@ import path from "path";
 
 /**
  * goToUploadBannersPage - ฟังก์ชันสำหรับนำทางไปยังหน้าการอัพโหลดแบนเนอร์
- * Input: 
+ * Input:
  *   - page: object ของ Playwright Page ใช้สำหรับควบคุม browser
- * Action: 
- *   1. เลือกเมนู "การตั้งค่า" (Settings) 
+ * Action:
+ *   1. เลือกเมนู "การตั้งค่า" (Settings)
  *   2. คลิกปุ่ม "เพิ่ม/แก้ไข โลโก้และรูปภาพ" (Add/Edit Logo and Images)
  *   3. รอหน้าเปลี่ยน URL ไปยังหน้าอัพโหลดแบนเนอร์
  * Output:
  *   - ไม่มี return value, แต่ browser จะถูก navigate ไปยัง URL /super/banners
  */
 async function goToUploadBannersPage(page) {
+  const settingsMenuLink = page.getByRole("link", {
+    name: "การตั้งค่า",
+  });
+  await expect(settingsMenuLink).toBeVisible();
+  await settingsMenuLink.click();
 
-  const settingsMenu = page.getByRole("link", { name: "การตั้งค่า" });
-  await expect(settingsMenu).toBeVisible();
-  await settingsMenu.click();
-
-  const uploadBannerBtn = page.getByText(/การเพิ่ม\/แก้ไข โลโก้และรูปภาพ/);
-  await expect(uploadBannerBtn).toBeVisible();
-  await uploadBannerBtn.click();
+  const uploadBannerButton = page.getByText(
+    /การเพิ่ม\/แก้ไข โลโก้และรูปภาพ/
+  );
+  await expect(uploadBannerButton).toBeVisible();
+  await uploadBannerButton.click();
 
   await expect(page).toHaveURL(/super\/banners/);
 }
 
 /**
  * uploadBanner - ฟังก์ชันสำหรับอัพโหลดแบนเนอร์ด้วยไฟล์ที่ระบุ
- * Input: 
+ * Input:
  *   - page: Playwright Page object
- * Action: 
+ *   - relativePath: path ของไฟล์รูปภาพแบบ relative
+ * Action:
  *   1. กำหนด path ของรูปโปรไฟล์
  *   2. อัพโหลดไฟล์ผ่าน input[type="file"]
  *   3. ตรวจสอบว่า dialog สำหรับรูปภาพแสดงขึ้น
@@ -38,14 +42,18 @@ async function goToUploadBannersPage(page) {
  *   - ไม่มี return value, แต่ระบบจะทำการอัพโหลดไฟล์ที่ระบุ
  */
 async function uploadBanner(page, relativePath) {
+  const absoluteFilePath = path.resolve(
+    process.cwd(),
+    relativePath
+  );
 
-  const filePath = path.resolve(process.cwd(), relativePath);
-
-  const fileInput = page
+  const imageFileInput = page
     .locator('input[type="file"][accept*="image"]')
     .first();
-  await expect(fileInput).toBeAttached();
-  await fileInput.setInputFiles(filePath);
+    
+  await expect(imageFileInput).toBeAttached();
+
+  await imageFileInput.setInputFiles(absoluteFilePath);
 }
 
 test.describe("SuperAdmin - Upload Banners", () => {
@@ -58,40 +66,66 @@ test.describe("SuperAdmin - Upload Banners", () => {
    * TC-MD-01.1
    * อัปโหลดโลโก้สำเร็จ
    */
-  test("TS-MD-01.1: SuperAdmin upload banner with JPG/PNG successfully", async ({ page }) => {
-    await uploadBanner(page, "assets/photo/profile.jpg");
+  test(
+    "TS-MD-01.1: SuperAdmin upload banner with JPG/PNG successfully",
+    async ({ page }) => {
+      await uploadBanner(page, "assets/photo/profile.jpg");
 
-    const uploadedImage = page.locator("img").first();
-    await expect(uploadedImage).toBeVisible({ timeout: 10000 });
-  });
+      const uploadedBannerImage = page
+        .locator("img")
+        .first();
+
+      await expect(uploadedBannerImage).toBeVisible({
+        timeout: 10000,
+      });
+    }
+  );
 
   /**
    * TS-MD-01.2
    * อัปโหลดไฟล์ผิดรูปแบบ (ไม่ใช่ JPG/PNG)
    */
-  test("TS-MD-01.2: SuperAdmin can't upload banner with non-JPG/PNG file", async ({ page }) => {
-    await uploadBanner(page, "assets/files/sample.pdf");
+  test(
+    "TS-MD-01.2: SuperAdmin can't upload banner with non-JPG/PNG file",
+    async ({ page }) => {
+      await uploadBanner(page, "assets/files/sample.pdf");
 
-    const errorMessage = page.getByText(/อัพโหลดไฟล์เฉพาะ JPG\/PNG/);
+      const invalidFileErrorMessage = page.getByText(
+        /อัพโหลดไฟล์เฉพาะ JPG\/PNG/
+      );
 
-    await expect(errorMessage).toBeVisible({ timeout: 10000 });
+      await expect(invalidFileErrorMessage).toBeVisible({
+        timeout: 10000,
+      });
 
-    const uploadedImages = page.locator("img");
-    await expect(uploadedImages).toHaveCount(0);
-  });
+      const uploadedImages = page.locator("img");
+      await expect(uploadedImages).toHaveCount(0);
+    }
+  );
 
   /**
    * TS-MD-01.3
    * อัปโหลดไฟล์ใหญ่เกิดกำหนด
    */
-  test("TS-MD-01.3: Cannot upload JPG/PNG file larger than allowed size", async ({ page }) => {
-    // สมมติว่าไฟล์ oversize-image.jpg มีขนาดเกิน 2MB
-    await uploadBanner(page, "assets/photo/oversize-image.jpg");
+  test(
+    "TS-MD-01.3: Cannot upload JPG/PNG file larger than allowed size",
+    async ({ page }) => {
+      // สมมติว่าไฟล์ oversize-image.jpg มีขนาดเกิน 2MB
+      await uploadBanner(
+        page,
+        "assets/photo/oversize-image.jpg"
+      );
 
-    const errorMessage = page.getByText(/อัพโหลดไฟล์เกินขนาดที่กำหนด/);
-    await expect(errorMessage).toBeVisible({ timeout: 10000 });
+      const oversizeFileErrorMessage = page.getByText(
+        /อัพโหลดไฟล์เกินขนาดที่กำหนด/
+      );
 
-    const uploadedImages = page.locator("img");
-    await expect(uploadedImages).toHaveCount(0);
-  });
+      await expect(oversizeFileErrorMessage).toBeVisible({
+        timeout: 10000,
+      });
+
+      const uploadedImages = page.locator("img");
+      await expect(uploadedImages).toHaveCount(0);
+    }
+  );
 });
