@@ -3,7 +3,15 @@ import { loginAs } from "../../utils/roles.js";
 import path from "path";
 
 /**
- * goToUploadBannersPage - ฟังก์ชันนำผู้ใช้งานไปยังหน้าเพิ่ม/แก้ไข โลโก้และรูปภาพ
+ * goToUploadBannersPage - ฟังก์ชันสำหรับนำผู้ใช้งานไปยังหน้าเพิ่ม/แก้ไข โลโก้และรูปภาพ
+ * Input:
+ *   - page: Playwright Page object ใช้สำหรับควบคุม browser
+ * Action:
+ *   1. คลิกเมนู "การตั้งค่า"
+ *   2. คลิกลิงก์ "การเพิ่ม/แก้ไข โลโก้และรูปภาพ"
+ *   3. รอให้ URL เปลี่ยนไปยังหน้า /super/banners
+ * Output:
+ *   - ไม่มี return value แต่ browser จะถูกนำทางไปยังหน้าจัดการแบนเนอร์
  */
 async function goToUploadBannersPage(page) {
   const settingsMenuLink = page.getByRole("link", { name: "การตั้งค่า" });
@@ -16,7 +24,19 @@ async function goToUploadBannersPage(page) {
 }
 
 /**
- * editFirstBannerImage - ฟังก์ชันแก้ไข banner รูปแรก
+ * editFirstBannerImage - ฟังก์ชันสำหรับแก้ไขรูป banner รูปแรก
+ * Input:
+ *   - page: Playwright Page object ใช้สำหรับควบคุม browser
+ *   - relativeImagePath: path ของไฟล์รูปภาพแบบ relative
+ * Action:
+ *   1. ตรวจสอบการแสดงผลของรูป banner รูปแรก
+ *   2. เก็บค่า src ของรูปเดิมไว้เพื่อนำมาเปรียบเทียบ
+ *   3. คลิกปุ่ม "แก้ไขรูป"
+ *   4. เลือกไฟล์รูปภาพใหม่ผ่าน file chooser
+ *   5. ยืนยันการอัพโหลดรูปภาพ
+ *   6. ตรวจสอบว่ารูป banner ถูกเปลี่ยนจากรูปเดิม
+ * Output:
+ *   - ไม่มี return value แต่รูป banner รูปแรกจะถูกแก้ไขสำเร็จ
  */
 async function editFirstBannerImage(page, relativeImagePath) {
   const firstBannerImage = page
