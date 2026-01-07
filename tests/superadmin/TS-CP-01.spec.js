@@ -56,7 +56,7 @@ test.describe("SuperAdmin - Edit Profile", () => {
   });
 
   /**
-   * TC-CP-01.1
+   * TS-CP-01.1
    * แก้ไขข้อมูลส่วนตัวสำเร็จ
    */
   test("TS-CP-01.1 : SuperAdmin edit profile successfully", async ({
@@ -99,7 +99,7 @@ test.describe("SuperAdmin - Edit Profile", () => {
   });
 
   /**
-   * TC-CP-01.2
+   * TS-CP-01.2
    * ยกเลิกการแก้ไขข้อมูลส่วนตัว
    */
   test("TS-CP-01.2 : SuperAdmin cancle edit profile", async ({ page }) => {
@@ -125,7 +125,7 @@ test.describe("SuperAdmin - Edit Profile", () => {
   });
 
   /**
-   * TC-CP-01.3.1
+   * TS-CP-01.3.1
    * กรอกข้อมูลไม่ครบ (ชื่อว่าง) textbox
    */
   test("TS-CP-01.3.1 : Validation when firstname is empty (TextBox)", async ({
@@ -142,7 +142,7 @@ test.describe("SuperAdmin - Edit Profile", () => {
   });
 
   /**
-   * TC-CP-01.3.2
+   * TS-CP-01.3.2
    * กรอกข้อมูลไม่ครบ (ชื่อว่าง) modal
    */
   test("TS-CP-01.3.2 : Validation when firstname is empty (Modal)", async ({
@@ -171,7 +171,7 @@ test.describe("SuperAdmin - Edit Profile", () => {
   });
 
   /**
-   * TC-CP-01.4.1
+   * TS-CP-01.4.1
    * กรอกข้อมูลไม่ครบ (นามสกุลว่าง) textbox
    */
   test("TS-CP-01.4.1 : Validation when first lastname is empty ", async ({
@@ -191,7 +191,7 @@ test.describe("SuperAdmin - Edit Profile", () => {
   });
 
   /**
-   * TC-CP-01.4.2
+   * TS-CP-01.4.2
    * กรอกข้อมูลไม่ครบ (นามสกุลว่าง) modal
    */
   test("TS-CP-01.4.2 : Validation when first name is empty (Modal)", async ({
@@ -220,7 +220,7 @@ test.describe("SuperAdmin - Edit Profile", () => {
   });
 
   /**
-   * TC-CP-01.5
+   * TS-CP-01.5
    * อีเมลซ้ำกับในระบบ
    */
   test("TS-CP-01.5 : Validation when email is already used", async ({
@@ -243,7 +243,7 @@ test.describe("SuperAdmin - Edit Profile", () => {
   });
 
   /**
-   * TC-CP-01.6
+   * TS-CP-01.6
    * อีเมลรูปแบบผิด
    */
   test("TS-CP-01.6 : Validation when email format is invalid", async ({
@@ -266,7 +266,7 @@ test.describe("SuperAdmin - Edit Profile", () => {
   });
 
   /**
-   * TC-CP-01.7
+   * TS-CP-01.7
    * กรอกข้อมูลผิดหลายอย่างพร้อมกัน
    */
   test("TS-CP-01.7 : Create account failed - multiple invalid fields", async ({
