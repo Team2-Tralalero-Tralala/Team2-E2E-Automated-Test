@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { loginAs } from "../../utils/roles.js";
 import path from "path";
-import { validStore, incompleteStore } from "./store-data.js";
+import { validStore, incompleteStore } from "../../utils/store-data.js";
 
 /**
  * goToManageStorePage - นำผู้ใช้งานไปยังหน้า "จัดการร้านค้า"
