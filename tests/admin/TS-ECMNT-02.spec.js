@@ -94,13 +94,11 @@ test.describe("Admin - Edit Community", () => {
     const latitude = page.getByRole("spinbutton", { name: "ละติจูด *" });
     await latitude.fill("");
     await latitude.press("Tab");
-
     await expect(page.getByText("กรุณากรอกละติจูด")).toBeVisible();
 
     const longitude = page.getByRole("spinbutton", { name: "ลองจิจูด *" });
     await longitude.fill("");
     await longitude.press("Tab");
-
     await expect(page.getByText("กรุณากรอกลองจิจูด")).toBeVisible();
   });
 
