@@ -1,6 +1,5 @@
 /**
  * validStore
- * -------------------------
  * ข้อมูลร้านค้าที่ครบถ้วนและถูกต้องทุก field
  * ใช้สำหรับ Test case แบบ Positive
  * - ควรถูก submit ได้สำเร็จ
@@ -32,7 +31,6 @@ export const validStore = {
 
 /**
  * incompleteStore
- * -------------------------
  * ข้อมูลร้านค้าที่ไม่ครบถ้วน
  * ใช้สำหรับ Test case แบบ Negative
  * - ใช้ทดสอบ validation / error handling
