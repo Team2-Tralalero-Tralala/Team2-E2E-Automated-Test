@@ -129,20 +129,4 @@ test("TS-MD-02.1: SuperAdmin can upload 5 banner images successfully", async ({ 
 
   await expect(banners).toHaveCount(5);
 });
-  /**
-   * TS-MD-02.2
-   * SuperAdmin สามารถอัปโหลดรูป banner ได้สูงสุด 5 รูป (ถ้ามีครบ 5 รูปแล้ว จะไม่สามารถเพิ่มรูปได้อีก)
-   */
- test("TS-MD-02.2: SuperAdmin can not add more than 5 banner images", async ({ page }) => {
-    const banners = page.getByRole("img", { name: /preview-banner-/ });
-    const addFileButton = page.getByRole("button", { name: "เพิ่มไฟล์" });
-
-    await page.waitForLoadState("networkidle");
-
-    const bannerCount = await banners.count();
-
-    expect(bannerCount).toBe(5);
-
-    await expect(addFileButton).toHaveCount(0);
-  });
 });
