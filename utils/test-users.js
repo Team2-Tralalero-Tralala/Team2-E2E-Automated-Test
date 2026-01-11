@@ -18,6 +18,9 @@ export const users = {
   },
   admin4: {
     email: "comm_admin_4",
+  },
+  thanakorn: {
+    email: "comm_admin_1",
     password: "hashedpw",
     loginPath: "/guest/partner/login",
     redirectTo: "/admin/community/own",
