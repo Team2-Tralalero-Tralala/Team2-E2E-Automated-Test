@@ -32,7 +32,6 @@ test.describe("admin - Edit Activity Role Member", () => {
       .getByRole("row", { name: "แดง ชาติ" })
       .getByLabel("แก้ไข")
       .click();
-    await submitMemberForm(page);
     await page
       .getByRole("textbox", { name: "บทบาทในชุมชน *" })
       .fill(" มัคคุเทศนก์");
@@ -47,7 +46,6 @@ test.describe("admin - Edit Activity Role Member", () => {
       .getByRole("row", { name: "แดง ชาติ" })
       .getByLabel("แก้ไข")
       .click();
-    await submitMemberForm(page);
     await page.getByRole("textbox", { name: "บทบาทในชุมชน *" }).fill(" ");
     await submitForm(page);
     await expect(page.getByText("มัคคุเทศนก์")).not.toBeVisible();
