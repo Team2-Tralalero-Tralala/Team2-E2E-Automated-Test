@@ -56,10 +56,10 @@ test.describe("SuperAdmin - Create Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.1
+   * TS-ACMNT-01.1
    * กรอกข้อมูลครบถ้วน (ข้อมูลชุมชน)
    */
-  test("TC-ACMNT-01.1: Create community with complete community information", async ({
+  test("TS-ACMNT-01.1: Create community with complete community information", async ({
     page,
   }) => {
     await goToPageCreateAccount(page);
@@ -116,10 +116,10 @@ test.describe("SuperAdmin - Create Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.2
+   * TS-ACMNT-01.2
    * ไม่กรอกชื่อวิสาหกิจ
    */
-  test("TC-ACMNT-01.2: Validate required community name", async ({ page }) => {
+  test("TS-ACMNT-01.2: Validate required community name", async ({ page }) => {
     await goToPageCreateAccount(page);
     await page.getByRole("button", { name: "ข้อมูลชุมชน" }).click();
 
@@ -185,10 +185,10 @@ test.describe("SuperAdmin - Create Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.3
+   * TS-ACMNT-01.3
    * ไม่กรอกเลขทะเบียน
    */
-  test("TC-ACMNT-01.3: Validate required community registration number", async ({
+  test("TS-ACMNT-01.3: Validate required community registration number", async ({
     page,
   }) => {
     await goToPageCreateAccount(page);
@@ -255,10 +255,10 @@ test.describe("SuperAdmin - Create Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.4
+   * TS-ACMNT-01.4
    * อัพโหลดรูปภาพหน้าปกและโลโก้
    */
-  test("TC-ACMNT-01.4: Upload community cover and logo images", async ({
+  test("TS-ACMNT-01.4: Upload community cover and logo images", async ({
     page,
   }) => {
     await goToPageCreateAccount(page);
@@ -269,10 +269,10 @@ test.describe("SuperAdmin - Create Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.5
+   * TS-ACMNT-01.5
    * กรอกข้อมูลบัญชีธนาคารครบ
    */
-  test("TC-ACMNT-01.5: Fill complete bank account information", async ({
+  test("TS-ACMNT-01.5: Fill complete bank account information", async ({
     page,
   }) => {
     await goToPageCreateAccount(page);
@@ -289,10 +289,10 @@ test.describe("SuperAdmin - Create Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.6
+   * TS-ACMNT-01.6
    * ไม่กรอกเลขบัญชี
    */
-  test("TC-ACMNT-01.6: Validate required bank account number", async ({
+  test("TS-ACMNT-01.6: Validate required bank account number", async ({
     page,
   }) => {
     await goToPageCreateAccount(page);
@@ -324,10 +324,10 @@ test.describe("SuperAdmin - Create Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.7
+   * TS-ACMNT-01.7
    * กรอกเลขบัญชีเป็นตัวอักษร
    */
-  test("TC-ACMNT-01.7: Validate bank account accepts numeric only", async ({
+  test("TS-ACMNT-01.7: Validate bank account accepts numeric only", async ({
     page,
   }) => {
     await goToPageCreateAccount(page);
@@ -343,10 +343,10 @@ test.describe("SuperAdmin - Create Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.8
+   * TS-ACMNT-01.8
    * กรอกกิจกรรมหลัก
    */
-  test("TC-ACMNT-01.8: Fill main activity information", async ({ page }) => {
+  test("TS-ACMNT-01.8: Fill main activity information", async ({ page }) => {
     await goToPageCreateAccount(page);
     await page.getByRole("button", { name: "ข้อมูลชุมชน" }).click();
     await page
@@ -359,10 +359,10 @@ test.describe("SuperAdmin - Create Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.9
+   * TS-ACMNT-01.9
    * ไม่กรอกชื่อกิจกรรมหลัก
    */
-  test("TC-ACMNT-01.9: Validate required main activity name", async ({
+  test("TS-ACMNT-01.9: Validate required main activity name", async ({
     page,
   }) => {
     await goToPageCreateAccount(page);
@@ -432,10 +432,10 @@ test.describe("SuperAdmin - Create Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.10
+   * TS-ACMNT-01.10
    * อัพโหลดรูปภาพเพิ่มเติม
    */
-  test("TC-ACMNT-01.10: Upload additional community images", async ({
+  test("TS-ACMNT-01.10: Upload additional community images", async ({
     page,
   }) => {
     await goToPageCreateAccount(page);
@@ -460,10 +460,10 @@ test.describe("SuperAdmin - Create Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.11
+   * TS-ACMNT-01.11
    * อัพโหลดวิดิโอเพิ่มเติม
    */
-  test("TC-ACMNT-01.11: Upload additional community videos", async ({
+  test("TS-ACMNT-01.11: Upload additional community videos", async ({
     page,
   }) => {
     await goToPageCreateAccount(page);
@@ -486,10 +486,10 @@ test.describe("SuperAdmin - Create Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.12
+   * TS-ACMNT-01.12
    * กรอกข้อมูลครบถ้วน(ข้อมูลที่อยู่ชุมชน)
    */
-  test("TC-ACMNT-01.12: Fill complete community address information", async ({
+  test("TS-ACMNT-01.12: Fill complete community address information", async ({
     page,
   }) => {
     await goToPageCreateAccount(page);
@@ -547,10 +547,10 @@ test.describe("SuperAdmin - Create Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.13
+   * TS-ACMNT-01.13
    * กรอกข้อมูลไม่ครบถ้วนหลายจุด
    */
-  test("TC-ACMNT-01.13: Validate incomplete community address information", async ({
+  test("TS-ACMNT-01.13: Validate incomplete community address information", async ({
     page,
   }) => {
     await goToPageCreateAccount(page);
@@ -619,10 +619,10 @@ test.describe("SuperAdmin - Create Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.14
+   * TS-ACMNT-01.14
    * ปักหมุดวิสาหกิจ
    */
-  test("TC-ACMNT-01.14: Pin community location by latitude and longitude", async ({
+  test("TS-ACMNT-01.14: Pin community location by latitude and longitude", async ({
     page,
   }) => {
     await goToPageCreateAccount(page);
@@ -633,10 +633,10 @@ test.describe("SuperAdmin - Create Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.15
+   * TS-ACMNT-01.15
    * ปักหมุดวิสาหกิจ
    */
-  test("TC-ACMNT-01.15: Pin community location by searching place", async ({
+  test("TS-ACMNT-01.15: Pin community location by searching place", async ({
     page,
   }) => {
     await goToPageCreateAccount(page);
@@ -668,10 +668,10 @@ test.describe("SuperAdmin - Create Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.16
+   * TS-ACMNT-01.16
    * กรอกข้อมูลวิสาหกิจ (ข้อมูลติดต่อและผู้ดูแล)
    */
-  test("TC-ACMNT-01.16: Fill contact and caretaker information", async ({
+  test("TS-ACMNT-01.16: Fill contact and caretaker information", async ({
     page,
   }) => {
     await goToPageCreateAccount(page);
@@ -739,10 +739,10 @@ test.describe("SuperAdmin - Create Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.17
+   * TS-ACMNT-01.17
    * กรอกข้อมูลไม่ครบถ้วน
    */
-  test("TC-ACMNT-01.17: Validate incomplete community information", async ({ page }) => {
+  test("TS-ACMNT-01.17: Validate incomplete community information", async ({ page }) => {
     await goToPageCreateAccount(page);
     await page.getByRole("button", { name: "ข้อมูลชุมชน" }).click();
 
@@ -861,10 +861,10 @@ test.describe("SuperAdmin - Create Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.18
+   * TS-ACMNT-01.18
    * กรอกข้อมูลครบถ้วน Dropdown (Modal)
    */
-  test("TC-ACMNT-01.18: Create community with complete information", async ({
+  test("TS-ACMNT-01.18: Create community with complete information", async ({
     page,
   }) => {
     await goToPageCreateAccount(page);
@@ -1083,10 +1083,10 @@ test.describe("SuperAdmin - Create Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.19
+   * TS-ACMNT-01.19
    * กรอกข้อมูลเมนูแบบเลื่อนลง (Dropdown)ไม่ครบถ้วน
    */
-  test("TC-ACMNT-01.19: Validate incomplete dropdown selections", async ({
+  test("TS-ACMNT-01.19: Validate incomplete dropdown selections", async ({
     page,
   }) => {
     await goToPageCreateAccount(page);
@@ -1218,10 +1218,10 @@ test.describe("SuperAdmin - Create Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.20
+   * TS-ACMNT-01.20
    * ยกเลิกการสร้างชุมชน (แบบ Modal)
    */
-  test("TC-ACMNT-01.20: Cancel create community via confirmation modal", async ({
+  test("TS-ACMNT-01.20: Cancel create community via confirmation modal", async ({
     page,
   }) => {
     await goToPageCreateAccount(page);
@@ -1342,10 +1342,10 @@ test.describe("SuperAdmin - Create Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.21
+   * TS-ACMNT-01.21
    *  ยกเลิกการสร้างชุมชน;
    */
-  test("TC-ACMNT-01.21: Cancel create community and return to community list", async ({
+  test("TS-ACMNT-01.21: Cancel create community and return to community list", async ({
     page,
   }) => {
     await goToPageCreateAccount(page);

@@ -12,7 +12,7 @@ export const users = {
   },
   admin: {
     email: "comm_admin_2@example.com",
-    password: "Hashedpw1",
+    password: "hashedpw",
     loginPath: "/guest/partner/login",
     redirectTo: "/admin/community/own",
   },
@@ -21,5 +21,10 @@ export const users = {
     password: "hashedpw",
     loginPath: "/guest/partner/login",
     redirectTo: "/admin/community/own",
+  member: {
+    email: "member_1@example.com",
+    password: "hashedpw",
+    loginPath: "/guest/partner/login",
+    //redirectTo: "/member/community/own",
   },
 };

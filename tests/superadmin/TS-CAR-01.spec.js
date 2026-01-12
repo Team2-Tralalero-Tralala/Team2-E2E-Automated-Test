@@ -3,13 +3,15 @@ import { loginAs } from "../../utils/roles.js";
 
 /**
  * goToAccountDetail
- * คลิกชื่อสมาชิกในตาราง แล้วไปหน้ารายละเอียดสมาชิก
+ * ใช้สำหรับนำทางจากหน้า Community List ไปยังหน้ารายละเอียดสมาชิก
+ * Steps:
+ * 1. คลิกเมนู "จัดการบัญชี"
+ * 2. คลิกชื่อสมาชิก
+ * 3. ไปยังหน้า /super/account/:id
  */
 async function goToAccountDetail(page, fullName) {
-
   const manageAccountMenu = page.getByRole("link", { name: "จัดการบัญชี" });
   await manageAccountMenu.click();
-
   const memberLink = page.getByRole("link", { name: fullName });
   await memberLink.click();
 }
@@ -21,12 +23,10 @@ test.describe("SuperAdmin - Edit Account Navigation", () => {
   });
 
   /**
-   * TC-CA-02.1.1
-   * เมื่อคลิกชื่อสมาชิก จะไปยังหน้าของสมาชิกที่คลิก
+   * TS-CAR-01.1
+   * แก้ไขข้อมูล
    */
-  test("TC-CAR-01: Click member name navigates to correct member page", async ({
-    page,
-  }) => {
+  test("TS-CAR-01.1: Edit member successfully", async ({ page }) => {
     const memberName = "จินตนา จิรายุ";
     await goToAccountDetail(page, memberName);
     await expect(page).toHaveURL(/\/super\/account\/\d+$/);
@@ -50,11 +50,10 @@ test.describe("SuperAdmin - Edit Account Navigation", () => {
   });
 
   /**
-   * TC-CA-02.1.1
-   * เมื่อคลิกชื่อสมาชิก จะไปยังหน้าของสมาชิกที่คลิก
+   * TS-CAR-01.2
+   * ยกเลิกการแก้ไขข้อมูลสมาชิก
    */
-
-  test("TC-CAR-02: Cancel edit member", async ({ page }) => {
+  test("TS-CAR-01.2: Cancel edit member", async ({ page }) => {
     const memberName = "จินตนา จิรายุ";
     await goToAccountDetail(page, memberName);
     await expect(page).toHaveURL(/\/super\/account\/\d+$/);
@@ -66,12 +65,10 @@ test.describe("SuperAdmin - Edit Account Navigation", () => {
   });
 
   /**
-   * TC-CA-02.1.1
-   * เมื่อคลิกชื่อสมาชิก จะไปยังหน้าของสมาชิกที่คลิก
+   * TS-CAR-01.3
+   * ไม่กรอกชื่อ (required field)
    */
-  test("TC-CAR-03: Create account failed - name is required", async ({
-    page,
-  }) => {
+  test("TS-CAR-01.3: Validation required first name", async ({ page }) => {
     const memberName = "จินตนา จิรายุ";
     await goToAccountDetail(page, memberName);
     await expect(page).toHaveURL(/\/super\/account\/\d+$/);
@@ -87,10 +84,10 @@ test.describe("SuperAdmin - Edit Account Navigation", () => {
   });
 
   /**
-   * TC-CA-04
-   * เมื่อคลิกชื่อสมาชิก จะไปยังหน้าของสมาชิกที่คลิก
+   * TS-CAR-01.4
+   * ตั้งรหัสผ่านใหม่สำเร็จ
    */
-  test("TC-CAR-04: Cancel edit member", async ({ page }) => {
+  test("TS-CAR-01.4: Change password successfully", async ({ page }) => {
     const memberName = "จินตนา จิรายุ";
     await goToAccountDetail(page, memberName);
     await expect(page).toHaveURL(/\/super\/account\/\d+$/);
@@ -108,12 +105,10 @@ test.describe("SuperAdmin - Edit Account Navigation", () => {
   });
 
   /**
-   * TC-CA-01.5
+   * TS-CAR-01.5
    * อีเมลซ้ำกับในระบบ
    */
-  test("TC-CAR-05: Create account failed - duplicate email", async ({
-    page,
-  }) => {
+  test("TS-CAR-01.5: Validation duplicate email", async ({ page }) => {
     const memberName = "จินตนา จิรายุ";
     await goToAccountDetail(page, memberName);
     await expect(page).toHaveURL(/\/super\/account\/\d+$/);
@@ -130,12 +125,10 @@ test.describe("SuperAdmin - Edit Account Navigation", () => {
   });
 
   /**
-   * TC-CA-01.6
-   * อีเมลผิดรูปแบบ
+   * TS-CAR-01.06
+   * อีเมลรูปแบบไม่ถูกต้อง
    */
-  test("TC-CAR-06: Create account failed - duplicate email", async ({
-    page,
-  }) => {
+  test("TS-CAR-01.6: Validation invalid email format", async ({ page }) => {
     const memberName = "จินตนา จิรายุ";
     await goToAccountDetail(page, memberName);
     await expect(page).toHaveURL(/\/super\/account\/\d+$/);
@@ -152,10 +145,10 @@ test.describe("SuperAdmin - Edit Account Navigation", () => {
   });
 
   /**
-   * TC-CA-04
-   * เมื่อคลิกชื่อสมาชิก จะไปยังหน้าของสมาชิกที่คลิก
+   * TS-CAR-01.07
+   * รหัสผ่านสั้นกว่าที่กำหนด
    */
-  test("TC-CAR-07: Cancel edit member", async ({ page }) => {
+  test("TS-CAR-01.7: Validation password too short", async ({ page }) => {
     const memberName = "จินตนา จิรายุ";
     await goToAccountDetail(page, memberName);
     await expect(page).toHaveURL(/\/super\/account\/\d+$/);
@@ -167,10 +160,10 @@ test.describe("SuperAdmin - Edit Account Navigation", () => {
   });
 
   /**
-   * TC-CA-04
-   * เมื่อคลิกชื่อสมาชิก จะไปยังหน้าของสมาชิกที่คลิก
+   * TS-CAR-01.8
+   * ยกเลิกการตั้งรหัสผ่าน
    */
-  test("TC-CAR-05: Cancel edit member", async ({ page }) => {
+  test("TS-CAR-01.8: Cancel change password", async ({ page }) => {
     const memberName = "จินตนา จิรายุ";
     await goToAccountDetail(page, memberName);
     await expect(page).toHaveURL(/\/super\/account\/\d+$/);
@@ -181,30 +174,31 @@ test.describe("SuperAdmin - Edit Account Navigation", () => {
   });
 
   /**
-   * TC-CAR-02.1.1
-   * เมื่อคลิกชื่อสมาชิก จะไปยังหน้าของสมาชิกที่คลิก
+   * TS-CAR-01.9
+   * กรอกข้อมูลไม่ครบถ้วน
    */
- test("TC-CAR-04: Validation required fields", async ({ page }) => {
-   const memberName = "จินตนา จิรายุ";
-   await goToAccountDetail(page, memberName);
-   await expect(page).toHaveURL(/\/super\/account\/\d+$/);
+  test("TS-CAR-01.9: Validation required fields on edit member", async ({
+    page,
+  }) => {
+    const memberName = "จินตนา จิรายุ";
+    await goToAccountDetail(page, memberName);
+    await expect(page).toHaveURL(/\/super\/account\/\d+$/);
 
-   await page.getByRole("button", { name: "แก้ไข" }).click();
+    await page.getByRole("button", { name: "แก้ไข" }).click();
 
-   await page.getByLabel("ชื่อ *").fill("จินตนา");
-   await page.getByLabel("นามสกุล *").fill("จิรายุ");
+    await page.getByLabel("ชื่อ *").fill("จินตนา");
+    await page.getByLabel("นามสกุล *").fill("จิรายุ");
 
-   await page.getByLabel("ชื่อผู้ใช้ *").clear();
-   await page.getByLabel("อีเมล *").clear();
-   await page.getByLabel("โทรศัพท์ *").clear();
+    await page.getByLabel("ชื่อผู้ใช้ *").clear();
+    await page.getByLabel("อีเมล *").clear();
+    await page.getByLabel("โทรศัพท์ *").clear();
 
-   await page.getByRole("button", { name: "บันทึก" }).click();
+    await page.getByRole("button", { name: "บันทึก" }).click();
 
-   await expect(page.getByText("กรุณากรอกชื่อผู้ใช้")).toBeVisible();
-   await expect(page.getByText("กรุณากรอกอีเมล")).toBeVisible();
-   await expect(page.getByText("กรุณากรอกเบอร์โทรศัพท์")).toBeVisible();
-  
-   await expect(page).toHaveURL(/\/super\/account\/\d+$/);
- });
+    await expect(page.getByText("กรุณากรอกชื่อผู้ใช้")).toBeVisible();
+    await expect(page.getByText("กรุณากรอกอีเมล")).toBeVisible();
+    await expect(page.getByText("กรุณากรอกเบอร์โทรศัพท์")).toBeVisible();
 
+    await expect(page).toHaveURL(/\/super\/account\/\d+$/);
+  });
 });

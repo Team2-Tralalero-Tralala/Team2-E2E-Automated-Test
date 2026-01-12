@@ -60,7 +60,7 @@ test.describe("SuperAdmin - Create Account", () => {
   });
 
   /**
-   * TC-CAU-01.1
+   * TS-CAU-01.1
    * สร้างบัญชีสำเร็จ Tourist สำเร็จ
    */
   test("TS-CAU-01.1 : SuperAdmin create Tourist successfully", async ({
@@ -131,7 +131,7 @@ test.describe("SuperAdmin - Create Account", () => {
   });
 
   /**
-   * TC-CAU-01.2
+   * TS-CAU-01.2
    * กดยกเลิกสร้าง Tourist สำเร็จ (จากหน้าสร้างบัญชี)
    */
   test("TS-CAU-01.2: cancel create account from create page", async ({
@@ -146,7 +146,7 @@ test.describe("SuperAdmin - Create Account", () => {
   });
 
   /**
-   * TC-CAU-01.3
+   * TS-CAU-01.3
    * กรอกข้อมูลไม่ครบ (ชื่อว่าง)
    */
   test("TS-CAU-01.3: Create account failed - name is required", async ({
@@ -201,7 +201,7 @@ test.describe("SuperAdmin - Create Account", () => {
   });
 
   /**
-   * TC-CAU-01.4
+   * TS-CAU-01.4
    * กรอกข้อมูลไม่ครบ (นามสกุลว่าง)
    */
   test("TS-CAU-01.4: Create account failed - lastname is required", async ({
@@ -264,7 +264,7 @@ test.describe("SuperAdmin - Create Account", () => {
   });
 
   /**
-   * TC-CAU-01.5
+   * TS-CAU-01.5
    * รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน
    */
   test("TS-CAU-01.5: Create account failed - password mismatch", async ({
@@ -325,7 +325,7 @@ test.describe("SuperAdmin - Create Account", () => {
   });
 
   /**
-   * TC-CAU-01.6
+   * TS-CAU-01.6
    * อีเมลซ้ำกับในระบบ
    */
   test("TS-CAU-01.6: Create account failed - duplicate email", async ({
@@ -380,7 +380,7 @@ test.describe("SuperAdmin - Create Account", () => {
   });
 
   /**
-   * TC-CA-01.7
+   * TS-CA-01.7
    * กรอกรหัสผ่านไม่ครบทุกเงื่อนไข
    */
   test("TS-CA-01.7: Create account failed - password does not meet requirements", async ({
@@ -438,7 +438,7 @@ test.describe("SuperAdmin - Create Account", () => {
   });
 
   /**
-   * TC-CAU-01.8
+   * TS-CAU-01.8
    * รหัสผ่านสั้นกว่าที่กำหนด
    */
   test("TS-CAU-01.8: Create account failed - password too short", async ({
@@ -500,7 +500,7 @@ test.describe("SuperAdmin - Create Account", () => {
   });
 
   /**
-   * TC-CAU-01.9
+   * TS-CAU-01.9
    * อีเมลรูปแบบผิด
    */
   test("TS-CAU-01.9: Create account failed - invalid email format", async ({
@@ -561,7 +561,7 @@ test.describe("SuperAdmin - Create Account", () => {
   });
 
   /**
-   * TC-CA-01.10
+   * TS-CA-01.10
    * กรอกข้อมูลผิดหลายอย่างพร้อมกัน
    */
   test("TS-CA-01.10: Create account failed - multiple invalid fields", async ({
@@ -624,7 +624,7 @@ test.describe("SuperAdmin - Create Account", () => {
   });
 
    /**
-     * TC-CA-01.11
+     * TS-CA-01.11
      * กรอกรหัสผ่านถูกต้องครบทุกเงื่อนไข
      */
     test("TS-CA-01.11: Create account success - valid password", async ({

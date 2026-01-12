@@ -61,10 +61,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.1
+   * TS-ECMNT-01.1
    * กรอกข้อมูลครบถ้วน (ข้อมูลชุมชน)
    */
-  test("TC-ECMNT-01.1: Edit community with complete community information", async ({
+  test("TS-ECMNT-01.1: Edit community with complete community information", async ({
     page,
   }) => {
     await goToPageEditCommunity(page);
@@ -124,10 +124,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.2
+   * TS-ECMNT-01.2
    * ไม่กรอกชื่อวิสาหกิจชุมชน
    */
-  test("TC-ECMNT-01.2: Validate required community name", async ({ page }) => {
+  test("TS-ECMNT-01.2: Validate required community name", async ({ page }) => {
     await goToPageEditCommunity(page);
     await page.getByRole("button", { name: "ข้อมูลชุมชน" }).click();
 
@@ -143,10 +143,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.3
+   * TS-ECMNT-01.3
    * ไม่กรอกเลขทะเบียน
    */
-  test("TC-ECMNT-01.3: Validate required community registration number", async ({
+  test("TS-ECMNT-01.3: Validate required community registration number", async ({
     page,
   }) => {
     await goToPageEditCommunity(page);
@@ -158,10 +158,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.4
+   * TS-ECMNT-01.4
    * กรอกเลขทะเบียนเป็นตัวอักษร
    */
-  test("TC-ECMNT-01.4: Upload community cover and logo images", async ({
+  test("TS-ECMNT-01.4: Upload community cover and logo images", async ({
     page,
   }) => {
     await goToPageEditCommunity(page);
@@ -175,10 +175,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.5
+   * TS-ECMNT-01.5
    * กรอกชื่อย่อ / ชื่อเรียก / ชื่อท้องถิ่น
    */
-  test("TC-ECMNT-01.5: Validate local name input", async ({ page }) => {
+  test("TS-ECMNT-01.5: Validate local name input", async ({ page }) => {
     await goToPageEditCommunity(page);
     const localNameInput = page.locator("#alias");
     await localNameInput.fill("", { force: true });
@@ -187,10 +187,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.6
+   * TS-ECMNT-01.6
    * อัพโหลดรูปภาพหน้าปกและโลโก้
    */
-  test("TC-ECMNT-01.6: Upload community cover and logo images", async ({
+  test("TS-ECMNT-01.6: Upload community cover and logo images", async ({
     page,
   }) => {
     await goToPageEditCommunity(page);
@@ -200,10 +200,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.8
+   * TS-ECMNT-01.8
    * ไม่อัพโลโก้
    */
-  test("TC-ECMNT-01.8: Click community name without logo should navigate to detail page", async ({
+  test("TS-ECMNT-01.8: Click community name without logo should navigate to detail page", async ({
     page,
   }) => {
     await page.goto("/super/communities/all");
@@ -214,10 +214,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.9
+   * TS-ECMNT-01.9
    * กรอกบัญชีข้อมูลธนาคารครบ
    */
-  test("TC-ECMNT-01.8: Fill complete bank account information", async ({
+  test("TS-ECMNT-01.8: Fill complete bank account information", async ({
     page,
   }) => {
     await goToPageEditCommunity(page);
@@ -233,10 +233,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.10
+   * TS-ECMNT-01.10
    * ไม่กรอกเลขบัญชี
    */
-  test("TC-ECMNT-01.10: Validate required bank account number", async ({
+  test("TS-ECMNT-01.10: Validate required bank account number", async ({
     page,
   }) => {
     await goToPageEditCommunity(page);
@@ -246,10 +246,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.11
+   * TS-ECMNT-01.11
    * ไม่กรอกเลขบัญชี
    */
-  test("TC-ECMNT-01.11: Validate bank account accepts numeric only", async ({
+  test("TS-ECMNT-01.11: Validate bank account accepts numeric only", async ({
     page,
   }) => {
     await goToPageEditCommunity(page);
@@ -263,10 +263,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.12
+   * TS-ECMNT-01.12
    * กรอกชื่อกิจกรรมหลัก
    */
-  test("TC-ECMNT-01.12: Fill main activity information", async ({ page }) => {
+  test("TS-ECMNT-01.12: Fill main activity information", async ({ page }) => {
     await goToPageEditCommunity(page);
     await page.getByRole("button", { name: "ข้อมูลชุมชน" }).click();
     await page
@@ -275,10 +275,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.13
+   * TS-ECMNT-01.13
    * ไม่กรอกชื่อกิจกรรมหลัก
    */
-  test("TC-ECMNT-01.13: Validate required main activity name", async ({
+  test("TS-ECMNT-01.13: Validate required main activity name", async ({
     page,
   }) => {
     await goToPageEditCommunity(page);
@@ -289,10 +289,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.14
+   * TS-ECMNT-01.14
    * อัพโหลดรูปภาพเพิ่มเติม
    */
-  test("TC-ECMNT-01.14: Upload additional community images", async ({
+  test("TS-ECMNT-01.14: Upload additional community images", async ({
     page,
   }) => {
     await goToPageEditCommunity(page);
@@ -317,10 +317,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.15
+   * TS-ACMNT-01.15
    * อัพโหลดวิดิโอเพิ่มเติม
    */
-  test("TC-ECMNT-01.15: Upload additional community videos", async ({
+  test("TS-ECMNT-01.15: Upload additional community videos", async ({
     page,
   }) => {
     await goToPageEditCommunity(page);
@@ -343,10 +343,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.16
+   * TS-ACMNT-01.16
    * ไม่อัพโหลดรูปภาพเพิ่มเติม
    */
-  test("TC-ECMNT-01.16: No additional photos uploaded.", async ({ page }) => {
+  test("TS-ECMNT-01.16: No additional photos uploaded.", async ({ page }) => {
     await goToPageEditCommunity(page);
     await page.getByRole("button", { name: "ข้อมูลชุมชน" }).click();
 
@@ -369,10 +369,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ACMNT-01.17
+   * TS-ACMNT-01.17
    * ไม่อัพโหลดวิดิโอเพิ่มเติม
    */
-  test("TC-ECMNT-01.17: No additional video uploaded.", async ({ page }) => {
+  test("TS-ECMNT-01.17: No additional video uploaded.", async ({ page }) => {
     await goToPageEditCommunity(page);
     await page.getByRole("button", { name: "ข้อมูลชุมชน" }).click();
 
@@ -412,10 +412,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.18
+   * TS-ECMNT-01.18
    * กรอกข้อมูลครบถ้วน (ข้อมูลที่อยู่วิสาหกิจชุมชน)
    */
-  test("TC-ECMNT-01.18: Fill complete community address information", async ({
+  test("TS-ECMNT-01.18: Fill complete community address information", async ({
     page,
   }) => {
     await goToPageEditCommunity(page);
@@ -456,10 +456,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.19
+   * TS-ECMNT-01.19
    * กรอกข้อมูลไม่ครบถ้วน (ข้อมูลที่อยู่วิสาหกิจชุมชน)
    */
-  test("TC-ECMNT-01.19: Validate incomplete community address information", async ({
+  test("TS-ECMNT-01.19: Validate incomplete community address information", async ({
     page,
   }) => {
     await goToPageEditCommunity(page);
@@ -499,10 +499,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.20
+   * TS-ECMNT-01.20
    * ปักหมุดวิสาหกิจ
    */
-  test("TC-ECMNT-01.20: Pin community location by latitude and longitude", async ({
+  test("TS-ECMNT-01.20: Pin community location by latitude and longitude", async ({
     page,
   }) => {
     await goToPageEditCommunity(page);
@@ -514,10 +514,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.21
+   * TS-ECMNT-01.21
    * ปักหมุดวิสาหกิจจากการค้นหาสถานที่ใกล้เคียง
    */
-  test("TC-ECMNT-01.21: Pin community location by searching place", async ({
+  test("TS-ECMNT-01.21: Pin community location by searching place", async ({
     page,
   }) => {
     await goToPageEditCommunity(page);
@@ -549,10 +549,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.22
+   * TS-ECMNT-01.22
    * กรอกข้อมูลครบถ้วน (ข้อมูลติดต่อและผู้ดูแล)
    */
-  test("TC-ECMNT-01.22:  Fill contact and caretaker information", async ({
+  test("TS-ECMNT-01.22:  Fill contact and caretaker information", async ({
     page,
   }) => {
     await goToPageEditCommunity(page);
@@ -623,10 +623,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.23
+   * TS-ECMNT-01.23
    * กรอกข้อมูลไม่ครบถ้วน (ข้อมูลติดต่อและผู้ดูแล)
    */
-  test("TC-ECMNT-01.23: Validate incomplete community information", async ({
+  test("TS-ECMNT-01.23: Validate incomplete community information", async ({
     page,
   }) => {
     await goToPageEditCommunity(page);
@@ -655,10 +655,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.24
+   * TS-ECMNT-01.24
    * กรอกข้อมูลเมนูแบบเลื่อนลง (Dropdown) ครบถ้วน (แบบ Modal)
    */
-  test("TC-ECMNT-01.24: Edit community with complete community information", async ({
+  test("TS-ECMNT-01.24: Edit community with complete community information", async ({
     page,
   }) => {
     await goToPageEditCommunity(page);
@@ -826,10 +826,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.25
+   * TS-ECMNT-01.25
    * กรอกข้อมูลเมนูแบบเลื่อนลง (Dropdown) ไม่ครบถ้วน
    */
-  test("TC-ECMNT-01.25: Validate incomplete dropdown inputs", async ({
+  test("TS-ECMNT-01.25: Validate incomplete dropdown inputs", async ({
     page,
   }) => {
     await goToPageEditCommunity(page);
@@ -942,10 +942,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.26
+   * TS-ECMNT-01.26
    * บันทึกแก้ไขผู้ดูแลระบบ
    */
-  test("TC-ECMNT-01.26: Cancel editing community via confirmation modal", async ({
+  test("TS-ECMNT-01.26: Cancel editing community via confirmation modal", async ({
     page,
   }) => {
     await goToPageEditCommunity(page);
@@ -1012,10 +1012,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.27
+   * TS-ECMNT-01.27
    *  ยกเลิกการแก้ไขชุมชน;
    */
-  test("TC-ECMNT-01.27: Cancel edit community and return to community list", async ({
+  test("TS-ECMNT-01.27: Cancel edit community and return to community list", async ({
     page,
   }) => {
     await goToPageEditCommunity(page);
@@ -1067,10 +1067,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.28
+   * TS-ECMNT-01.28
    *  ยกเลิกการแก้ไขชุมชน;
    */
-  test("TC-ECMNT-01.28: Cancel edit community and return to community list", async ({
+  test("TS-ECMNT-01.28: Cancel edit community and return to community list", async ({
     page,
   }) => {
     await goToPageEditCommunity(page);
@@ -1082,10 +1082,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.29
+   * TS-ECMNT-01.29
    * เปิดสถานะชุมชน
    */
-  test("TC-ECMNT-01.29: Enable community status", async ({ page }) => {
+  test("TS-ECMNT-01.29: Enable community status", async ({ page }) => {
     await goToPageEditCommunity(page);
 
     let statusToggle = page.getByRole("switch");
@@ -1110,10 +1110,10 @@ test.describe("SuperAdmin - Edit Community", () => {
   });
 
   /**
-   * TC-ECMNT-01.30
+   * TS-ECMNT-01.30
    * ปิดสถานะชุมชน
    */
-  test("TC-ECMNT-01.30: Disable community status", async ({ page }) => {
+  test("TS-ECMNT-01.30: Disable community status", async ({ page }) => {
     await goToPageEditCommunity(page);
     let statusToggle = page.getByRole("switch");
     if ((await statusToggle.count()) === 0) {
