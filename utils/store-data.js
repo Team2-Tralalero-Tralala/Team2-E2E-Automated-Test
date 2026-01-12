@@ -29,7 +29,6 @@ export const validStore = {
   ],
 };
 
-
 /**
  * incompleteStore
  * ข้อมูลร้านค้าที่ไม่ครบถ้วน
