@@ -36,6 +36,7 @@ export const users = {
     password: "hashedpw",
     loginPath: "/guest/login",
     redirectTo: "/tourist/home",
+  },
   member: {
     email: "member_1@example.com",
     password: "hashedpw",
