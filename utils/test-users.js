@@ -25,8 +25,8 @@ export const users = {
     loginPath: "/guest/partner/login",
     redirectTo: "/admin/community/own",
   },
-  tourist2: {
-    email: "tourist_2",
+  tourist: {
+    email: "tourist_1",
     password: "hashedpw",
     loginPath: "/guest/login",
     redirectTo: "/tourist/home",
