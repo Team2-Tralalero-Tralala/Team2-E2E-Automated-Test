@@ -135,7 +135,7 @@ async function fillPackageForm(page, data) {
   }
 }
 
-test.describe("Member - create packages draft", () => {
+test.describe("Member - create packages", () => {
   test.beforeEach(async ({ page }) => {
     await loginAs(page, "member");
     await goToCreatePackagePage(page);
