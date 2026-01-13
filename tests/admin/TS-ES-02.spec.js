@@ -272,7 +272,8 @@ async function pinMapWhenNoPlaceFound(page) {
 }
 
 test.describe('Admin - Edit Store (from "pencil" icon)', () => {
-  test.describe.configure({ mode: "serial" });
+  // Don't use "serial" — it skips remaining tests after first failure
+  test.describe.configure({ mode: "parallel" });
 
   test.beforeEach(async ({ page }) => {
     await loginAs(page, "admin");
