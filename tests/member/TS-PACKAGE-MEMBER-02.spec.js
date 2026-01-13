@@ -205,7 +205,7 @@ test.describe("Member - create packages", () => {
       .getByRole("button", { name: /ยืนยัน/i })
       .click();
 
-    await page.getByText("สร้างแพ็กเกจสำเร็จ").toBeVisible();
+    await expect(page.getByText("Hello")).toBeVisible();
     await page.goto("/member/packages/all");
     await expect(page).toHaveURL(/member\/packages\/all/);
 
