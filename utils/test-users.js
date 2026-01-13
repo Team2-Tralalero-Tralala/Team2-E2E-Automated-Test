@@ -25,12 +25,6 @@ export const users = {
     loginPath: "/guest/partner/login",
     redirectTo: "/admin/community/own",
   },
-  member1: {
-    email: "member_1",
-    password: "hashedpw",
-    loginPath: "/guest/partner/login",
-    redirectTo: "/member/home",
-  },
   tourist2: {
     email: "tourist_2",
     password: "hashedpw",
@@ -38,7 +32,13 @@ export const users = {
     redirectTo: "/tourist/home",
   },
   member: {
-    email: "member_1@example.com",
+    email: "comm_member_1@example.com",
+    password: "hashedpw",
+    loginPath: "/guest/partner/login",
+    //redirectTo: "/member/community/own",
+  },
+  member2: {
+    email: "comm_member_2@example.com",
     password: "hashedpw",
     loginPath: "/guest/partner/login",
     //redirectTo: "/member/community/own",
