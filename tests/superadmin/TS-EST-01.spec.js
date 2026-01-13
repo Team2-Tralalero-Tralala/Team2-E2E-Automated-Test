@@ -484,7 +484,7 @@ test.describe("SuperAdmin - Edit Store", () => {
    * TC-EST-01.13
    *
    */
-  test("TC-EST-01.13: ยกเลิกการแก้ไขร้านค้า (แบบ Modal)", async ({ page }) => {
+  test("TC-ECT-01.12: ยกเลิกการแก้ไขร้านค้า", async ({ page }) => {
     await goToPageEditStore(page);
 
     await page.getByRole("textbox", { name: "ชื่อร้านค้า *" }).click();
