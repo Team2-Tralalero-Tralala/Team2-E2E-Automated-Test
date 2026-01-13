@@ -16,7 +16,7 @@ export const users = {
     loginPath: "/guest/partner/login",
     redirectTo: "/admin/community/own",
   },
-   thanakorn: {
+  thanakorn: {
     email: "comm_admin_1",
     password: "hashedpw",
     loginPath: "/guest/partner/login",
