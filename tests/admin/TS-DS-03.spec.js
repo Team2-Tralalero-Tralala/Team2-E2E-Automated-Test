@@ -24,7 +24,7 @@ async function goToPageStore(page) {
 
 test.describe("Admin - Change page size", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAs(page, "admin");
+    await loginAs(page, "thanakorn");
     await expect(page).toHaveURL(/admin\/community\/own/);
   });
 

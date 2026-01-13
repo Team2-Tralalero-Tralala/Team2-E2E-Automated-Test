@@ -24,7 +24,7 @@ async function goToPageHomestay(page) {
 
 test.describe("Admin - Add Homestay", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAs(page, "admin");
+    await loginAs(page, "thanakorn");
     await expect(page).toHaveURL(/admin\/community\/own/);
   });
 
