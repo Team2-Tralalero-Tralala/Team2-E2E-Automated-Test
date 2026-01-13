@@ -142,4 +142,3 @@ export default defineConfig({
   // },
 });
 
-# Test Case Structure Within a Scenario File
