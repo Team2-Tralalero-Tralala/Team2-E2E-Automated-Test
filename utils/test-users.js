@@ -16,11 +16,18 @@ export const users = {
     loginPath: "/guest/partner/login",
     redirectTo: "/admin/community/own",
   },
+  admin4: {
+    email: "comm_admin_4",
+    password: "hashedpw",
+    loginPath: "/guest/partner/login",
+    redirectTo: "/admin/community/own",
+  },
   thanakorn: {
     email: "comm_admin_1",
     password: "hashedpw",
     loginPath: "/guest/partner/login",
     redirectTo: "/admin/community/own",
+  },
   member: {
     email: "member_1@example.com",
     password: "hashedpw",
