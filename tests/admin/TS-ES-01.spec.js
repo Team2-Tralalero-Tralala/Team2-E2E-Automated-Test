@@ -279,7 +279,8 @@ async function pinMapWhenNoPlaceFound(page) {
 }
 
 test.describe("Admin - Edit Store (from store detail page)", () => {
-  test.describe.configure({ mode: "serial" });
+  // Don't use "serial" — it skips remaining tests after first failure
+  test.describe.configure({ mode: "parallel" });
 
   test.beforeEach(async ({ page }) => {
     await loginAs(page, "admin");
@@ -356,6 +357,13 @@ test.describe("Admin - Edit Store (from store detail page)", () => {
     await uploadStoreImages(page);
     await page.waitForTimeout(5000);
     await saveAndConfirm(page);
+    // หลังบันทึกควรกลับไปหน้ารายการ/รายละเอียดร้านค้า (ตรวจด้วยการเห็นชื่อร้าน)
+    await page.waitForLoadState("networkidle");
+    await expect(page).toHaveURL(/admin\/community\/stores/);
+    await expect(
+      page.getByRole("heading", { name: "จัดการร้านค้า", exact: true })
+    ).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText("ป้านกน้อย")).toBeVisible({ timeout: 15000 });
   });
 });
 
