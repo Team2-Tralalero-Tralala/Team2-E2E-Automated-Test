@@ -5,7 +5,6 @@ import { loginAs } from "../../utils/roles.js";
  * goToCreatePackagePage - Navigates to the Create Package page
  */
 async function goToCreatePackagePage(page) {
-  // Navigate to Manage Packages first
   await page.getByRole("link", { name: "จัดการแพ็กเกจ" }).click();
   await expect(page).toHaveURL(/member\/packages\/all/);
   await page.getByRole("button", { name: "เพิ่มแพ็กเกจ" }).click();
@@ -16,13 +15,11 @@ async function goToCreatePackagePage(page) {
  * fillPackageForm - Fills the package creation form
  */
 async function fillPackageForm(page, data) {
-  // Text Fields
   if (data.name) await page.locator("#name").fill(data.name);
 
   if (data.description)
     await page.locator("#description").fill(data.description);
 
-  // Address
   if (data.houseNumber)
     await page.locator("#houseNumber").fill(data.houseNumber);
   if (data.villageNumber)
@@ -76,6 +73,7 @@ async function fillPackageForm(page, data) {
 
   const fillTime = async (labelKeyword, timeStr) => {
     const [h, m] = timeStr.split(":");
+
     const wrapper = page
       .locator("div")
       .filter({ hasText: new RegExp(labelKeyword) })
@@ -142,28 +140,28 @@ test.describe("Member - create packages", () => {
   });
 
   /**
-   * TC-PACKAGE-01: ทดสอบสร้างแพ็กเกจเพื่อส่งแพ็กเกจไปตรวจ
+   * TS-PACKAGE-MEMBER-02.1: ทดสอบกรอกข้อมูลครบถ้วนและกด “บันทึก” เพื่อสร้างแพ็กเกจ
    */
-  test("TC-PACKAGE-01: ทดสอบสร้างแพ็กเกจเพื่อส่งแพ็กเกจไปตรวจ", async ({
+  test("TS-PACKAGE-MEMBER-02.1: ทดสอบกรอกข้อมูลครบถ้วนและกด “บันทึก” เพื่อสร้างแพ็กเกจ", async ({
     page,
   }) => {
     await page.getByRole("button", { name: "ฉบับร่าง" }).click();
     await page.getByRole("button", { name: "เผยแพร่" }).nth(1).click();
 
     const fullData = {
-      name: "แพ็กเกจส่งตรวจ",
-      description: "รายละเอียดครบถ้วน",
-      price: "2500",
-      houseNumber: "123",
-      villageNumber: "4",
+      name: "แพ็กเกจสมบูรณ์",
+      description: "แพ็กเกจสมบูรณ์",
+      price: "3500",
+      houseNumber: "99",
+      villageNumber: "5",
       province: "เชียงใหม่",
       district: "เมืองเชียงใหม่",
       subDistrict: "สุเทพ",
-      addressDetail: "ใกล้มหาวิทยาลัย",
+      addressDetail: "วิวสวย",
       latitude: "18.796143",
       longitude: "98.979263",
-      capacity: "10",
-      facility: "Wi-Fi, ที่จอดรถ",
+      capacity: "5",
+      facility: "ห้องน้ำส่วนตัว",
       startDate: "01/02/2569",
       startTime: "10:00",
       endDate: "05/02/2569",
@@ -172,11 +170,11 @@ test.describe("Member - create packages", () => {
       openTime: "08:00",
       closeDate: "30/01/2569",
       closeTime: "22:00",
-      tags: ["เดินป่า"],
+      tags: ["ธรรมชาติ", "ภูเขา"],
       coverImage: {
         name: "cover.jpg",
         mimeType: "image/jpeg",
-        buffer: Buffer.from("this is a test image"),
+        buffer: Buffer.from("this is a test image"), // Dummy content
       },
       images: [
         {
@@ -198,6 +196,7 @@ test.describe("Member - create packages", () => {
         },
       ],
     };
+
     await fillPackageForm(page, fullData);
 
     await page.getByRole("button", { name: "สร้างแพ็กเกจ" }).click();
@@ -206,11 +205,10 @@ test.describe("Member - create packages", () => {
       .getByRole("button", { name: /ยืนยัน/i })
       .click();
 
+    await expect(page.getByText("Hello")).toBeVisible();
     await page.goto("/member/packages/all");
+    await expect(page).toHaveURL(/member\/packages\/all/);
 
-    // Check for row
-    const row = page.getByRole("row").filter({ hasText: fullData.name });
-    await expect(row).toBeVisible();
-    await expect(row).toContainText("รออนุมัติ");
+    await expect(page.getByRole("row", { name: fullData.name })).toBeVisible();
   });
 });

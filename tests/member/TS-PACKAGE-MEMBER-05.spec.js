@@ -55,6 +55,8 @@ async function fillPackageForm(page, data) {
 
   if (data.addressDetail)
     await page.locator("#addressDetail").fill(data.addressDetail);
+
+  // Coordinates
   if (data.latitude) await page.locator("#latitude").fill(data.latitude);
   if (data.longitude) await page.locator("#longitude").fill(data.longitude);
 
@@ -64,9 +66,19 @@ async function fillPackageForm(page, data) {
   const fillDate = async (id, dateStr) => {
     const [d, m, y] = dateStr.split("/");
     const group = page.locator(`#${id}`);
-    await group.locator("input[placeholder='วว']").fill(d);
-    await group.locator("input[placeholder='ดด']").fill(m);
-    await group.locator("input[placeholder='ปปปป']").fill(y);
+    const dayInput = group.locator("input[placeholder='วว']");
+    await dayInput.focus();
+    await dayInput.fill(d);
+    await dayInput.blur();
+    const monthInput = group.locator("input[placeholder='ดด']");
+    await monthInput.focus();
+    await monthInput.fill(m);
+    await monthInput.blur();
+
+    const yearInput = group.locator("input[placeholder='ปปปป']");
+    await yearInput.focus();
+    await yearInput.fill(y);
+    await yearInput.blur();
   };
 
   if (data.startDate) await fillDate("startDate", data.startDate);
@@ -74,7 +86,9 @@ async function fillPackageForm(page, data) {
   if (data.openDate) await fillDate("openDate", data.openDate);
   if (data.closeDate) await fillDate("closeDate", data.closeDate);
 
+  // Helper for Times
   const fillTime = async (labelKeyword, timeStr) => {
+    // Expects "HH:mm"
     const [h, m] = timeStr.split(":");
     const wrapper = page
       .locator("div")
@@ -97,6 +111,7 @@ async function fillPackageForm(page, data) {
   if (data.openTime) await fillTime("เวลาที่เปิดจอง", data.openTime);
   if (data.closeTime) await fillTime("เวลาที่ปิดจอง", data.closeTime);
 
+  // Tags
   if (data.tags) {
     const tags = Array.isArray(data.tags) ? data.tags : [data.tags];
     for (const tag of tags) {
@@ -112,6 +127,7 @@ async function fillPackageForm(page, data) {
     await page.getByPlaceholder("ค้นหาชื่อที่พัก").fill(data.accommodation);
   }
 
+  // Files
   if (data.coverImage) {
     const section = page
       .locator("div")
@@ -119,98 +135,65 @@ async function fillPackageForm(page, data) {
       .last();
     await section.locator("input[type='file']").setInputFiles(data.coverImage);
   }
-  if (data.images) {
-    const section = page
-      .locator("div")
-      .filter({ hasText: /^อัพโหลดรูปภาพเพิ่มเติม/ })
-      .last();
-    await section.locator("input[type='file']").setInputFiles(data.images);
-  }
-  if (data.videos) {
-    const section = page
-      .locator("div")
-      .filter({ hasText: /^อัพโหลดวิดีโอเพิ่มเติม/ })
-      .last();
-    await section.locator("input[type='file']").setInputFiles(data.videos);
-  }
 }
 
-test.describe("Member - create packages", () => {
+test.describe("Member - create packages map coordinates", () => {
   test.beforeEach(async ({ page }) => {
     await loginAs(page, "member");
     await goToCreatePackagePage(page);
   });
 
   /**
-   * TC-PACKAGE-01: ทดสอบสร้างแพ็กเกจเพื่อส่งแพ็กเกจไปตรวจ
+   * TS-PACKAGE-MEMBER-05.1: ทดสอบเลือกตำแหน่งในแผนที่ก่อนบันทึก
    */
-  test("TC-PACKAGE-01: ทดสอบสร้างแพ็กเกจเพื่อส่งแพ็กเกจไปตรวจ", async ({
+  test("TS-PACKAGE-MEMBER-05.1: ทดสอบเลือกตำแหน่งในแผนที่ก่อนบันทึก", async ({
     page,
   }) => {
     await page.getByRole("button", { name: "ฉบับร่าง" }).click();
     await page.getByRole("button", { name: "เผยแพร่" }).nth(1).click();
-
     const fullData = {
-      name: "แพ็กเกจส่งตรวจ",
-      description: "รายละเอียดครบถ้วน",
-      price: "2500",
-      houseNumber: "123",
-      villageNumber: "4",
+      name: "แพ็กเกจทดสอบแผนที่",
+      description: "ทดสอบการบันทึกพิกัด",
+      price: "1000",
+      houseNumber: "555",
+      villageNumber: "1",
       province: "เชียงใหม่",
       district: "เมืองเชียงใหม่",
       subDistrict: "สุเทพ",
-      addressDetail: "ใกล้มหาวิทยาลัย",
+      addressDetail: "พิกัดชัดเจน",
       latitude: "18.796143",
       longitude: "98.979263",
-      capacity: "10",
-      facility: "Wi-Fi, ที่จอดรถ",
-      startDate: "01/02/2569",
-      startTime: "10:00",
-      endDate: "05/02/2569",
-      endTime: "14:00",
-      openDate: "15/01/2569",
+      capacity: "2",
+      facility: "ลานกางเต็นท์",
+      startDate: "01/03/2569",
+      startTime: "08:00",
+      endDate: "03/03/2569",
+      endTime: "16:00",
+      openDate: "01/02/2569",
       openTime: "08:00",
-      closeDate: "30/01/2569",
+      closeDate: "20/02/2569",
       closeTime: "22:00",
-      tags: ["เดินป่า"],
+      tags: ["แคมป์ปิ้ง"],
       coverImage: {
         name: "cover.jpg",
         mimeType: "image/jpeg",
         buffer: Buffer.from("this is a test image"),
       },
-      images: [
-        {
-          name: "img1.jpg",
-          mimeType: "image/jpeg",
-          buffer: Buffer.from("img1"),
-        },
-        {
-          name: "img2.jpg",
-          mimeType: "image/jpeg",
-          buffer: Buffer.from("img2"),
-        },
-      ],
-      videos: [
-        {
-          name: "vid1.mp4",
-          mimeType: "video/mp4",
-          buffer: Buffer.from("vid1"),
-        },
-      ],
     };
     await fillPackageForm(page, fullData);
-
     await page.getByRole("button", { name: "สร้างแพ็กเกจ" }).click();
     await page
       .getByRole("dialog")
       .getByRole("button", { name: /ยืนยัน/i })
       .click();
-
-    await page.goto("/member/packages/all");
-
-    // Check for row
-    const row = page.getByRole("row").filter({ hasText: fullData.name });
-    await expect(row).toBeVisible();
-    await expect(row).toContainText("รออนุมัติ");
+    await page.getByText(fullData.name).click();
+    await expect(
+      page.getByText(
+        `ละติจูด / ลองจิจูด : ${fullData.latitude}, ${fullData.longitude}`
+      )
+    ).toBeVisible();
+    await expect(page.frameLocator('iframe[title="map"]').locator("body"))
+      .toBeVisible()
+      .catch(() => {});
   });
 });

@@ -16,13 +16,11 @@ async function goToCreatePackagePage(page) {
  * fillPackageForm - Fills the package creation form
  */
 async function fillPackageForm(page, data) {
-  // Text Fields
   if (data.name) await page.locator("#name").fill(data.name);
 
   if (data.description)
     await page.locator("#description").fill(data.description);
 
-  // Address
   if (data.houseNumber)
     await page.locator("#houseNumber").fill(data.houseNumber);
   if (data.villageNumber)
@@ -76,6 +74,7 @@ async function fillPackageForm(page, data) {
 
   const fillTime = async (labelKeyword, timeStr) => {
     const [h, m] = timeStr.split(":");
+
     const wrapper = page
       .locator("div")
       .filter({ hasText: new RegExp(labelKeyword) })
@@ -108,10 +107,7 @@ async function fillPackageForm(page, data) {
 
   if (data.price) await page.locator("#price").fill(data.price.toString());
 
-  if (data.accommodation) {
-    await page.getByPlaceholder("ค้นหาชื่อที่พัก").fill(data.accommodation);
-  }
-
+  // Files
   if (data.coverImage) {
     const section = page
       .locator("div")
@@ -135,82 +131,27 @@ async function fillPackageForm(page, data) {
   }
 }
 
-test.describe("Member - create packages", () => {
+test.describe("Member - ตรวจสอบการแสดงข้อความเตือนเมื่อกรอกไม่ครบ", () => {
   test.beforeEach(async ({ page }) => {
     await loginAs(page, "member");
     await goToCreatePackagePage(page);
   });
 
   /**
-   * TC-PACKAGE-01: ทดสอบสร้างแพ็กเกจเพื่อส่งแพ็กเกจไปตรวจ
+   * TS-PACKAGE-MEMBER-03.1: ทดสอบกรอกข้อมูลไม่ครบแล้วกด “บันทึก”
    */
-  test("TC-PACKAGE-01: ทดสอบสร้างแพ็กเกจเพื่อส่งแพ็กเกจไปตรวจ", async ({
+  test("TS-PACKAGE-MEMBER-03.1: ทดสอบกรอกข้อมูลไม่ครบแล้วกด “บันทึก”", async ({
     page,
   }) => {
     await page.getByRole("button", { name: "ฉบับร่าง" }).click();
     await page.getByRole("button", { name: "เผยแพร่" }).nth(1).click();
-
-    const fullData = {
-      name: "แพ็กเกจส่งตรวจ",
-      description: "รายละเอียดครบถ้วน",
-      price: "2500",
-      houseNumber: "123",
-      villageNumber: "4",
-      province: "เชียงใหม่",
-      district: "เมืองเชียงใหม่",
-      subDistrict: "สุเทพ",
-      addressDetail: "ใกล้มหาวิทยาลัย",
-      latitude: "18.796143",
-      longitude: "98.979263",
-      capacity: "10",
-      facility: "Wi-Fi, ที่จอดรถ",
-      startDate: "01/02/2569",
-      startTime: "10:00",
-      endDate: "05/02/2569",
-      endTime: "14:00",
-      openDate: "15/01/2569",
-      openTime: "08:00",
-      closeDate: "30/01/2569",
-      closeTime: "22:00",
-      tags: ["เดินป่า"],
-      coverImage: {
-        name: "cover.jpg",
-        mimeType: "image/jpeg",
-        buffer: Buffer.from("this is a test image"),
-      },
-      images: [
-        {
-          name: "img1.jpg",
-          mimeType: "image/jpeg",
-          buffer: Buffer.from("img1"),
-        },
-        {
-          name: "img2.jpg",
-          mimeType: "image/jpeg",
-          buffer: Buffer.from("img2"),
-        },
-      ],
-      videos: [
-        {
-          name: "vid1.mp4",
-          mimeType: "video/mp4",
-          buffer: Buffer.from("vid1"),
-        },
-      ],
+    const partialData = {
+      name: "แพ็กเกจไม่สมบูรณ์",
     };
-    await fillPackageForm(page, fullData);
+    await fillPackageForm(page, partialData);
 
     await page.getByRole("button", { name: "สร้างแพ็กเกจ" }).click();
-    await page
-      .getByRole("dialog")
-      .getByRole("button", { name: /ยืนยัน/i })
-      .click();
 
-    await page.goto("/member/packages/all");
-
-    // Check for row
-    const row = page.getByRole("row").filter({ hasText: fullData.name });
-    await expect(row).toBeVisible();
-    await expect(row).toContainText("รออนุมัติ");
+    await expect(page.getByText("กรุณากรอกข้อมูลให้ครบถ้วน")).toBeVisible();
   });
 });

@@ -64,9 +64,21 @@ async function fillPackageForm(page, data) {
   const fillDate = async (id, dateStr) => {
     const [d, m, y] = dateStr.split("/");
     const group = page.locator(`#${id}`);
-    await group.locator("input[placeholder='วว']").fill(d);
-    await group.locator("input[placeholder='ดด']").fill(m);
-    await group.locator("input[placeholder='ปปปป']").fill(y);
+
+    const dayInput = group.locator("input[placeholder='วว']");
+    await dayInput.focus();
+    await dayInput.fill(d);
+    await dayInput.blur();
+
+    const monthInput = group.locator("input[placeholder='ดด']");
+    await monthInput.focus();
+    await monthInput.fill(m);
+    await monthInput.blur();
+
+    const yearInput = group.locator("input[placeholder='ปปปป']");
+    await yearInput.focus();
+    await yearInput.fill(y);
+    await yearInput.blur();
   };
 
   if (data.startDate) await fillDate("startDate", data.startDate);
@@ -74,7 +86,9 @@ async function fillPackageForm(page, data) {
   if (data.openDate) await fillDate("openDate", data.openDate);
   if (data.closeDate) await fillDate("closeDate", data.closeDate);
 
+  // Helper for Times
   const fillTime = async (labelKeyword, timeStr) => {
+    // Expects "HH:mm"
     const [h, m] = timeStr.split(":");
     const wrapper = page
       .locator("div")
@@ -97,6 +111,7 @@ async function fillPackageForm(page, data) {
   if (data.openTime) await fillTime("เวลาที่เปิดจอง", data.openTime);
   if (data.closeTime) await fillTime("เวลาที่ปิดจอง", data.closeTime);
 
+  // Tags
   if (data.tags) {
     const tags = Array.isArray(data.tags) ? data.tags : [data.tags];
     for (const tag of tags) {
@@ -112,6 +127,7 @@ async function fillPackageForm(page, data) {
     await page.getByPlaceholder("ค้นหาชื่อที่พัก").fill(data.accommodation);
   }
 
+  // Files
   if (data.coverImage) {
     const section = page
       .locator("div")
@@ -135,35 +151,36 @@ async function fillPackageForm(page, data) {
   }
 }
 
-test.describe("Member - create packages", () => {
+test.describe("Member - create packages file uploads", () => {
   test.beforeEach(async ({ page }) => {
     await loginAs(page, "member");
     await goToCreatePackagePage(page);
   });
 
   /**
-   * TC-PACKAGE-01: ทดสอบสร้างแพ็กเกจเพื่อส่งแพ็กเกจไปตรวจ
+   * TS-PACKAGE-MEMBER-04.1: ทดสอบอัปโหลดรูปภาพและวิดีโอในแบบฟอร์ม
    */
-  test("TC-PACKAGE-01: ทดสอบสร้างแพ็กเกจเพื่อส่งแพ็กเกจไปตรวจ", async ({
+  test("TS-PACKAGE-MEMBER-04.1: ทดสอบอัปโหลดรูปภาพและวิดีโอในแบบฟอร์ม", async ({
     page,
   }) => {
+    // Navigate and set status to Published (or Draft, verification implies validation)
     await page.getByRole("button", { name: "ฉบับร่าง" }).click();
     await page.getByRole("button", { name: "เผยแพร่" }).nth(1).click();
 
     const fullData = {
-      name: "แพ็กเกจส่งตรวจ",
-      description: "รายละเอียดครบถ้วน",
-      price: "2500",
-      houseNumber: "123",
-      villageNumber: "4",
+      name: "แพ็กเกจทดสอบอัปโหลดไฟล์",
+      description: "ทดสอบการอัปโหลดรูปภาพหน้าปกและรูปเพิ่มเติม",
+      price: "3500",
+      houseNumber: "99/9",
+      villageNumber: "5",
       province: "เชียงใหม่",
       district: "เมืองเชียงใหม่",
       subDistrict: "สุเทพ",
-      addressDetail: "ใกล้มหาวิทยาลัย",
+      addressDetail: "ทดสอบที่อยู่",
       latitude: "18.796143",
       longitude: "98.979263",
-      capacity: "10",
-      facility: "Wi-Fi, ที่จอดรถ",
+      capacity: "5",
+      facility: "Wi-Fi, แอร์",
       startDate: "01/02/2569",
       startTime: "10:00",
       endDate: "05/02/2569",
@@ -172,7 +189,8 @@ test.describe("Member - create packages", () => {
       openTime: "08:00",
       closeDate: "30/01/2569",
       closeTime: "22:00",
-      tags: ["เดินป่า"],
+      tags: ["ธรรมชาติ"],
+      accommodation: "โรงแรมทดสอบ",
       coverImage: {
         name: "cover.jpg",
         mimeType: "image/jpeg",
@@ -184,11 +202,6 @@ test.describe("Member - create packages", () => {
           mimeType: "image/jpeg",
           buffer: Buffer.from("img1"),
         },
-        {
-          name: "img2.jpg",
-          mimeType: "image/jpeg",
-          buffer: Buffer.from("img2"),
-        },
       ],
       videos: [
         {
@@ -198,19 +211,25 @@ test.describe("Member - create packages", () => {
         },
       ],
     };
-    await fillPackageForm(page, fullData);
 
+    await fillPackageForm(page, fullData);
     await page.getByRole("button", { name: "สร้างแพ็กเกจ" }).click();
     await page
       .getByRole("dialog")
       .getByRole("button", { name: /ยืนยัน/i })
       .click();
-
-    await page.goto("/member/packages/all");
-
-    // Check for row
-    const row = page.getByRole("row").filter({ hasText: fullData.name });
-    await expect(row).toBeVisible();
-    await expect(row).toContainText("รออนุมัติ");
+    await page.getByText(fullData.name).click();
+    // Verify Video
+    await expect(
+      page.locator(`video[src*="${fullData.videos[0].name}"]`).first()
+    ).toBeVisible();
+    // Verify Cover Image
+    await expect(
+      page.locator(`img[alt="COVER"][src*="${fullData.coverImage.name}"]`)
+    ).toBeVisible();
+    // Verify Gallery Images
+    await expect(
+      page.locator(`img[alt="GALLERY"][src*="${fullData.images[0].name}"]`)
+    ).toBeVisible();
   });
 });
