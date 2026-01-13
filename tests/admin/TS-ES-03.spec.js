@@ -171,7 +171,8 @@ async function saveAndCancelInModal(page) {
 }
 
 test.describe("Admin - Edit Store (save/cancel behaviors)", () => {
-  test.describe.configure({ mode: "serial" });
+  // Don't use "serial" — it skips remaining tests after first failure
+  test.describe.configure({ mode: "parallel" });
 
   test.beforeEach(async ({ page }) => {
     await loginAs(page, "admin");
