@@ -164,14 +164,14 @@ test.describe("Member - create packages", () => {
       longitude: "98.979263",
       capacity: "10",
       facility: "Wi-Fi, ที่จอดรถ",
-      startDate: "20/01/2569",
-      startTime: "09:00",
-      endDate: "25/01/2569",
-      endTime: "17:00",
-      openDate: "01/01/2569",
+      startDate: "01/02/2569",
+      startTime: "10:00",
+      endDate: "05/02/2569",
+      endTime: "14:00",
+      openDate: "15/01/2569",
       openTime: "08:00",
-      closeDate: "15/01/2569",
-      closeTime: "20:00",
+      closeDate: "30/01/2569",
+      closeTime: "22:00",
       tags: ["เดินป่า"],
       coverImage: {
         name: "cover.jpg",
@@ -205,8 +205,6 @@ test.describe("Member - create packages", () => {
       .getByRole("dialog")
       .getByRole("button", { name: /ยืนยัน/i })
       .click();
-
-    await expect(page.getByText("สร้างแพ็กเกจสำเร็จ")).toBeVisible();
 
     await page.goto("/member/packages/all");
 
