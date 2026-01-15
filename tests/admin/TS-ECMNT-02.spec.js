@@ -53,7 +53,7 @@ test.describe("Admin - Edit Community", () => {
 
     await expect(
       page.getByRole("textbox", { name: "รหัสไปรษณีย์ *" })
-    ).toHaveValue("23000");
+    ).toHaveValue("23170");
 
     await page
       .getByRole("textbox", { name: "คำอธิบายที่อยู่" })
