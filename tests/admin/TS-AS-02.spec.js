@@ -76,7 +76,7 @@ test.describe("Admin - Edit Community", () => {
         await page.getByRole('link', { name: 'จัดการชุมชน' }).click();
         let textHeader = page.getByText('รายละเอียดของชุมชน');
         await expect(textHeader).toBeVisible();
-        await page.getByRole('button', { name: 'ร้านค้า จำนวน 12 ร้านค้า' }).click();
+        await page.getByRole('button', { name: /ร้านค้า จำนวน/ }).click();
         await page.getByRole('button', { name: 'จัดการ' }).click();
         textHeader = page.getByRole('heading', { name: 'จัดการร้านค้า' })
         await expect(textHeader).toBeVisible();
