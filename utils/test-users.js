@@ -22,4 +22,10 @@ export const users = {
     loginPath: "/guest/partner/login",
     redirectTo: "/admin/community/own",
   },
+  member: {
+    email: "comm_member_1@example.com",
+    password: "hashedpw",
+    loginPath: "/guest/partner/login",
+    // redirectTo: "/member/community/own",
+  },
 };
