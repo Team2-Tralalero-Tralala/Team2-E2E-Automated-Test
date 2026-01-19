@@ -47,10 +47,9 @@ async function deleteLastBannerImage(page) {
   await page.getByRole("button", { name: "ยืนยัน" }).click();
   await page.getByRole("button", { name: "ตกลง" }).click();
 
-  await expect(deleteButtons).toHaveCount(
-    bannerCountBeforeDelete - 1,
-    { timeout: 10000 }
-  );
+  await expect(deleteButtons).toHaveCount(bannerCountBeforeDelete - 1, {
+    timeout: 10000,
+  });
 }
 
 test.describe("SuperAdmin - Banner", () => {
@@ -63,7 +62,9 @@ test.describe("SuperAdmin - Banner", () => {
    * TC-MD-03.1
    * ลบรูป banner สำเร็จ
    */
-  test("TS-MD-03.1: SuperAdmin can delete last banner image", async ({ page }) => {
+  test("TS-MD-03.1: SuperAdmin can delete last banner image", async ({
+    page,
+  }) => {
     await deleteLastBannerImage(page);
   });
 });
