@@ -13,7 +13,7 @@ export async function loginAs(page, role) {
 
   if (!user) throw new Error(`Unknown role: ${role}`);
   if (!user.email || !user.password)
-    throw new Error(`Missing credentials for role: ${role}`);
+      throw new Error(`Missing credentials for role: ${role}`);
 
   const loginPage = new LoginPage(page);
   await loginPage.goto(user.loginPath);
@@ -21,4 +21,3 @@ export async function loginAs(page, role) {
 
   await expect(page).toHaveURL(new RegExp(user.redirectTo));
 }
-
