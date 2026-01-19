@@ -39,8 +39,7 @@ async function goToUploadBannersPage(page) {
  *   - ไม่มี return value แต่รูป banner รูปแรกจะถูกแก้ไขสำเร็จ
  */
 async function editFirstBannerImage(page, relativeImagePath) {
-  const firstBannerImage = page
-    .getByRole("img", { name: /preview-banner-0/ });
+  const firstBannerImage = page.getByRole("img", { name: /preview-banner-0/ });
 
   await expect(firstBannerImage).toBeVisible({ timeout: 10000 });
 
@@ -57,9 +56,7 @@ async function editFirstBannerImage(page, relativeImagePath) {
     editButton.click(),
   ]);
 
-  await fileChooser.setFiles(
-    path.resolve(process.cwd(), relativeImagePath)
-  );
+  await fileChooser.setFiles(path.resolve(process.cwd(), relativeImagePath));
 
   const confirmDialog = page.getByRole("dialog");
   await confirmDialog.getByRole("button", { name: "ยืนยัน" }).click();
@@ -67,11 +64,9 @@ async function editFirstBannerImage(page, relativeImagePath) {
   const successDialog = page.getByRole("dialog");
   await successDialog.getByRole("button", { name: "ตกลง" }).click();
 
-  await expect(firstBannerImage).not.toHaveAttribute(
-    "src",
-    oldImageSrc,
-    { timeout: 10000 }
-  );
+  await expect(firstBannerImage).not.toHaveAttribute("src", oldImageSrc, {
+    timeout: 10000,
+  });
 }
 
 test.describe("SuperAdmin - Banner", () => {
@@ -84,10 +79,9 @@ test.describe("SuperAdmin - Banner", () => {
    * TC-MD-03.2
    * แก้ไขรูป banner สำเร็จ
    */
-  test("TS-MD-03.2: SuperAdmin can edit first banner image", async ({ page }) => {
-    await editFirstBannerImage(
-      page,
-      "assets/photo/banner-edit.jpg"
-    );
+  test("TS-MD-03.2: SuperAdmin can edit first banner image", async ({
+    page,
+  }) => {
+    await editFirstBannerImage(page, "assets/photo/banner-edit.jpg");
   });
 });

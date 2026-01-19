@@ -4,7 +4,7 @@ import path from "path";
 
 /**
  * goToUploadBannersPage - ฟังก์ชันสำหรับไปยังหน้าการอัพโหลดรูปโปรไฟล์
- * Input: 
+ * Input:
  *   - page: Playwright Page object
  * Action:
  *   1. คลิกที่เมนู "การตั้งค่า"
@@ -21,7 +21,7 @@ async function goToUploadBannersPage(page) {
 
 /**
  * deleteLastBannerImage - ฟังก์ชันสำหรับลบรูปโปรไฟล์ล่าสุด
- * Input: 
+ * Input:
  *   - page: Playwright Page object
  * Action:
  *   1. หาปุ่มลบรูปโปรไฟล์ทั้งหมด
@@ -43,15 +43,14 @@ async function deleteLastBannerImage(page) {
   await page.getByRole("button", { name: "ยืนยัน" }).click();
   await page.getByRole("button", { name: "ตกลง" }).click();
 
-  await expect(deleteButtons).toHaveCount(
-    bannerCountBeforeDelete - 1,
-    { timeout: 10000 }
-  );
+  await expect(deleteButtons).toHaveCount(bannerCountBeforeDelete - 1, {
+    timeout: 10000,
+  });
 }
 
 /**
  * deleteAllBannerImages - ฟังก์ชันสำหรับลบรูปโปรไฟล์ทั้งหมด
- * Input: 
+ * Input:
  *   - page: Playwright Page object
  * Action:
  *   1. หาปุ่มลบรูปโปรไฟล์ทั้งหมด
@@ -67,7 +66,7 @@ async function deleteAllBannerImages(page) {
 
   await page.waitForLoadState("networkidle");
 
-  while (await deleteButtons.count() > 0) {
+  while ((await deleteButtons.count()) > 0) {
     await deleteLastBannerImage(page);
 
     await page.waitForLoadState("networkidle");
@@ -78,7 +77,7 @@ async function deleteAllBannerImages(page) {
 
 /**
  * uploadBannerImage - ฟังก์ชันสำหรับอัพโหลดรูปโปรไฟล์
- * Input: 
+ * Input:
  *   - page: Playwright Page object
  * Action:
  *   1. กำหนด path ของรูปโปรไฟล์
@@ -93,15 +92,12 @@ async function uploadBannerImage(page, imagePath) {
 
   const beforeCount = await banners.count();
 
-  await fileInput.setInputFiles(
-    path.resolve(process.cwd(), imagePath)
-  );
+  await fileInput.setInputFiles(path.resolve(process.cwd(), imagePath));
 
   await expect(banners).toHaveCount(beforeCount + 1, {
     timeout: 15000,
   });
 }
-
 
 test.describe("SuperAdmin - Banner", () => {
   test.beforeEach(async ({ page }) => {
@@ -112,7 +108,9 @@ test.describe("SuperAdmin - Banner", () => {
    * TS-MD-02.2
    * SuperAdmin จะไม่เห็นปุ่มเพิ่มไฟล์เมื่อมีรูป banner ครบ 5 รูปแล้ว
    */
-test("TS-MD-02.2: Add button should not appear when banner count is 5", async ({ page }) => {
+  test("TS-MD-02.2: Add button should not appear when banner count is 5", async ({
+    page,
+  }) => {
     const banners = page.getByRole("img", { name: /preview-banner-/ });
     const addFileButton = page.getByRole("button", { name: "เพิ่มไฟล์" });
 
@@ -121,10 +119,7 @@ test("TS-MD-02.2: Add button should not appear when banner count is 5", async ({
     await expect(banners).toHaveCount(0);
 
     for (let i = 1; i <= 5; i++) {
-      await uploadBannerImage(
-        page,
-        `assets/photo/banner${i}.jpg`
-      );
+      await uploadBannerImage(page, `assets/photo/banner${i}.jpg`);
     }
 
     await expect(banners).toHaveCount(5);
