@@ -1,768 +1,151 @@
 import { test, expect } from "@playwright/test";
+import { users } from "../../utils/test-users.js";
+import { LoginPage } from "../../pages/auth/LoginPage.js";
 
-/**
- * TS-CP-01.1: ผู้ใช้งานทั่วไปสร้างโปรไฟล์ได้สำเร็จ
- */
-test("TS-CP-01.1: ผู้ใช้งานทั่วไปสร้างโปรไฟล์ได้สำเร็จ", async ({
-  page,
-}) => {
-  // 1. ไปที่หน้าลงทะเบียน
-  await page.goto("/guest/signup");
+test.describe("TS-CP-01 ผู้ใช้งานทั่วไปสามารถเปลี่ยนรหัสผ่าน", () => {
+    let currentPassword = users.tourist.password;
+    const NEW_PASSWORD_VALID = "Abc@7890";
 
-  // --- ข้อมูลส่วนตัว ---
-  await page
-    .getByRole("textbox", { name: "ชื่อ (ไม่ต้องใส่คำนำหน้า) *" })
-    .click();
-  await page
-    .getByRole("textbox", { name: "ชื่อ (ไม่ต้องใส่คำนำหน้า) *" })
-    .fill("ดงยุค");
+    /**
+     * Pre-condition:
+     * 1. เข้าสู่หน้า Login
+     * 2. ล็อกอินด้วยบัญชี Tourist
+     * 3. ไปที่เมนู Profile -> เปลี่ยนรหัสผ่าน
+     * 4. ตรวจสอบว่าอยู่หน้าเปลี่ยนรหัสผ่านจริง
+     */
+    test.beforeEach(async({ page }) => {
+        const loginPage = new LoginPage(page);
+        await loginPage.goto(users.tourist.loginPath);
+        await loginPage.login(users.tourist.email, currentPassword);
 
-  await page.getByRole("textbox", { name: "นามสกุล *" }).click();
-  await page.getByRole("textbox", { name: "นามสกุล *" }).fill("ลาลา");
+        await page.waitForTimeout(2000);
 
-  // --- ข้อมูลบัญชี ---
-  await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).click();
-  await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).fill("lala22");
+        await page.getByRole("button", { name: "Profile", exact: false }).click();
+        await page.getByText("เปลี่ยนรหัสผ่าน").click();
 
-  await page.getByRole("textbox", { name: "อีเมล *" }).click();
-  await page.getByRole("textbox", { name: "อีเมล *" }).fill("lala22@gmail.com");
+        await expect(
+            page.getByRole("heading", { name: "เปลี่ยนรหัสผ่าน" })
+        ).toBeVisible();
+    });
 
-  await page.getByRole("textbox", { name: "รหัสผ่าน *", exact: true }).click();
-  await page
-    .getByRole("textbox", { name: "รหัสผ่าน *", exact: true })
-    .fill("Samitanan99");
+    /**
+     * TC-CP-01.1
+     * เปลี่ยนรหัสผ่านสำเร็จ
+     */
+    test("TS-CP-01.1: เปลี่ยนรหัสผ่านสำเร็จ", async({ page }) => {
+        await page.locator("#current-password").fill(currentPassword);
+        await page.locator("#new-password").fill(NEW_PASSWORD_VALID);
+        await page.locator("#confirm-password").fill(NEW_PASSWORD_VALID);
 
-  await page.getByRole("textbox", { name: "ยืนยันรหัสผ่าน *" }).click();
-  await page
-    .getByRole("textbox", { name: "ยืนยันรหัสผ่าน *" })
-    .fill("Samitanan99");
+        await page.getByRole("button", { name: "ยืนยัน" }).click();
 
-  // --- ข้อมูลติดต่อ ---
-  await page.getByRole("textbox", { name: "โทรศัพท์ *" }).click();
-  await page.getByRole("textbox", { name: "โทรศัพท์ *" }).fill("0987654321");
+        const confirmPopup = page.locator(".swal2-popup");
+        if (await confirmPopup.isVisible()) {
+            await confirmPopup.locator(".swal2-confirm").click();
+        }
 
-  // --- วันเกิด (ตาม Selector ที่คุณให้มา: วว/ดด/ปปปป) ---
-  await page.getByRole("textbox", { name: "วว" }).click();
-  await page.getByRole("textbox", { name: "วว" }).fill("01");
+        currentPassword = NEW_PASSWORD_VALID;
 
-  await page.getByRole("textbox", { name: "ดด" }).click();
-  await page.getByRole("textbox", { name: "ดด" }).fill("01");
+        await page.waitForTimeout(1000);
+    });
 
-  await page.getByRole("textbox", { name: "ปปปป" }).click();
-  await page.getByRole("textbox", { name: "ปปปป" }).fill("2540");
+    /**
+     * TC-CP-01.2
+     * รหัสผ่านปัจจุบันไม่ถูกต้อง
+     */
+    test("TS-CP-01.2: รหัสผ่านปัจจุบันไม่ถูกต้อง", async({ page }) => {
+        await page.locator("#current-password").fill("WrongPass1234");
+        await page.locator("#new-password").fill("Abc@7890");
+        await page.locator("#confirm-password").fill("Abc@7890");
 
-  // --- เพศ ---
-  await page.getByRole("radio", { name: "ชาย" }).click();
-   await page.getByRole("radio", { name: "ชาย" }).click();
-  // --- ที่อยู่ (Dropdown แบบคลิกปุ่ม Open) ---
+        await page.getByRole("button", { name: "ยืนยัน" }).click();
 
-  // 1. จังหวัด (ปุ่ม Open ตัวแรก)
-  await page.getByRole("button", { name: "Open" }).first().click();
-  await page.getByRole("option", { name: "กรุงเทพมหานคร" }).click();
+        const confirmPopup = page.locator(".swal2-popup");
+        if (await confirmPopup.isVisible({ timeout: 3000 })) {
+            await confirmPopup.locator(".swal2-confirm").click();
+        }
 
-  // 2. อำเภอ/เขต (ปุ่ม Open ตัวที่สอง - index 1)
-  await page.getByRole("button", { name: "Open" }).nth(1).click();
-  await page.getByRole("option", { name: "บางรัก" }).click();
+        const errorMsg = page
+            .getByText("Invalid current password")
+            .or(page.getByText("ข้อมูลไม่ถูกต้อง"));
 
-  // 3. ตำบล/แขวง (ปุ่ม Open ตัวที่สาม - index 2)
-  await page.getByRole("button", { name: "Open" }).nth(2).click();
-  await page.getByRole("option", { name: "สีลม" }).click();
+        const errorBanner = page
+            .locator("div.bg-red-50")
+            .filter({ hasText: "ไม่ถูกต้อง" });
 
-  await page.getByRole("button", { name: "ลงทะเบียน" }).click();
+        await expect(errorMsg.or(errorBanner).first()).toBeVisible();
+    });
+
+    /**
+     * TC-CP-01.3
+     * รหัสผ่านใหม่กับยืนยันไม่ตรงกัน
+     */
+    test("TS-CP-01.3: รหัสผ่านใหม่กับยืนยันไม่ตรงกัน", async({ page }) => {
+        await page.locator("#current-password").fill(currentPassword);
+        await page.locator("#new-password").fill("Abc@7891");
+        await page.locator("#confirm-password").fill("Abc@7892");
+
+        await page.getByRole("button", { name: "ยืนยัน" }).click();
+
+        const helperText = page.locator("#confirm-password-helper-text");
+        await expect(helperText).toBeVisible();
+        await expect(helperText).toContainText("ไม่ตรงกัน");
+    });
+
+    /**
+     * TC-CP-01.4
+     * กรอกรหัสผ่านไม่ครบ
+     */
+    test("TS-CP-01.4: กรอกรหัสผ่านไม่ครบ", async({ page }) => {
+        await page.locator("#current-password").fill(currentPassword);
+        await page.locator("#new-password").fill("");
+        await page.locator("#confirm-password").fill("");
+
+        await page.getByRole("button", { name: "ยืนยัน" }).click();
+        const confirmPopup = page.locator(".swal2-popup");
+        if (await confirmPopup.isVisible({ timeout: 3000 })) {
+            await confirmPopup.locator(".swal2-confirm").click();
+        }
+        await expect(confirmPopup).toContainText(
+            "ข้อมูลไม่ครบหรือรูปแบบรหัสผ่านไม่ถูกต้อง"
+        );
+        await page.getByRole("button", { name: "ปิด" }).click();
+        await expect(confirmPopup).toBeHidden();
+    });
+
+    /**
+     * TC-CP-01.5
+     * รูปแบบรหัสผ่านใหม่ไม่ถูกต้อง (Weak Password)
+     */
+    test("TS-CP-01.5: รูปแบบรหัสผ่านใหม่ไม่ถูกต้อง", async({ page }) => {
+        await page.locator("#current-password").fill(currentPassword);
+
+        await page.locator("#new-password").fill("12345678");
+        await page.locator("#confirm-password").fill("12345678");
+
+        await page.getByRole("button", { name: "ยืนยัน" }).click();
+
+        const bannerError = page.locator("div.bg-red-50");
+
+        const passwordRequirementError = page.getByText("รหัสผ่านต้องประกอบด้วย");
+
+        await expect(
+            bannerError.or(passwordRequirementError).first()
+        ).toBeVisible();
+    });
+
+    /**
+     * TC-CP-01.6
+     * ยกเลิกการเปลี่ยนรหัสผ่าน
+     */
+    test("TS-CP-01.6: ยกเลิกการเปลี่ยนรหัสผ่าน", async({ page }) => {
+        await page.locator("#current-password").fill(currentPassword);
+        await page.locator("#new-password").fill(currentPassword);
+        await page.locator("#confirm-password").fill(currentPassword);
+
+        await page.getByRole("button", { name: "ยกเลิก" }).click();
+
+        await expect(page).toHaveURL(/.*\/change-password/);
+    });
+
 });
-
-/**
- * TS-CP-01.2: กรอกข้อมูลไม่ครบ (ชื่อว่าง)
- */
-test("TS-CP-01.2: กรอกข้อมูลไม่ครบ (ชื่อว่าง)", async ({
-  page,
-}) => {
-  // 1. ไปที่หน้าลงทะเบียน
-  await page.goto("/guest/signup");
-
-  // --- ข้อมูลส่วนตัว ---
-  await page
-    .getByRole("textbox", { name: "ชื่อ (ไม่ต้องใส่คำนำหน้า) *" })
-    .click();
-  await page
-    .getByRole("textbox", { name: "ชื่อ (ไม่ต้องใส่คำนำหน้า) *" })
-    .fill("");
-
-  await page.getByRole("textbox", { name: "นามสกุล *" }).click();
-  await page.getByRole("textbox", { name: "นามสกุล *" }).fill("ลาลา");
-
-  // --- ข้อมูลบัญชี ---
-  await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).click();
-  await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).fill("lala22");
-
-  await page.getByRole("textbox", { name: "อีเมล *" }).click();
-  await page.getByRole("textbox", { name: "อีเมล *" }).fill("lala22@gmail.com");
-
-  await page.getByRole("textbox", { name: "รหัสผ่าน *", exact: true }).click();
-  await page
-    .getByRole("textbox", { name: "รหัสผ่าน *", exact: true })
-    .fill("Samitanan99");
-
-  await page.getByRole("textbox", { name: "ยืนยันรหัสผ่าน *" }).click();
-  await page
-    .getByRole("textbox", { name: "ยืนยันรหัสผ่าน *" })
-    .fill("Samitanan99");
-
-  // --- ข้อมูลติดต่อ ---
-  await page.getByRole("textbox", { name: "โทรศัพท์ *" }).click();
-  await page.getByRole("textbox", { name: "โทรศัพท์ *" }).fill("0987654321");
-
-  // --- วันเกิด (ตาม Selector ที่คุณให้มา: วว/ดด/ปปปป) ---
-  await page.getByRole("textbox", { name: "วว" }).click();
-  await page.getByRole("textbox", { name: "วว" }).fill("01");
-
-  await page.getByRole("textbox", { name: "ดด" }).click();
-  await page.getByRole("textbox", { name: "ดด" }).fill("01");
-
-  await page.getByRole("textbox", { name: "ปปปป" }).click();
-  await page.getByRole("textbox", { name: "ปปปป" }).fill("2540");
-
-  // --- เพศ ---
-  await page.getByRole("radio", { name: "ชาย" }).click();
-   await page.getByRole("radio", { name: "ชาย" }).click();
-  // --- ที่อยู่ (Dropdown แบบคลิกปุ่ม Open) ---
-
-  // 1. จังหวัด (ปุ่ม Open ตัวแรก)
-  await page.getByRole("button", { name: "Open" }).first().click();
-  await page.getByRole("option", { name: "กรุงเทพมหานคร" }).click();
-
-  // 2. อำเภอ/เขต (ปุ่ม Open ตัวที่สอง - index 1)
-  await page.getByRole("button", { name: "Open" }).nth(1).click();
-  await page.getByRole("option", { name: "บางรัก" }).click();
-
-  // 3. ตำบล/แขวง (ปุ่ม Open ตัวที่สาม - index 2)
-  await page.getByRole("button", { name: "Open" }).nth(2).click();
-  await page.getByRole("option", { name: "สีลม" }).click();
-
-  await page.getByRole("button", { name: "ลงทะเบียน" }).click();
-});
-
-/**
- * TS-CP-01.3: กรอกข้อมูลไม่ครบ (นามสกุลว่าง)
- */
-test("TS-CP-01.3: กรอกข้อมูลไม่ครบ (นามสกุลว่าง)", async ({
-  page,
-}) => {
-  // 1. ไปที่หน้าลงทะเบียน
-  await page.goto("/guest/signup");
-
-  // --- ข้อมูลส่วนตัว ---
-  await page
-    .getByRole("textbox", { name: "ชื่อ (ไม่ต้องใส่คำนำหน้า) *" })
-    .click();
-  await page
-    .getByRole("textbox", { name: "ชื่อ (ไม่ต้องใส่คำนำหน้า) *" })
-    .fill("ดงยุค");
-
-  await page.getByRole("textbox", { name: "นามสกุล *" }).click();
-  await page.getByRole("textbox", { name: "นามสกุล *" }).fill("");
-
-  // --- ข้อมูลบัญชี ---
-  await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).click();
-  await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).fill("lala22");
-
-  await page.getByRole("textbox", { name: "อีเมล *" }).click();
-  await page.getByRole("textbox", { name: "อีเมล *" }).fill("lala22@gmail.com");
-
-  await page.getByRole("textbox", { name: "รหัสผ่าน *", exact: true }).click();
-  await page
-    .getByRole("textbox", { name: "รหัสผ่าน *", exact: true })
-    .fill("Samitanan99");
-
-  await page.getByRole("textbox", { name: "ยืนยันรหัสผ่าน *" }).click();
-  await page
-    .getByRole("textbox", { name: "ยืนยันรหัสผ่าน *" })
-    .fill("Samitanan99");
-
-  // --- ข้อมูลติดต่อ ---
-  await page.getByRole("textbox", { name: "โทรศัพท์ *" }).click();
-  await page.getByRole("textbox", { name: "โทรศัพท์ *" }).fill("0987654321");
-
-  // --- วันเกิด (ตาม Selector ที่คุณให้มา: วว/ดด/ปปปป) ---
-  await page.getByRole("textbox", { name: "วว" }).click();
-  await page.getByRole("textbox", { name: "วว" }).fill("01");
-
-  await page.getByRole("textbox", { name: "ดด" }).click();
-  await page.getByRole("textbox", { name: "ดด" }).fill("01");
-
-  await page.getByRole("textbox", { name: "ปปปป" }).click();
-  await page.getByRole("textbox", { name: "ปปปป" }).fill("2540");
-
-  // --- เพศ ---
-  await page.getByRole("radio", { name: "ชาย" }).click();
-   await page.getByRole("radio", { name: "ชาย" }).click();
-  // --- ที่อยู่ (Dropdown แบบคลิกปุ่ม Open) ---
-
-  // 1. จังหวัด (ปุ่ม Open ตัวแรก)
-  await page.getByRole("button", { name: "Open" }).first().click();
-  await page.getByRole("option", { name: "กรุงเทพมหานคร" }).click();
-
-  // 2. อำเภอ/เขต (ปุ่ม Open ตัวที่สอง - index 1)
-  await page.getByRole("button", { name: "Open" }).nth(1).click();
-  await page.getByRole("option", { name: "บางรัก" }).click();
-
-  // 3. ตำบล/แขวง (ปุ่ม Open ตัวที่สาม - index 2)
-  await page.getByRole("button", { name: "Open" }).nth(2).click();
-  await page.getByRole("option", { name: "สีลม" }).click();
-
-  await page.getByRole("button", { name: "ลงทะเบียน" }).click();
-});
-
-/**
- * TS-CP-01.4: ชื่อผู้ใช้ไม่ครบตามเงื่อนไข
- */
-test("TS-CP-01.4: ชื่อผู้ใช้ไม่ครบตามเงื่อนไข", async ({
-  page,
-}) => {
-  // 1. ไปที่หน้าลงทะเบียน
-  await page.goto("/guest/signup");
-
-  // --- ข้อมูลส่วนตัว ---
-  await page
-    .getByRole("textbox", { name: "ชื่อ (ไม่ต้องใส่คำนำหน้า) *" })
-    .click();
-  await page
-    .getByRole("textbox", { name: "ชื่อ (ไม่ต้องใส่คำนำหน้า) *" })
-    .fill("ดงยุค");
-
-  await page.getByRole("textbox", { name: "นามสกุล *" }).click();
-  await page.getByRole("textbox", { name: "นามสกุล *" }).fill("ลาลา");
-
-  // --- ข้อมูลบัญชี ---
-  await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).click();
-  await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).fill("la");
-
-  await page.getByRole("textbox", { name: "อีเมล *" }).click();
-  await page.getByRole("textbox", { name: "อีเมล *" }).fill("lala22@gmail.com");
-
-  await page.getByRole("textbox", { name: "รหัสผ่าน *", exact: true }).click();
-  await page
-    .getByRole("textbox", { name: "รหัสผ่าน *", exact: true })
-    .fill("Samitanan99");
-
-  await page.getByRole("textbox", { name: "ยืนยันรหัสผ่าน *" }).click();
-  await page
-    .getByRole("textbox", { name: "ยืนยันรหัสผ่าน *" })
-    .fill("Samitanan99");
-
-  // --- ข้อมูลติดต่อ ---
-  await page.getByRole("textbox", { name: "โทรศัพท์ *" }).click();
-  await page.getByRole("textbox", { name: "โทรศัพท์ *" }).fill("0987654321");
-
-  // --- วันเกิด (ตาม Selector ที่คุณให้มา: วว/ดด/ปปปป) ---
-  await page.getByRole("textbox", { name: "วว" }).click();
-  await page.getByRole("textbox", { name: "วว" }).fill("01");
-
-  await page.getByRole("textbox", { name: "ดด" }).click();
-  await page.getByRole("textbox", { name: "ดด" }).fill("01");
-
-  await page.getByRole("textbox", { name: "ปปปป" }).click();
-  await page.getByRole("textbox", { name: "ปปปป" }).fill("2540");
-
-  // --- เพศ ---
-  await page.getByRole("radio", { name: "ชาย" }).click();
-   await page.getByRole("radio", { name: "ชาย" }).click();
-  // --- ที่อยู่ (Dropdown แบบคลิกปุ่ม Open) ---
-
-  // 1. จังหวัด (ปุ่ม Open ตัวแรก)
-  await page.getByRole("button", { name: "Open" }).first().click();
-  await page.getByRole("option", { name: "กรุงเทพมหานคร" }).click();
-
-  // 2. อำเภอ/เขต (ปุ่ม Open ตัวที่สอง - index 1)
-  await page.getByRole("button", { name: "Open" }).nth(1).click();
-  await page.getByRole("option", { name: "บางรัก" }).click();
-
-  // 3. ตำบล/แขวง (ปุ่ม Open ตัวที่สาม - index 2)
-  await page.getByRole("button", { name: "Open" }).nth(2).click();
-  await page.getByRole("option", { name: "สีลม" }).click();
-
-  await page.getByRole("button", { name: "ลงทะเบียน" }).click();
-});
-
-/**
- * TS-CP-01.5: รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน
- */
-test("TS-CP-01.5: รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน", async ({
-  page,
-}) => {
-  // 1. ไปที่หน้าลงทะเบียน
-  await page.goto("/guest/signup");
-
-  // --- ข้อมูลส่วนตัว ---
-  await page
-    .getByRole("textbox", { name: "ชื่อ (ไม่ต้องใส่คำนำหน้า) *" })
-    .click();
-  await page
-    .getByRole("textbox", { name: "ชื่อ (ไม่ต้องใส่คำนำหน้า) *" })
-    .fill("ดงยุค");
-
-  await page.getByRole("textbox", { name: "นามสกุล *" }).click();
-  await page.getByRole("textbox", { name: "นามสกุล *" }).fill("ลาลา");
-
-  // --- ข้อมูลบัญชี ---
-  await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).click();
-  await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).fill("lala22");
-
-  await page.getByRole("textbox", { name: "อีเมล *" }).click();
-  await page.getByRole("textbox", { name: "อีเมล *" }).fill("lala22@gmail.com");
-
-  await page.getByRole("textbox", { name: "รหัสผ่าน *", exact: true }).click();
-  await page
-    .getByRole("textbox", { name: "รหัสผ่าน *", exact: true })
-    .fill("Samitanan99");
-
-  await page.getByRole("textbox", { name: "ยืนยันรหัสผ่าน *" }).click();
-  await page
-    .getByRole("textbox", { name: "ยืนยันรหัสผ่าน *" })
-    .fill("Samitanan");
-
-  // --- ข้อมูลติดต่อ ---
-  await page.getByRole("textbox", { name: "โทรศัพท์ *" }).click();
-  await page.getByRole("textbox", { name: "โทรศัพท์ *" }).fill("0987654321");
-
-  // --- วันเกิด (ตาม Selector ที่คุณให้มา: วว/ดด/ปปปป) ---
-  await page.getByRole("textbox", { name: "วว" }).click();
-  await page.getByRole("textbox", { name: "วว" }).fill("01");
-
-  await page.getByRole("textbox", { name: "ดด" }).click();
-  await page.getByRole("textbox", { name: "ดด" }).fill("01");
-
-  await page.getByRole("textbox", { name: "ปปปป" }).click();
-  await page.getByRole("textbox", { name: "ปปปป" }).fill("2540");
-
-  // --- เพศ ---
-  await page.getByRole("radio", { name: "ชาย" }).click();
-   await page.getByRole("radio", { name: "ชาย" }).click();
-  // --- ที่อยู่ (Dropdown แบบคลิกปุ่ม Open) ---
-
-  // 1. จังหวัด (ปุ่ม Open ตัวแรก)
-  await page.getByRole("button", { name: "Open" }).first().click();
-  await page.getByRole("option", { name: "กรุงเทพมหานคร" }).click();
-
-  // 2. อำเภอ/เขต (ปุ่ม Open ตัวที่สอง - index 1)
-  await page.getByRole("button", { name: "Open" }).nth(1).click();
-  await page.getByRole("option", { name: "บางรัก" }).click();
-
-  // 3. ตำบล/แขวง (ปุ่ม Open ตัวที่สาม - index 2)
-  await page.getByRole("button", { name: "Open" }).nth(2).click();
-  await page.getByRole("option", { name: "สีลม" }).click();
-
-  await page.getByRole("button", { name: "ลงทะเบียน" }).click();
-});
-
-/**
- * TS-CP-01.6: รหัสผ่านสั้นเกินไป
- */
-test("TS-CP-01.6: รหัสผ่านสั้นเกินไป", async ({
-  page,
-}) => {
-  // 1. ไปที่หน้าลงทะเบียน
-  await page.goto("/guest/signup");
-
-  // --- ข้อมูลส่วนตัว ---
-  await page
-    .getByRole("textbox", { name: "ชื่อ (ไม่ต้องใส่คำนำหน้า) *" })
-    .click();
-  await page
-    .getByRole("textbox", { name: "ชื่อ (ไม่ต้องใส่คำนำหน้า) *" })
-    .fill("ดงยุค");
-
-  await page.getByRole("textbox", { name: "นามสกุล *" }).click();
-  await page.getByRole("textbox", { name: "นามสกุล *" }).fill("ลาลา");
-
-  // --- ข้อมูลบัญชี ---
-  await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).click();
-  await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).fill("lala22");
-
-  await page.getByRole("textbox", { name: "อีเมล *" }).click();
-  await page.getByRole("textbox", { name: "อีเมล *" }).fill("lala22@gmail.com");
-
-  await page.getByRole("textbox", { name: "รหัสผ่าน *", exact: true }).click();
-  await page
-    .getByRole("textbox", { name: "รหัสผ่าน *", exact: true })
-    .fill("Sa");
-
-  await page.getByRole("textbox", { name: "ยืนยันรหัสผ่าน *" }).click();
-  await page
-    .getByRole("textbox", { name: "ยืนยันรหัสผ่าน *" })
-    .fill("Sa");
-
-  // --- ข้อมูลติดต่อ ---
-  await page.getByRole("textbox", { name: "โทรศัพท์ *" }).click();
-  await page.getByRole("textbox", { name: "โทรศัพท์ *" }).fill("0987654321");
-
-  // --- วันเกิด (ตาม Selector ที่คุณให้มา: วว/ดด/ปปปป) ---
-  await page.getByRole("textbox", { name: "วว" }).click();
-  await page.getByRole("textbox", { name: "วว" }).fill("01");
-
-  await page.getByRole("textbox", { name: "ดด" }).click();
-  await page.getByRole("textbox", { name: "ดด" }).fill("01");
-
-  await page.getByRole("textbox", { name: "ปปปป" }).click();
-  await page.getByRole("textbox", { name: "ปปปป" }).fill("2540");
-
-  // --- เพศ ---
-  await page.getByRole("radio", { name: "ชาย" }).click();
-   await page.getByRole("radio", { name: "ชาย" }).click();
-  // --- ที่อยู่ (Dropdown แบบคลิกปุ่ม Open) ---
-
-  // 1. จังหวัด (ปุ่ม Open ตัวแรก)
-  await page.getByRole("button", { name: "Open" }).first().click();
-  await page.getByRole("option", { name: "กรุงเทพมหานคร" }).click();
-
-  // 2. อำเภอ/เขต (ปุ่ม Open ตัวที่สอง - index 1)
-  await page.getByRole("button", { name: "Open" }).nth(1).click();
-  await page.getByRole("option", { name: "บางรัก" }).click();
-
-  // 3. ตำบล/แขวง (ปุ่ม Open ตัวที่สาม - index 2)
-  await page.getByRole("button", { name: "Open" }).nth(2).click();
-  await page.getByRole("option", { name: "สีลม" }).click();
-
-  await page.getByRole("button", { name: "ลงทะเบียน" }).click();
-});
-
-/**
- * TS-CP-01.7: อีเมลรูปแบบผิด
- */
-test("TS-CP-01.7: อีเมลรูปแบบผิด", async ({
-  page,
-}) => {
-  // 1. ไปที่หน้าลงทะเบียน
-  await page.goto("/guest/signup");
-
-  // --- ข้อมูลส่วนตัว ---
-  await page
-    .getByRole("textbox", { name: "ชื่อ (ไม่ต้องใส่คำนำหน้า) *" })
-    .click();
-  await page
-    .getByRole("textbox", { name: "ชื่อ (ไม่ต้องใส่คำนำหน้า) *" })
-    .fill("ดงยุค");
-
-  await page.getByRole("textbox", { name: "นามสกุล *" }).click();
-  await page.getByRole("textbox", { name: "นามสกุล *" }).fill("ลาลา");
-
-  // --- ข้อมูลบัญชี ---
-  await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).click();
-  await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).fill("lala22");
-
-  await page.getByRole("textbox", { name: "อีเมล *" }).click();
-  await page.getByRole("textbox", { name: "อีเมล *" }).fill("lal");
-
-  await page.getByRole("textbox", { name: "รหัสผ่าน *", exact: true }).click();
-  await page
-    .getByRole("textbox", { name: "รหัสผ่าน *", exact: true })
-    .fill("Samitanan99");
-
-  await page.getByRole("textbox", { name: "ยืนยันรหัสผ่าน *" }).click();
-  await page
-    .getByRole("textbox", { name: "ยืนยันรหัสผ่าน *" })
-    .fill("Samitanan99");
-
-  // --- ข้อมูลติดต่อ ---
-  await page.getByRole("textbox", { name: "โทรศัพท์ *" }).click();
-  await page.getByRole("textbox", { name: "โทรศัพท์ *" }).fill("0987654321");
-
-  // --- วันเกิด (ตาม Selector ที่คุณให้มา: วว/ดด/ปปปป) ---
-  await page.getByRole("textbox", { name: "วว" }).click();
-  await page.getByRole("textbox", { name: "วว" }).fill("01");
-
-  await page.getByRole("textbox", { name: "ดด" }).click();
-  await page.getByRole("textbox", { name: "ดด" }).fill("01");
-
-  await page.getByRole("textbox", { name: "ปปปป" }).click();
-  await page.getByRole("textbox", { name: "ปปปป" }).fill("2540");
-
-  // --- เพศ ---
-  await page.getByRole("radio", { name: "ชาย" }).click();
-   await page.getByRole("radio", { name: "ชาย" }).click();
-  // --- ที่อยู่ (Dropdown แบบคลิกปุ่ม Open) ---
-
-  // 1. จังหวัด (ปุ่ม Open ตัวแรก)
-  await page.getByRole("button", { name: "Open" }).first().click();
-  await page.getByRole("option", { name: "กรุงเทพมหานคร" }).click();
-
-  // 2. อำเภอ/เขต (ปุ่ม Open ตัวที่สอง - index 1)
-  await page.getByRole("button", { name: "Open" }).nth(1).click();
-  await page.getByRole("option", { name: "บางรัก" }).click();
-
-  // 3. ตำบล/แขวง (ปุ่ม Open ตัวที่สาม - index 2)
-  await page.getByRole("button", { name: "Open" }).nth(2).click();
-  await page.getByRole("option", { name: "สีลม" }).click();
-
-  await page.getByRole("button", { name: "ลงทะเบียน" }).click();
-});
-
-/**
- * TS-CP-01.8: อีเมลซ้ำกับในระบบ
- */
-test("TS-CP-01.8: อีเมลซ้ำกับในระบบ", async ({
-  page,
-}) => {
-  // 1. ไปที่หน้าลงทะเบียน
-  await page.goto("/guest/signup");
-
-  // --- ข้อมูลส่วนตัว ---
-  await page
-    .getByRole("textbox", { name: "ชื่อ (ไม่ต้องใส่คำนำหน้า) *" })
-    .click();
-  await page
-    .getByRole("textbox", { name: "ชื่อ (ไม่ต้องใส่คำนำหน้า) *" })
-    .fill("ดงยุค");
-
-  await page.getByRole("textbox", { name: "นามสกุล *" }).click();
-  await page.getByRole("textbox", { name: "นามสกุล *" }).fill("ลาลา");
-
-  // --- ข้อมูลบัญชี ---
-  await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).click();
-  await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).fill("lala22");
-
-  await page.getByRole("textbox", { name: "อีเมล *" }).click();
-  await page.getByRole("textbox", { name: "อีเมล *" }).fill("lala22@gmail.com");
-
-  await page.getByRole("textbox", { name: "รหัสผ่าน *", exact: true }).click();
-  await page
-    .getByRole("textbox", { name: "รหัสผ่าน *", exact: true })
-    .fill("Samitanan99");
-
-  await page.getByRole("textbox", { name: "ยืนยันรหัสผ่าน *" }).click();
-  await page
-    .getByRole("textbox", { name: "ยืนยันรหัสผ่าน *" })
-    .fill("Samitanan99");
-
-  // --- ข้อมูลติดต่อ ---
-  await page.getByRole("textbox", { name: "โทรศัพท์ *" }).click();
-  await page.getByRole("textbox", { name: "โทรศัพท์ *" }).fill("0987654321");
-
-  // --- วันเกิด (ตาม Selector ที่คุณให้มา: วว/ดด/ปปปป) ---
-  await page.getByRole("textbox", { name: "วว" }).click();
-  await page.getByRole("textbox", { name: "วว" }).fill("01");
-
-  await page.getByRole("textbox", { name: "ดด" }).click();
-  await page.getByRole("textbox", { name: "ดด" }).fill("01");
-
-  await page.getByRole("textbox", { name: "ปปปป" }).click();
-  await page.getByRole("textbox", { name: "ปปปป" }).fill("2540");
-
-  // --- เพศ ---
-  await page.getByRole("radio", { name: "ชาย" }).click();
-   await page.getByRole("radio", { name: "ชาย" }).click();
-  // --- ที่อยู่ (Dropdown แบบคลิกปุ่ม Open) ---
-
-  // 1. จังหวัด (ปุ่ม Open ตัวแรก)
-  await page.getByRole("button", { name: "Open" }).first().click();
-  await page.getByRole("option", { name: "กรุงเทพมหานคร" }).click();
-
-  // 2. อำเภอ/เขต (ปุ่ม Open ตัวที่สอง - index 1)
-  await page.getByRole("button", { name: "Open" }).nth(1).click();
-  await page.getByRole("option", { name: "บางรัก" }).click();
-
-  // 3. ตำบล/แขวง (ปุ่ม Open ตัวที่สาม - index 2)
-  await page.getByRole("button", { name: "Open" }).nth(2).click();
-  await page.getByRole("option", { name: "สีลม" }).click();
-
-  await page.getByRole("button", { name: "ลงทะเบียน" }).click();
-});
-
-/**
- * TS-CP-01.9: เบอร์โทรศัพท์ไม่ถูกต้อง
- */
-test("TS-CP-01.9: เบอร์โทรศัพท์ไม่ถูกต้อง", async ({
-  page,
-}) => {
-  // 1. ไปที่หน้าลงทะเบียน
-  await page.goto("/guest/signup");
-
-  // --- ข้อมูลส่วนตัว ---
-  await page
-    .getByRole("textbox", { name: "ชื่อ (ไม่ต้องใส่คำนำหน้า) *" })
-    .click();
-  await page
-    .getByRole("textbox", { name: "ชื่อ (ไม่ต้องใส่คำนำหน้า) *" })
-    .fill("ดงยุค");
-
-  await page.getByRole("textbox", { name: "นามสกุล *" }).click();
-  await page.getByRole("textbox", { name: "นามสกุล *" }).fill("ลาลา");
-
-  // --- ข้อมูลบัญชี ---
-  await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).click();
-  await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).fill("lala22");
-
-  await page.getByRole("textbox", { name: "อีเมล *" }).click();
-  await page.getByRole("textbox", { name: "อีเมล *" }).fill("lala22@gmail.com");
-
-  await page.getByRole("textbox", { name: "รหัสผ่าน *", exact: true }).click();
-  await page
-    .getByRole("textbox", { name: "รหัสผ่าน *", exact: true })
-    .fill("Samitanan99");
-
-  await page.getByRole("textbox", { name: "ยืนยันรหัสผ่าน *" }).click();
-  await page
-    .getByRole("textbox", { name: "ยืนยันรหัสผ่าน *" })
-    .fill("Samitanan99");
-
-  // --- ข้อมูลติดต่อ ---
-  await page.getByRole("textbox", { name: "โทรศัพท์ *" }).click();
-  await page.getByRole("textbox", { name: "โทรศัพท์ *" }).fill("09");
-
-  // --- วันเกิด (ตาม Selector ที่คุณให้มา: วว/ดด/ปปปป) ---
-  await page.getByRole("textbox", { name: "วว" }).click();
-  await page.getByRole("textbox", { name: "วว" }).fill("01");
-
-  await page.getByRole("textbox", { name: "ดด" }).click();
-  await page.getByRole("textbox", { name: "ดด" }).fill("01");
-
-  await page.getByRole("textbox", { name: "ปปปป" }).click();
-  await page.getByRole("textbox", { name: "ปปปป" }).fill("2540");
-
-  // --- เพศ ---
-  await page.getByRole("radio", { name: "ชาย" }).click();
-   await page.getByRole("radio", { name: "ชาย" }).click();
-  // --- ที่อยู่ (Dropdown แบบคลิกปุ่ม Open) ---
-
-  // 1. จังหวัด (ปุ่ม Open ตัวแรก)
-  await page.getByRole("button", { name: "Open" }).first().click();
-  await page.getByRole("option", { name: "กรุงเทพมหานคร" }).click();
-
-  // 2. อำเภอ/เขต (ปุ่ม Open ตัวที่สอง - index 1)
-  await page.getByRole("button", { name: "Open" }).nth(1).click();
-  await page.getByRole("option", { name: "บางรัก" }).click();
-
-  // 3. ตำบล/แขวง (ปุ่ม Open ตัวที่สาม - index 2)
-  await page.getByRole("button", { name: "Open" }).nth(2).click();
-  await page.getByRole("option", { name: "สีลม" }).click();
-
-  await page.getByRole("button", { name: "ลงทะเบียน" }).click();
-});
-
-/**
- * TS-CP-01.10: ไม่เลือกเพศ
- */
-test("TS-CP-01.10: ไม่เลือกเพศ", async ({
-  page,
-}) => {
-  // 1. ไปที่หน้าลงทะเบียน
-  await page.goto("/guest/signup");
-
-  // --- ข้อมูลส่วนตัว ---
-  await page
-    .getByRole("textbox", { name: "ชื่อ (ไม่ต้องใส่คำนำหน้า) *" })
-    .click();
-  await page
-    .getByRole("textbox", { name: "ชื่อ (ไม่ต้องใส่คำนำหน้า) *" })
-    .fill("ดงยุค");
-
-  await page.getByRole("textbox", { name: "นามสกุล *" }).click();
-  await page.getByRole("textbox", { name: "นามสกุล *" }).fill("ลาลา");
-
-  // --- ข้อมูลบัญชี ---
-  await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).click();
-  await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).fill("lala22");
-
-  await page.getByRole("textbox", { name: "อีเมล *" }).click();
-  await page.getByRole("textbox", { name: "อีเมล *" }).fill("lala22@gmail.com");
-
-  await page.getByRole("textbox", { name: "รหัสผ่าน *", exact: true }).click();
-  await page
-    .getByRole("textbox", { name: "รหัสผ่าน *", exact: true })
-    .fill("Samitanan99");
-
-  await page.getByRole("textbox", { name: "ยืนยันรหัสผ่าน *" }).click();
-  await page
-    .getByRole("textbox", { name: "ยืนยันรหัสผ่าน *" })
-    .fill("Samitanan99");
-
-  // --- ข้อมูลติดต่อ ---
-  await page.getByRole("textbox", { name: "โทรศัพท์ *" }).click();
-  await page.getByRole("textbox", { name: "โทรศัพท์ *" }).fill("0987654321");
-
-  // --- วันเกิด (ตาม Selector ที่คุณให้มา: วว/ดด/ปปปป) ---
-  await page.getByRole("textbox", { name: "วว" }).click();
-  await page.getByRole("textbox", { name: "วว" }).fill("01");
-
-  await page.getByRole("textbox", { name: "ดด" }).click();
-  await page.getByRole("textbox", { name: "ดด" }).fill("01");
-
-  await page.getByRole("textbox", { name: "ปปปป" }).click();
-  await page.getByRole("textbox", { name: "ปปปป" }).fill("2540");
-
-  // --- ที่อยู่ (Dropdown แบบคลิกปุ่ม Open) ---
-
-  // 1. จังหวัด (ปุ่ม Open ตัวแรก)
-  await page.getByRole("button", { name: "Open" }).first().click();
-  await page.getByRole("option", { name: "กรุงเทพมหานคร" }).click();
-
-  // 2. อำเภอ/เขต (ปุ่ม Open ตัวที่สอง - index 1)
-  await page.getByRole("button", { name: "Open" }).nth(1).click();
-  await page.getByRole("option", { name: "บางรัก" }).click();
-
-  // 3. ตำบล/แขวง (ปุ่ม Open ตัวที่สาม - index 2)
-  await page.getByRole("button", { name: "Open" }).nth(2).click();
-  await page.getByRole("option", { name: "สีลม" }).click();
-
-  await page.getByRole("button", { name: "ลงทะเบียน" }).click();
-});
-
-/**
- * TS-CP-01.11: ไม่เลือกจังหวัด/อำเภอ/ตำบล
- */
-test("TS-CP-01.11: ไม่เลือกจังหวัด/อำเภอ/ตำบล", async ({
-  page,
-}) => {
-  // 1. ไปที่หน้าลงทะเบียน
-  await page.goto("/guest/signup");
-
-  // --- ข้อมูลส่วนตัว ---
-  await page
-    .getByRole("textbox", { name: "ชื่อ (ไม่ต้องใส่คำนำหน้า) *" })
-    .click();
-  await page
-    .getByRole("textbox", { name: "ชื่อ (ไม่ต้องใส่คำนำหน้า) *" })
-    .fill("ดงยุค");
-
-  await page.getByRole("textbox", { name: "นามสกุล *" }).click();
-  await page.getByRole("textbox", { name: "นามสกุล *" }).fill("ลาลา");
-
-  // --- ข้อมูลบัญชี ---
-  await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).click();
-  await page.getByRole("textbox", { name: "ชื่อผู้ใช้ *" }).fill("lala22");
-
-  await page.getByRole("textbox", { name: "อีเมล *" }).click();
-  await page.getByRole("textbox", { name: "อีเมล *" }).fill("lala22@gmail.com");
-
-  await page.getByRole("textbox", { name: "รหัสผ่าน *", exact: true }).click();
-  await page
-    .getByRole("textbox", { name: "รหัสผ่าน *", exact: true })
-    .fill("Samitanan99");
-
-  await page.getByRole("textbox", { name: "ยืนยันรหัสผ่าน *" }).click();
-  await page
-    .getByRole("textbox", { name: "ยืนยันรหัสผ่าน *" })
-    .fill("Samitanan99");
-
-  // --- ข้อมูลติดต่อ ---
-  await page.getByRole("textbox", { name: "โทรศัพท์ *" }).click();
-  await page.getByRole("textbox", { name: "โทรศัพท์ *" }).fill("0987654321");
-
-  // --- วันเกิด (ตาม Selector ที่คุณให้มา: วว/ดด/ปปปป) ---
-  await page.getByRole("textbox", { name: "วว" }).click();
-  await page.getByRole("textbox", { name: "วว" }).fill("01");
-
-  await page.getByRole("textbox", { name: "ดด" }).click();
-  await page.getByRole("textbox", { name: "ดด" }).fill("01");
-
-  await page.getByRole("textbox", { name: "ปปปป" }).click();
-  await page.getByRole("textbox", { name: "ปปปป" }).fill("2540");
-
-  // --- เพศ ---
-  await page.getByRole("radio", { name: "ชาย" }).click();
-   await page.getByRole("radio", { name: "ชาย" }).click();
-  // --- ที่อยู่ (Dropdown แบบคลิกปุ่ม Open) ---
-
-  await page.getByRole("button", { name: "ลงทะเบียน" }).click();
-});
-
