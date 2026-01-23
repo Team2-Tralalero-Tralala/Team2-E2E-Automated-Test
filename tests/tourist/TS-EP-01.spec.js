@@ -24,15 +24,23 @@ async function uploadProfileImage(page) {
   await expect(imageDialog).toBeHidden();
 }
 
-test.beforeEach(async ({ page }) => {
-  await loginAs(page, "tourist");
+test.describe("TC-EP-01 - แก้ไขข้อมูลส่วนตัว", () => {
 
-  await expect(page).toHaveURL(/tourist\/home/);
+  test.beforeEach(async ({ page }) => {
+    await loginAs(page, "tourist");
+    await expect(page).toHaveURL(/tourist\/home/);
 
-  // ไปหน้าแก้ไขโปรไฟล์
-  await page.goto("/tourist/profile/edit");
+    // ไปหน้าแก้ไขโปรไฟล์
+    await page.goto("/tourist/edit-profile");
+    await expect(
+      page.getByRole("heading", { name: /แก้ไขโปรไฟล์/i })
+    ).toBeVisible();
+  });
 
-  await expect(
-    page.getByRole("heading", { name: /แก้ไขโปรไฟล์/i })
-  ).toBeVisible();
+  test("TC-EP-01.1: เปิดหน้าแก้ไขโปรไฟล์ได้", async ({ page }) => {
+    await expect(
+      page.getByRole("heading", { name: /แก้ไขโปรไฟล์/})
+    ).toBeVisible();
+  });
+
 });
