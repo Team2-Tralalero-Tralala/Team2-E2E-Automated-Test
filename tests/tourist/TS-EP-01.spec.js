@@ -161,33 +161,40 @@ test.describe("TS-EP-01.1 - แก้ไขข้อมูลส่วนตั�
     await uploadProfileImage(page);
     await fillProfileForm(page, { firstName: "" });
     await submitAndConfirm(page);
-    await expect(page.getByRole("dialog")).toBeVisible();
+
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toContainText("ไม่สามารถบันทึกข้อมูลได้");
   });
 
   /**
    * TC-EP-01.4
    * นามสกุลว่าง
    */
-  test.only("TS-EP-01.4: นามสกุลว่าง", async ({ page }) => {
+  test("TS-EP-01.4: นามสกุลว่าง", async ({ page }) => {
     await loginAs(page, "tourist");
     await goToPageEditProfile(page);
     await uploadProfileImage(page);
     await fillProfileForm(page, { lastName: "" });
     await submitAndConfirm(page);
-    await expect(page.getByRole("dialog")).toBeVisible();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toContainText("ไม่สามารถบันทึกข้อมูลได้");
   });
 
   /**
    * TC-EP-01.5
    * อีเมลผิดรูปแบบ
    */
-  test.only("TS-EP-01.5: อีเมลผิดรูปแบบ", async ({ page }) => {
+  test("TS-EP-01.5: อีเมลผิดรูปแบบ", async ({ page }) => {
     await loginAs(page, "tourist");
     await goToPageEditProfile(page);
     await uploadProfileImage(page);
     await fillProfileForm(page, { email: "tr" });
     await submitAndConfirm(page);
-    await expect(page.getByRole("dialog")).toBeVisible();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toContainText("ไม่สามารถบันทึกข้อมูลได้");
   });
 
   /**
@@ -200,7 +207,9 @@ test.describe("TS-EP-01.1 - แก้ไขข้อมูลส่วนตั�
     await uploadProfileImage(page);
     await fillProfileForm(page, { email: "comm_member_2@example.com" });
     await submitAndConfirm(page);
-    await expect(page.getByRole("dialog")).toBeVisible();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toContainText("ไม่สามารถบันทึกข้อมูลได้");
   });
 
   /**
@@ -213,7 +222,9 @@ test.describe("TS-EP-01.1 - แก้ไขข้อมูลส่วนตั�
     await uploadProfileImage(page);
     await fillProfileForm(page, { phone: "09" });
     await submitAndConfirm(page);
-    await expect(page.getByRole("dialog")).toBeVisible();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toContainText("ไม่สามารถบันทึกข้อมูลได้");
   });
 
   /**
@@ -226,7 +237,9 @@ test.describe("TS-EP-01.1 - แก้ไขข้อมูลส่วนตั�
     await uploadProfileImage(page);
     await fillProfileForm(page, { skipAddress: true });
     await submitAndConfirm(page);
-    await expect(page.getByRole("dialog")).toBeVisible();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toContainText("ไม่สามารถบันทึกข้อมูลได้");
   });
 
   /**
@@ -239,6 +252,8 @@ test.describe("TS-EP-01.1 - แก้ไขข้อมูลส่วนตั�
     await uploadProfilePDF(page);
     await fillProfileForm(page);
     await submitAndConfirm(page);
-    await expect(page.getByRole("dialog")).toBeVisible();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toContainText("ไม่สามารถบันทึกข้อมูลได้");
   });
 });
