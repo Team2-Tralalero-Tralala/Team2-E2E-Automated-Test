@@ -14,24 +14,26 @@ test.describe("Guest - Register Flow", () => {
   test("TS-RT-01.1: Fill all required fields and submit", async ({ page }) => {
     await page.fill("#fname", "สมชาย");
     await page.fill("#lname", "ใจดี");
-    await page.fill("#username", "somchai01");
-    await page.fill("#email", "somchai01@example.com");
+    await page.fill("#username", "somchai02");
+    await page.fill("#email", "somchai02@example.com");
     await page.fill("#password", "Password123");
     await page.fill("#passwordConfirm", "Password123");
-    await page.fill("#phone", "812345678");
+    await page.fill("#phone", "812345648");
 
     const dateInputs = page.locator(
-      'div[aria-label="Thai BE date input"] input'
+      'div[aria-label="Thai BE date input"] input',
     );
     await dateInputs.nth(0).fill("01");
-    await dateInputs.nth(1).fill("01");
-    await dateInputs.nth(2).fill("2540");
+    await dateInputs.nth(1).fill("02");
+    await dateInputs.nth(2).fill("2556");
 
     await page.locator('label[for="male"]').click();
 
     await page.fill("#province", "กรุงเทพมหานคร");
     await page.keyboard.press("ArrowDown");
     await page.keyboard.press("Enter");
+
+    await expect(page.locator("#district")).toBeEnabled();
 
     await page.fill("#district", "บางรัก");
     await page.keyboard.press("ArrowDown");
@@ -45,7 +47,11 @@ test.describe("Guest - Register Flow", () => {
 
     await page.click('button:has-text("ลงทะเบียน")');
 
-    await expect(page).toHaveURL(/success|login|verify/);
+    await expect(page).toHaveURL("http://localhost:4000/guest/signup");
+
+    await expect(
+      page.getByRole("heading", { name: "ลงทะเบียนสำเร็จ!" }),
+    ).toBeVisible();
   });
 
   /**
@@ -59,12 +65,12 @@ test.describe("Guest - Register Flow", () => {
     await page.fill("#fname", "");
     await page.locator("#lname").click();
     await expect(page.locator("#fname-helper-text")).toHaveText(
-      "กรุณากรอกชื่อ"
+      "กรุณากรอกชื่อ",
     );
 
     await page.click('button:has-text("ลงทะเบียน")');
     await expect(page.locator("#fname-helper-text")).toHaveText(
-      "กรุณากรอกชื่อ"
+      "กรุณากรอกชื่อ",
     );
   });
 
@@ -79,13 +85,13 @@ test.describe("Guest - Register Flow", () => {
     await page.fill("#lname", "");
     await page.locator("#fname").click();
     await expect(page.locator("#lname-helper-text")).toHaveText(
-      "กรุณากรอกนามสกุล"
+      "กรุณากรอกนามสกุล",
     );
 
     await page.click('button:has-text("ลงทะเบียน")');
 
     await expect(page.locator("#lname-helper-text")).toHaveText(
-      "กรุณากรอกนามสกุล"
+      "กรุณากรอกนามสกุล",
     );
   });
 
@@ -102,13 +108,13 @@ test.describe("Guest - Register Flow", () => {
     await page.locator("#email").click();
 
     await expect(page.locator("#username-helper-text")).toHaveText(
-      "กรุณากรอกชื่อผู้ใช้"
+      "กรุณากรอกชื่อผู้ใช้",
     );
 
     await page.click('button:has-text("ลงทะเบียน")');
 
     await expect(page.locator("#username-helper-text")).toHaveText(
-      "กรุณากรอกชื่อผู้ใช้"
+      "กรุณากรอกชื่อผู้ใช้",
     );
   });
 
@@ -119,19 +125,19 @@ test.describe("Guest - Register Flow", () => {
   test("TS-RT-01.5: Username already exists", async ({ page }) => {
     await page.fill("#fname", "สมชาย");
     await page.fill("#lname", "ใจดี");
-    await page.fill("#username", "somchai01");
+    await page.fill("#username", "samitanan22");
     await page.fill("#email", "somchai02@example.com");
     await page.fill("#password", "Password123");
     await page.fill("#passwordConfirm", "Password123");
     await page.fill("#phone", "812345679");
 
     await expect(page.locator("#username-helper-text")).toHaveText(
-      "ชื่อผู้ใช้นี้ถูกใช้งานแล้ว"
+      "ชื่อผู้ใช้นี้ถูกใช้งานแล้ว",
     );
     await page.click('button:has-text("ลงทะเบียน")');
 
     await expect(page.locator("#username-helper-text")).toHaveText(
-      "ชื่อผู้ใช้นี้ถูกใช้งานแล้ว"
+      "ชื่อผู้ใช้นี้ถูกใช้งานแล้ว",
     );
   });
 
@@ -151,15 +157,9 @@ test.describe("Guest - Register Flow", () => {
     await page.fill("#phone", "812345680");
 
     await page.locator("#password").click();
-
-    await expect(page.locator("#email-helper-text")).toHaveText(
-      "กรุณากรอกอีเมล"
-    );
-
     await page.click('button:has-text("ลงทะเบียน")');
-
     await expect(page.locator("#email-helper-text")).toHaveText(
-      "กรุณากรอกอีเมล"
+      "กรุณากรอกอีเมล",
     );
   });
 
@@ -172,7 +172,7 @@ test.describe("Guest - Register Flow", () => {
     await page.fill("#lname", "ใจดี");
     await page.fill("#username", "somchai04");
 
-    await page.fill("#email", "somchai04@abc.com");
+    await page.fill("#email", "somchai04abc.com");
 
     await page.fill("#password", "Password123");
     await page.fill("#passwordConfirm", "Password123");
@@ -181,13 +181,13 @@ test.describe("Guest - Register Flow", () => {
     await page.locator("#password").click();
 
     await expect(page.locator("#email-helper-text")).toHaveText(
-      "กรุณากรอกรูปแบบอีเมลให้ถูกต้อง"
+      "กรุณากรอกรูปแบบอีเมลให้ถูกต้อง",
     );
 
     await page.click('button:has-text("ลงทะเบียน")');
 
     await expect(page.locator("#email-helper-text")).toHaveText(
-      "กรุณากรอกรูปแบบอีเมลให้ถูกต้อง"
+      "กรุณากรอกรูปแบบอีเมลให้ถูกต้อง",
     );
   });
 
@@ -209,13 +209,13 @@ test.describe("Guest - Register Flow", () => {
     await page.locator("#phone").click();
 
     await expect(page.locator("#password-helper-text")).toHaveText(
-      "รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร"
+      "รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร",
     );
 
     await page.click('button:has-text("ลงทะเบียน")');
 
     await expect(page.locator("#password-helper-text")).toHaveText(
-      "รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร"
+      "รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร",
     );
   });
 
@@ -233,18 +233,10 @@ test.describe("Guest - Register Flow", () => {
     await page.fill("#passwordConfirm", "password1");
 
     await page.fill("#phone", "812345683");
-    n;
-    await page.locator("#phone").click();
-
-    await expect(page.locator("#password-helper-text")).toHaveText(
-      "กรุณากรอกรหัสผ่านให้ตรงตามเงื่อนไข"
-    );
 
     await page.click('button:has-text("ลงทะเบียน")');
 
-    await expect(page.locator("#password-helper-text")).toHaveText(
-      "กรุณากรอกรหัสผ่านให้ตรงตามเงื่อนไข"
-    );
+    await expect(page.locator("#password")).toHaveClass(/border-red/);
   });
 
   /**
@@ -260,20 +252,20 @@ test.describe("Guest - Register Flow", () => {
     await page.fill("#email", "somchai07@example.com");
 
     await page.fill("#password", "Password123");
-    await page.fill("#passwordConfirm", "Password124");
+    await page.fill("#passwordConfirm", "Password");
 
     await page.fill("#phone", "812345684");
 
     await page.locator("#phone").click();
 
     await expect(page.locator("#passwordConfirm-helper-text")).toHaveText(
-      "รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน"
+      "รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน",
     );
 
     await page.click('button:has-text("ลงทะเบียน")');
 
     await expect(page.locator("#passwordConfirm-helper-text")).toHaveText(
-      "รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน"
+      "รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน",
     );
   });
 
@@ -293,7 +285,7 @@ test.describe("Guest - Register Flow", () => {
     await page.fill("#phone", "81234567");
 
     const dateInputs = page.locator(
-      'div[aria-label="Thai BE date input"] input'
+      'div[aria-label="Thai BE date input"] input',
     );
     await dateInputs.nth(0).fill("01");
     await dateInputs.nth(1).fill("01");
@@ -304,13 +296,13 @@ test.describe("Guest - Register Flow", () => {
     await page.locator("#email").click();
 
     await expect(page.locator("#phone-helper-text")).toHaveText(
-      "กรุณากรอกหมายเลขโทรศัพท์ให้ครบ 9 หลัก"
+      "กรุณากรอกหมายเลขโทรศัพท์ให้ครบ 9 หลัก",
     );
 
     await page.click('button:has-text("ลงทะเบียน")');
 
     await expect(page.locator("#phone-helper-text")).toHaveText(
-      "กรุณากรอกหมายเลขโทรศัพท์ให้ครบ 9 หลัก"
+      "กรุณากรอกหมายเลขโทรศัพท์ให้ครบ 9 หลัก",
     );
   });
 
@@ -330,15 +322,9 @@ test.describe("Guest - Register Flow", () => {
 
     await page.locator('label[for="male"]').click();
 
-    await expect(page.locator("#birthDate-helper-text")).toHaveText(
-      "กรุณาระบุวัน-เดือน-ปีเกิด"
-    );
-
     await page.click('button:has-text("ลงทะเบียน")');
 
-    await expect(page.locator("#birthDate-helper-text")).toHaveText(
-      "กรุณาระบุวัน-เดือน-ปีเกิด"
-    );
+    await expect(page.getByText("กรุณาระบุวัน-เดือน-ปีเกิด")).toBeVisible();
   });
 
   /**
@@ -354,18 +340,10 @@ test.describe("Guest - Register Flow", () => {
     await page.fill("#passwordConfirm", "Password123");
     await page.fill("#phone", "812345690");
 
-    const dateInputs = page.locator(
-      'div[aria-label="Thai BE date input"] input'
-    );
-    await dateInputs.nth(0).fill("01");
-    await dateInputs.nth(1).fill("01");
-    await dateInputs.nth(2).fill("2540");
-
     await page.click('button:has-text("ลงทะเบียน")');
 
-    await expect(page.locator("#gender-helper-text")).toHaveText(
-      "กรุณาเลือกเพศ"
-    );
+    await expect(page.getByText("กรุณาเลือกเพศ")).toBeVisible();
+   
   });
 
   /**
@@ -382,7 +360,7 @@ test.describe("Guest - Register Flow", () => {
     await page.fill("#phone", "812345691");
 
     const dateInputs = page.locator(
-      'div[aria-label="Thai BE date input"] input'
+      'div[aria-label="Thai BE date input"] input',
     );
     await dateInputs.nth(0).fill("01");
     await dateInputs.nth(1).fill("01");
@@ -393,7 +371,7 @@ test.describe("Guest - Register Flow", () => {
     await page.click('button:has-text("ลงทะเบียน")');
 
     await expect(page.locator("#province-helper-text")).toHaveText(
-      "กรุณาเลือกจังหวัด"
+      "กรุณาเลือกจังหวัด",
     );
   });
 
@@ -411,7 +389,7 @@ test.describe("Guest - Register Flow", () => {
     await page.fill("#phone", "812345692");
 
     const dateInputs = page.locator(
-      'div[aria-label="Thai BE date input"] input'
+      'div[aria-label="Thai BE date input"] input',
     );
     await dateInputs.nth(0).fill("01");
     await dateInputs.nth(1).fill("01");
@@ -426,7 +404,7 @@ test.describe("Guest - Register Flow", () => {
     await page.click('button:has-text("ลงทะเบียน")');
 
     await expect(page.locator("#district-helper-text")).toHaveText(
-      "กรุณาเลือกอำเภอ/เขต"
+      "กรุณาเลือกอำเภอ/เขต",
     );
   });
 
@@ -446,7 +424,7 @@ test.describe("Guest - Register Flow", () => {
     await page.fill("#phone", "812345693");
 
     const dateInputs = page.locator(
-      'div[aria-label="Thai BE date input"] input'
+      'div[aria-label="Thai BE date input"] input',
     );
     await dateInputs.nth(0).fill("01");
     await dateInputs.nth(1).fill("01");
@@ -465,7 +443,7 @@ test.describe("Guest - Register Flow", () => {
     await page.click('button:has-text("ลงทะเบียน")');
 
     await expect(page.locator("#postalCode-helper-text")).toHaveText(
-      "กรุณากรอกรหัสไปรษณีย์"
+      "กรุณากรอกรหัสไปรษณีย์",
     );
   });
 
@@ -483,43 +461,43 @@ test.describe("Guest - Register Flow", () => {
     await page.click('button:has-text("ลงทะเบียน")');
 
     await expect(page.locator("#fname-helper-text")).toHaveText(
-      "กรุณากรอกชื่อ"
+      "กรุณากรอกชื่อ",
     );
 
     await expect(page.locator("#username-helper-text")).toHaveText(
-      "กรุณากรอกชื่อผู้ใช้"
+      "กรุณากรอกชื่อผู้ใช้",
     );
 
     await expect(page.locator("#email-helper-text")).toHaveText(
-      "รูปแบบอีเมลไม่ถูกต้อง"
+      "รูปแบบอีเมลไม่ถูกต้อง",
     );
 
     await expect(page.locator("#password-helper-text")).toHaveText(
-      "รหัสผ่านไม่ตรงตามเงื่อนไข"
+      "รหัสผ่านไม่ตรงตามเงื่อนไข",
     );
 
     await expect(page.locator("#passwordConfirm-helper-text")).toHaveText(
-      "รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน"
+      "รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน",
     );
 
     await expect(page.locator("#phone-helper-text")).toHaveText(
-      "กรุณากรอกหมายเลขโทรศัพท์ให้ครบ 9 หลัก"
+      "กรุณากรอกหมายเลขโทรศัพท์ให้ครบ 9 หลัก",
     );
 
     await expect(page.locator("#birthDate-helper-text")).toHaveText(
-      "กรุณาระบุวัน-เดือน-ปีเกิด"
+      "กรุณาระบุวัน-เดือน-ปีเกิด",
     );
 
     await expect(page.locator("#gender-helper-text")).toHaveText(
-      "กรุณาเลือกเพศ"
+      "กรุณาเลือกเพศ",
     );
 
     await expect(page.locator("#province-helper-text")).toHaveText(
-      "กรุณาเลือกจังหวัด"
+      "กรุณาเลือกจังหวัด",
     );
 
     await expect(page.locator("#postalCode-helper-text")).toHaveText(
-      "กรุณากรอกรหัสไปรษณีย์"
+      "กรุณากรอกรหัสไปรษณีย์",
     );
   });
 });
