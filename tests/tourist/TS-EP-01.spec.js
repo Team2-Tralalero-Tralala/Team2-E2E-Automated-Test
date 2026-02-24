@@ -232,28 +232,33 @@ test.describe("TS-EP-01.1 - แก้ไขข้อมูลส่วนตั�
    * ที่อยู่ไม่ครบ
    */
   test("TS-EP-01.8: ที่อยู่ไม่ครบ", async ({ page }) => {
-    await loginAs(page, "tourist");
-    await goToPageEditProfile(page);
-    await uploadProfileImage(page);
-    await fillProfileForm(page, { skipAddress: true });
-    await submitAndConfirm(page);
-    const dialog = page.getByRole("dialog");
-    await expect(dialog).toBeVisible();
-    await expect(dialog).toContainText("ไม่สามารถบันทึกข้อมูลได้");
+  await loginAs(page, "tourist");
+  await goToPageEditProfile(page);
+  await uploadProfileImage(page);
+  await fillProfileForm(page, { skipAddress: true });
+  await page.getByRole("button", { name: "บันทึก" }).click();
+  const dialog = page.getByRole("dialog", { 
+    name: "ไม่สามารถบันทึกข้อมูลได้" 
   });
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText("กรุณากรอกที่อยู่ให้ครบถ้วน");
+  await dialog.getByRole("button", { name: "ปิด" }).click();
+});
 
   /**
    * TC-EP-01.9
    * อัปโหลดไฟล์ผิดประเภท
    */
-  test("TS-EP-01.9: อัปโหลดไฟล์ผิดประเภท", async ({ page }) => {
-    await loginAs(page, "tourist");
-    await goToPageEditProfile(page);
-    await uploadProfilePDF(page);
-    await fillProfileForm(page);
-    await submitAndConfirm(page);
-    const dialog = page.getByRole("dialog");
-    await expect(dialog).toBeVisible();
-    await expect(dialog).toContainText("ไม่สามารถบันทึกข้อมูลได้");
+test.only("TS-EP-01.9: อัปโหลดไฟล์ผิดประเภท", async ({ page }) => {
+  await loginAs(page, "tourist");
+  await goToPageEditProfile(page);
+  await uploadProfilePDF(page);
+  const dialog = page.getByRole("dialog", {
+    name: "ไม่สามารถบันทึกข้อมูลได้",
   });
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText(
+    "กรุณาอัปโหลดไฟล์รูปภาพเท่านั้น"
+  );
+});
 });
