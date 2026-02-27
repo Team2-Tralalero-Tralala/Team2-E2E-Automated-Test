@@ -14,8 +14,8 @@ test.describe("Guest - Register Flow", () => {
   test("TS-RT-01.1: Fill all required fields and submit", async ({ page }) => {
     await page.fill("#fname", "สมชาย");
     await page.fill("#lname", "ใจดี");
-    await page.fill("#username", "somchai02");
-    await page.fill("#email", "somchai02@example.com");
+    await page.fill("#username", "somchai01");
+    await page.fill("#email", "somchai01@example.com");
     await page.fill("#password", "Password123");
     await page.fill("#passwordConfirm", "Password123");
     await page.fill("#phone", "812345648");
@@ -131,14 +131,45 @@ test.describe("Guest - Register Flow", () => {
     await page.fill("#passwordConfirm", "Password123");
     await page.fill("#phone", "812345679");
 
-    await expect(page.locator("#username-helper-text")).toHaveText(
-      "ชื่อผู้ใช้นี้ถูกใช้งานแล้ว",
+    const dateInputs = page.locator(
+      'div[aria-label="Thai BE date input"] input',
     );
+    await dateInputs.nth(0).fill("01");
+    await dateInputs.nth(1).fill("02");
+    await dateInputs.nth(2).fill("2556");
+
+    await page.locator('label[for="male"]').click();
+
+    await page.fill("#province", "กรุงเทพมหานคร");
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("Enter");
+
+    await expect(page.locator("#district")).toBeEnabled();
+
+    await page.fill("#district", "บางรัก");
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("Enter");
+
+    await page.fill("#subDistrict", "สีลม");
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("Enter");
+
+    await expect(page.locator("#postalCode")).not.toBeEmpty();
+
     await page.click('button:has-text("ลงทะเบียน")');
 
-    await expect(page.locator("#username-helper-text")).toHaveText(
-      "ชื่อผู้ใช้นี้ถูกใช้งานแล้ว",
+    const modal = page.locator(".swal2-popup");
+    await expect(modal).toBeVisible();
+
+    await expect(page.locator("#swal2-title")).toHaveText("ลงทะเบียนไม่สำเร็จ");
+
+    await expect(page.locator("#swal2-html-container")).toHaveText(
+      "ชื่อผู้ใช้ถูกใช้แล้ว",
     );
+
+    await page.click(".swal2-confirm");
+    await expect(page).toHaveURL("http://localhost:4000/guest/signup");
+    await expect(page.locator("#username")).toBeVisible();
   });
 
   /**
@@ -343,7 +374,6 @@ test.describe("Guest - Register Flow", () => {
     await page.click('button:has-text("ลงทะเบียน")');
 
     await expect(page.getByText("กรุณาเลือกเพศ")).toBeVisible();
-   
   });
 
   /**

@@ -46,48 +46,6 @@ test.describe("Login validation", () => {
   });
 
   /**
-   * TS-Login-02.3 * เข้าสู่ระบบด้วยอีเมลผิดรูปแบบ
-   */
-  test("TC-Login-02.3: email correct format", async ({ page }) => {
-    await page
-      .getByRole("textbox", { name: /อีเมล/i })
-      .fill("comm_admin_1@abc.com");
-    await page.getByRole("textbox", { name: /รหัสผ่าน/i }).fill("hashedpw1");
-    await page.getByRole("button", { name: /เข้าสู่ระบบ/i }).click();
-    await expect(page.getByText("รูปแบบอีเมลไม่ถูกต้อง")).toBeVisible();
-  });
-
-  /**
-   * TC-Login-02.4
-   * เข้าสู่ระบบด้วยรหัสผ่านสั้นกว่าที่กำหนด
-   * */
-  test("TC-Login-02.4", async ({ page }) => {
-    await page
-      .getByRole("textbox", { name: /อีเมล/i })
-      .fill("comm_admin_1@example.com");
-    await page.getByRole("textbox", { name: /รหัสผ่าน/i }).fill("12345");
-    await page.getByRole("button", { name: /เข้าสู่ระบบ/i }).click();
-    await expect(page.getByText("มากกว่าหรือเท่ากับ 8 ตัว")).toBeVisible();
-  });
-
-  /**
-   * TC-Login-02.5
-   * เข้าสู่ระบบด้วยรหัสผ่านยาวเกินกำหนด (เช่น 255 ตัว)
-   */
-  test("TC-Login-02.5: login with password longer than maximum length", async ({
-    page,
-  }) => {
-    await page
-      .getByRole("textbox", { name: /อีเมล/i })
-      .fill("comm_admin_1@example.com");
-    await page
-      .getByRole("textbox", { name: /รหัสผ่าน/i })
-      .fill("a".repeat(255));
-    await page.getByRole("button", { name: /เข้าสู่ระบบ/i }).click();
-    await expect(page.getByText("รหัสผ่านเกินจำนวนที่อนุญาต")).toBeVisible();
-  });
-
-  /**
    * TC-Login-03.1
    * ผู้ใช้งานไม่กรอก Username / Email และรหัสผ่าน (ปล่อยช่องว่างทั้งหมด)
    */

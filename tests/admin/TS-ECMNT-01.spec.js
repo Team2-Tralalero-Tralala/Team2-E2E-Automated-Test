@@ -235,7 +235,7 @@ test.describe("Admin - Edit Community", () => {
       .getByRole("textbox", { name: "หมายเลขบัญชี *" })
       .fill("111-0-1กห11-ก");
 
-    const nameError = page.getByText("กรุณากรอกเลขบัญชีเป็นตัวเลข");
+    const nameError = page.getByText("กรุณากรอกหมายเลขบัญชีธนาคารเป็นตัวเลข");
     await expect(nameError).toBeVisible();
   });
 

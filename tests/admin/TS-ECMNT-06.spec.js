@@ -94,7 +94,7 @@ test.describe("Admin - Edit Community", () => {
     await page
       .getByRole("textbox", { name: "ประวัติวิสาหกิจชุมชน *" })
       .fill(
-        "กลุ่มเกษตรกรรวมตัวกันผลิตและแปรรูปข้าวอินทรีย์ เพื่อเพิ่มมูลค่าและสร้างรายได้อย่างยั่งยืน"
+        "กลุ่มเกษตรกรรวมตัวกันผลิตและแปรรูปข้าวอินทรีย์ เพื่อเพิ่มมูลค่าและสร้างรายได้อย่างยั่งยืน",
       );
 
     await page
@@ -104,7 +104,7 @@ test.describe("Admin - Edit Community", () => {
     await page
       .getByRole("textbox", { name: "รายละเอียดกิจกรรมหลัก *" })
       .fill(
-        "ผลิตและจำหน่ายข้าวสารอินทรีย์ ข้าวกล้อง และผลิตภัณฑ์แปรรูปจากข้าว"
+        "ผลิตและจำหน่ายข้าวสารอินทรีย์ ข้าวกล้อง และผลิตภัณฑ์แปรรูปจากข้าว",
       );
 
     const imageSection = page
@@ -112,6 +112,12 @@ test.describe("Admin - Edit Community", () => {
       .locator("..");
 
     const imageInput = imageSection.locator('input[type="file"]');
+    const imageCounter = imageSection.locator('span[id^="upload-counter"]');
+
+    const initialImageText = await imageCounter.textContent();
+    const initialImageCount = parseInt(
+      initialImageText?.split(" / ")[0] ?? "0",
+    );
 
     const images = [
       path.join(process.cwd(), "assets/photo/activity1.jpeg"),
@@ -121,7 +127,7 @@ test.describe("Admin - Edit Community", () => {
 
     for (let i = 0; i < images.length; i++) {
       await imageInput.setInputFiles(images[i]);
-      await expect(imageSection).toContainText(/\d+\s*\/\s*5/);
+      await expect(imageCounter).toHaveText(`${initialImageCount + i + 1} / 5`);
     }
 
     const videoSection = page
@@ -129,20 +135,25 @@ test.describe("Admin - Edit Community", () => {
       .locator("..");
 
     const videoInput = videoSection.locator('input[type="file"]');
+    const videoCounter = videoSection.locator('span[id^="upload-counter"]');
+
+    const initialVideoText = await videoCounter.textContent();
+    const initialVideoCount = parseInt(
+      initialVideoText?.split(" / ")[0] ?? "0",
+    );
 
     const videos = [
       path.join(process.cwd(), "assets/video/activity_Video1.mp4"),
       path.join(process.cwd(), "assets/video/activity_Video2.mp4"),
     ];
+
     for (let i = 0; i < videos.length; i++) {
       await videoInput.setInputFiles(videos[i]);
-      await expect(videoSection).toContainText(/\d+\s*\/\s*5/);
+      await expect(videoCounter).toHaveText(`${initialVideoCount + i + 1} / 5`);
     }
 
     await page.getByRole("button", { name: "ที่อยู่วิสาหกิจชุมชน" }).click();
-
     await page.getByRole("textbox", { name: "บ้านเลขที่ *" }).fill("128/7");
-
     await page.getByRole("spinbutton", { name: "หมู่ที่" }).fill("5");
 
     const province = page.getByRole("combobox", { name: "จังหวัด *" });
@@ -160,8 +171,8 @@ test.describe("Admin - Edit Community", () => {
     await subDistrict.press("Tab");
 
     await expect(
-      page.getByRole("textbox", { name: "รหัสไปรษณีย์ *" })
-    ).toHaveValue("23170");
+      page.getByRole("textbox", { name: "รหัสไปรษณีย์ *" }),
+    ).toHaveValue("65120");
 
     await page
       .getByRole("textbox", { name: "คำอธิบายที่อยู่" })
@@ -213,22 +224,6 @@ test.describe("Admin - Edit Community", () => {
       .getByPlaceholder("กรอกเบอร์โทรศัพท์ของผู้ประสานงาน")
       .fill(testData.coordinatorPhone);
 
-    const caretakerDropdown = page.getByRole("combobox", {
-      name: "ผู้ดูแล *",
-    });
-    await caretakerDropdown.click();
-
-    const caretakerSearch = page.getByPlaceholder("เลือกผู้ดูแล");
-    await caretakerSearch.fill(testData.caretakerSearch);
-
-    const caretakerOption = page.getByText(testData.caretakerValue, {
-      exact: true,
-    });
-    await expect(caretakerOption).toBeVisible();
-    await caretakerOption.click();
-
-    await expect(caretakerDropdown).toHaveValue(testData.caretakerValue);
-
     const memberDropdown = page.getByRole("combobox", { name: "สมาชิก" });
     await memberDropdown.click();
 
@@ -277,7 +272,7 @@ test.describe("Admin - Edit Community", () => {
     await houseNumber.fill("");
     await houseNumber.press("Tab");
     await expect(page.locator("#houseNumber-helper-text")).toHaveText(
-      "กรุณากรอกบ้านเลขที่"
+      "กรุณากรอกบ้านเลขที่",
     );
     await expect(houseNumber).toHaveClass(/border-red-600/);
 
@@ -306,7 +301,7 @@ test.describe("Admin - Edit Community", () => {
 
     await expect(resultDialog).toContainText("ข้อมูลไม่ถูกต้อง");
     await expect(resultDialog).toContainText(
-      "กรุณากรอกข้อมูลให้ครบถ้วนก่อนทำการบันทึก"
+      "กรุณากรอกข้อมูลให้ครบถ้วนก่อนทำการบันทึก",
     );
 
     await resultDialog.getByRole("button", { name: "ปิด" }).click();

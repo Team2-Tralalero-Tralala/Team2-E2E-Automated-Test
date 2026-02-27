@@ -337,7 +337,7 @@ test.describe("SuperAdmin - Create Community", () => {
       .getByRole("textbox", { name: "หมายเลขบัญชี *" })
       .fill("ssqowkq11029");
 
-    const nameError = page.getByText("กรุณากรอกเลขบัญชีเป็นตัวเลข");
+    const nameError = page.getByText("กรุณากรอกหมายเลขบัญชีธนาคารเป็นตัวเลข");
     await expect(nameError).toBeVisible();
     await expect(page).toHaveURL(/\/super\/community\/create$/);
   });

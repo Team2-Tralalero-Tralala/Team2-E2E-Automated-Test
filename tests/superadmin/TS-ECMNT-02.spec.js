@@ -29,7 +29,7 @@ async function goToPageEditCommunity(page) {
 async function uploadCoverImage(page) {
   const coverImage = path.resolve(
     process.cwd(),
-    "assets/photo/communityCover.jpeg"
+    "assets/photo/communityCover.jpeg",
   );
   await page.locator('input[type="file"]').nth(0).setInputFiles(coverImage);
   const useCropBtn = page.getByRole("button", { name: "ใช้รูปที่ครอป" });
@@ -45,7 +45,7 @@ async function uploadCoverImage(page) {
 async function uploadLogoImage(page) {
   const logoImage = path.resolve(
     process.cwd(),
-    "assets/photo/logoCommunity.jpg"
+    "assets/photo/logoCommunity.jpg",
   );
   await page.locator('input[type="file"]').nth(1).setInputFiles(logoImage);
   const useConfirmBtn = page.getByRole("button", { name: "ใช้รูปที่ครอป" });
@@ -109,7 +109,7 @@ test.describe("SuperAdmin - Edit Community", () => {
     await page
       .getByRole("textbox", { name: "ประวัติวิสาหกิจชุมชน *" })
       .fill(
-        "กลุ่มชาวบ้านรวมตัวกันนำสมุนไพรท้องถิ่นมาแปรรูปเป็นผลิตภัณฑ์สุขภาพ เพื่อเพิ่มมูลค่าและสร้างรายได้ให้กับชุมชน"
+        "กลุ่มชาวบ้านรวมตัวกันนำสมุนไพรท้องถิ่นมาแปรรูปเป็นผลิตภัณฑ์สุขภาพ เพื่อเพิ่มมูลค่าและสร้างรายได้ให้กับชุมชน",
       );
 
     await page
@@ -119,7 +119,7 @@ test.describe("SuperAdmin - Edit Community", () => {
     await page
       .getByRole("textbox", { name: "รายละเอียดกิจกรรมหลัก *" })
       .fill(
-        "ผลิตและจำหน่ายผลิตภัณฑ์สมุนไพร เช่น ยาหม่อง น้ำมันสมุนไพร และชาสมุนไพร"
+        "ผลิตและจำหน่ายผลิตภัณฑ์สมุนไพร เช่น ยาหม่อง น้ำมันสมุนไพร และชาสมุนไพร",
       );
   });
 
@@ -153,7 +153,7 @@ test.describe("SuperAdmin - Edit Community", () => {
     await page.getByRole("button", { name: "ข้อมูลชุมชน" }).click();
     await page.getByLabel("เลขทะเบียนวิสาหกิจชุมชน *").clear();
     await expect(
-      page.getByText("กรุณากรอกเลขทะเบียนวิสาหกิจชุมชน")
+      page.getByText("กรุณากรอกเลขทะเบียนวิสาหกิจชุมชน"),
     ).toBeVisible();
   });
 
@@ -258,7 +258,7 @@ test.describe("SuperAdmin - Edit Community", () => {
       .getByRole("textbox", { name: "หมายเลขบัญชี *" })
       .fill("dlpslwdlk11");
 
-    const nameError = page.getByText("กรุณากรอกเลขบัญชีเป็นตัวเลข");
+    const nameError = page.getByText("กรุณากรอกหมายเลขบัญชีธนาคารเป็นตัวเลข");
     await expect(nameError).toBeVisible();
   });
 
@@ -350,6 +350,14 @@ test.describe("SuperAdmin - Edit Community", () => {
     await goToPageEditCommunity(page);
     await page.getByRole("button", { name: "ข้อมูลชุมชน" }).click();
 
+    const deleteButtons = page.getByRole("button", { name: /ลบไฟล์/ });
+
+    if ((await deleteButtons.count()) > 0) {
+      const count = await deleteButtons.count();
+      for (let i = 0; i < count; i++) {
+        await deleteButtons.nth(0).click();
+      }
+    }
     await page.getByRole("button", { name: "บันทึก" }).click();
 
     const confirmDialog = page.getByRole("dialog");
@@ -357,15 +365,18 @@ test.describe("SuperAdmin - Edit Community", () => {
 
     await confirmDialog.getByRole("button", { name: "ยืนยัน" }).click();
 
-    const resultDialog = page.getByRole("dialog");
-    await expect(resultDialog).toBeVisible();
+    const modal = page.locator(".swal2-popup");
+    await expect(modal).toBeVisible();
 
-    await resultDialog.getByRole("button", { name: "ปิด" }).click();
-    await expect(resultDialog).toBeHidden();
+    await expect(modal.locator("#swal2-title")).toHaveText("ข้อมูลไม่ถูกต้อง");
 
-    const nameError = page.getByText("กรุณาอัพโหลดรูปภาพ");
-    await expect(nameError).toBeVisible();
-    await expect(page).toHaveURL(/\/super\/community\/\d+$/);
+    await expect(modal.locator("#swal2-html-container")).toHaveText(
+      "กรุณาอัปโหลดรูปภาพเพิ่มเติมอย่างน้อย 1 รูป",
+    );
+
+    await modal.getByRole("button", { name: "ปิด" }).click();
+    await expect(modal).toBeHidden();
+    await expect(page).toHaveURL("http://localhost:4000/super/community/108/edit");
   });
 
   /**
@@ -376,23 +387,6 @@ test.describe("SuperAdmin - Edit Community", () => {
     await goToPageEditCommunity(page);
     await page.getByRole("button", { name: "ข้อมูลชุมชน" }).click();
 
-    const imageSection = page
-      .locator("text=อัพโหลดรูปภาพเพิ่มเติม")
-      .locator("..");
-
-    const imageInput = imageSection.locator('input[type="file"]');
-
-    const images = [
-      path.join(process.cwd(), "assets/photo/activity1.jpeg"),
-      path.join(process.cwd(), "assets/photo/activity2.jpg"),
-      path.join(process.cwd(), "assets/photo/activity3.jpg"),
-    ];
-
-    for (let i = 0; i < images.length; i++) {
-      await imageInput.setInputFiles(images[i]);
-      await expect(imageSection).toContainText(`${i + 1} / 5`);
-    }
-
     await page.getByRole("button", { name: "บันทึก" }).click();
 
     const confirmDialog = page.getByRole("dialog");
@@ -400,15 +394,20 @@ test.describe("SuperAdmin - Edit Community", () => {
 
     await confirmDialog.getByRole("button", { name: "ยืนยัน" }).click();
 
-    const resultDialog = page.getByRole("dialog");
-    await expect(resultDialog).toBeVisible();
+    const modal = page.locator(".swal2-popup");
+    await expect(modal).toBeVisible();
 
-    await resultDialog.getByRole("button", { name: "ปิด" }).click();
-    await expect(resultDialog).toBeHidden();
+    await expect(modal.locator("#swal2-title")).toHaveText("ข้อมูลไม่ถูกต้อง");
 
-    const nameError = page.getByText("กรุณาอัพโหลดรูปภาพ");
-    await expect(nameError).toBeVisible();
-    await expect(page).toHaveURL(/\/super\/community\/\d+$/);
+    await expect(modal.locator("#swal2-html-container")).toHaveText(
+      "กรุณาอัปโหลดวิดีโออย่างน้อย 1 วิดีโอ",
+    );
+
+    await modal.getByRole("button", { name: "ปิด" }).click();
+    await expect(modal).toBeHidden();
+    await expect(page).toHaveURL(
+      "http://localhost:4000/super/community/108/edit",
+    );
   });
 
   /**
@@ -440,13 +439,13 @@ test.describe("SuperAdmin - Edit Community", () => {
     await page.getByRole("option", { name: "วารินชำราบ" }).click();
 
     await expect(
-      page.getByRole("textbox", { name: "รหัสไปรษณีย์ *" })
+      page.getByRole("textbox", { name: "รหัสไปรษณีย์ *" }),
     ).toHaveValue("34190");
 
     await page
       .getByRole("textbox", { name: "คำอธิบายที่อยู่" })
       .fill(
-        "ตั้งอยู่ในพื้นที่ชุมชนบ้านดอนกลาง ใกล้แปลงสมุนไพรและศูนย์เรียนรู้ชุมชน"
+        "ตั้งอยู่ในพื้นที่ชุมชนบ้านดอนกลาง ใกล้แปลงสมุนไพรและศูนย์เรียนรู้ชุมชน",
       );
 
     await page.getByRole("spinbutton", { name: "ละติจูด *" }).fill("15.244845");
@@ -478,7 +477,7 @@ test.describe("SuperAdmin - Edit Community", () => {
     });
     await addressDesc.clear();
     await addressDesc.fill(
-      "ตั้งอยู่ในพื้นที่ชุมชนบ้านดอนกลาง ใกล้แปลงสมุนไพรและศูนย์เรียนรู้ชุมชน"
+      "ตั้งอยู่ในพื้นที่ชุมชนบ้านดอนกลาง ใกล้แปลงสมุนไพรและศูนย์เรียนรู้ชุมชน",
     );
     await page.getByRole("button", { name: "บันทึก" }).click();
 
@@ -491,7 +490,7 @@ test.describe("SuperAdmin - Edit Community", () => {
 
     await expect(resultDialog).toContainText("ข้อมูลไม่ถูกต้อง");
     await expect(resultDialog).toContainText(
-      "กรุณากรอกข้อมูลให้ครบถ้วนก่อนทำการบันทึก"
+      "กรุณากรอกข้อมูลให้ครบถ้วนก่อนทำการบันทึก",
     );
 
     await resultDialog.getByRole("button", { name: "ปิด" }).click();
@@ -524,7 +523,7 @@ test.describe("SuperAdmin - Edit Community", () => {
     await page.getByRole("button", { name: "ที่อยู่วิสาหกิจชุมชน" }).click();
 
     const searchInput = page.getByPlaceholder(
-      "ป้อนชื่อวิสาหกิจชุมชนหรือสถานที่ใกล้เคียงเพื่อปักหมุด"
+      "ป้อนชื่อวิสาหกิจชุมชนหรือสถานที่ใกล้เคียงเพื่อปักหมุด",
     );
 
     await searchInput.click();
@@ -647,7 +646,7 @@ test.describe("SuperAdmin - Edit Community", () => {
 
     await expect(resultDialog).toContainText("ข้อมูลไม่ถูกต้อง");
     await expect(resultDialog).toContainText(
-      "กรุณากรอกข้อมูลให้ครบถ้วนก่อนทำการบันทึก"
+      "กรุณากรอกข้อมูลให้ครบถ้วนก่อนทำการบันทึก",
     );
 
     await resultDialog.getByRole("button", { name: "ปิด" }).click();
@@ -703,7 +702,7 @@ test.describe("SuperAdmin - Edit Community", () => {
     await page
       .getByRole("textbox", { name: "ประวัติวิสาหกิจชุมชน *" })
       .fill(
-        "กลุ่มชาวบ้านรวมตัวกันนำสมุนไพรท้องถิ่นมาแปรรูปเป็นผลิตภัณฑ์สุขภาพ เพื่อเพิ่มมูลค่าและสร้างรายได้ให้กับชุมชน"
+        "กลุ่มชาวบ้านรวมตัวกันนำสมุนไพรท้องถิ่นมาแปรรูปเป็นผลิตภัณฑ์สุขภาพ เพื่อเพิ่มมูลค่าและสร้างรายได้ให้กับชุมชน",
       );
 
     await page
@@ -713,7 +712,7 @@ test.describe("SuperAdmin - Edit Community", () => {
     await page
       .getByRole("textbox", { name: "รายละเอียดกิจกรรมหลัก *" })
       .fill(
-        "ผลิตและจำหน่ายผลิตภัณฑ์สมุนไพร เช่น ยาหม่อง น้ำมันสมุนไพร และชาสมุนไพร"
+        "ผลิตและจำหน่ายผลิตภัณฑ์สมุนไพร เช่น ยาหม่อง น้ำมันสมุนไพร และชาสมุนไพร",
       );
 
     await page.getByRole("button", { name: "ที่อยู่วิสาหกิจชุมชน" }).click();
@@ -737,13 +736,13 @@ test.describe("SuperAdmin - Edit Community", () => {
     await page.getByRole("option", { name: "วารินชำราบ" }).click();
 
     await expect(
-      page.getByRole("textbox", { name: "รหัสไปรษณีย์ *" })
+      page.getByRole("textbox", { name: "รหัสไปรษณีย์ *" }),
     ).toHaveValue("34190");
 
     await page
       .getByRole("textbox", { name: "คำอธิบายที่อยู่" })
       .fill(
-        "ตั้งอยู่ในพื้นที่ชุมชนบ้านดอนกลาง ใกล้แปลงสมุนไพรและศูนย์เรียนรู้ชุมชน"
+        "ตั้งอยู่ในพื้นที่ชุมชนบ้านดอนกลาง ใกล้แปลงสมุนไพรและศูนย์เรียนรู้ชุมชน",
       );
 
     await page.getByRole("spinbutton", { name: "ละติจูด *" }).fill("15.244845");
@@ -867,7 +866,7 @@ test.describe("SuperAdmin - Edit Community", () => {
     await page
       .getByRole("textbox", { name: "ประวัติวิสาหกิจชุมชน *" })
       .fill(
-        "กลุ่มชาวบ้านรวมตัวกันนำสมุนไพรท้องถิ่นมาแปรรูปเป็นผลิตภัณฑ์สุขภาพ"
+        "กลุ่มชาวบ้านรวมตัวกันนำสมุนไพรท้องถิ่นมาแปรรูปเป็นผลิตภัณฑ์สุขภาพ",
       );
 
     await page
@@ -934,7 +933,7 @@ test.describe("SuperAdmin - Edit Community", () => {
 
     await expect(resultDialog).toContainText("ข้อมูลไม่ถูกต้อง");
     await expect(resultDialog).toContainText(
-      "กรุณากรอกข้อมูลให้ครบถ้วนก่อนทำการบันทึก"
+      "กรุณากรอกข้อมูลให้ครบถ้วนก่อนทำการบันทึก",
     );
 
     await resultDialog.getByRole("button", { name: "ปิด" }).click();
@@ -990,7 +989,7 @@ test.describe("SuperAdmin - Edit Community", () => {
     await page
       .getByRole("textbox", { name: "ประวัติวิสาหกิจชุมชน *" })
       .fill(
-        "กลุ่มชาวบ้านรวมตัวกันนำสมุนไพรท้องถิ่นมาแปรรูปเป็นผลิตภัณฑ์สุขภาพ เพื่อเพิ่มมูลค่าและสร้างรายได้ให้กับชุมชน"
+        "กลุ่มชาวบ้านรวมตัวกันนำสมุนไพรท้องถิ่นมาแปรรูปเป็นผลิตภัณฑ์สุขภาพ เพื่อเพิ่มมูลค่าและสร้างรายได้ให้กับชุมชน",
       );
 
     await page
@@ -1000,7 +999,7 @@ test.describe("SuperAdmin - Edit Community", () => {
     await page
       .getByRole("textbox", { name: "รายละเอียดกิจกรรมหลัก *" })
       .fill(
-        "ผลิตและจำหน่ายผลิตภัณฑ์สมุนไพร เช่น ยาหม่อง น้ำมันสมุนไพร และชาสมุนไพร"
+        "ผลิตและจำหน่ายผลิตภัณฑ์สมุนไพร เช่น ยาหม่อง น้ำมันสมุนไพร และชาสมุนไพร",
       );
     await page.getByRole("button", { name: "บันทึก" }).click();
 
