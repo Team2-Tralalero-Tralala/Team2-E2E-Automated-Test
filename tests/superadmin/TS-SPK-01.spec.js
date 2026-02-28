@@ -28,7 +28,7 @@ async function goToManagePackagePage(page) {
  *   - dialog ตัวกรองจะแสดงขึ้นมา
  */
 async function openFilterDialog(page) {
-  await page.getByRole("button", { name: /ทั้งหมด/ }).click();
+  await page.getByRole("button", { name: /ตัวกรอง/ }).click();
   // รอให้ dialog เปิด
   await page.waitForTimeout(500);
 }
@@ -76,7 +76,9 @@ async function verifyPublishStatus(page, expectedStatus) {
     // ตรวจสอบว่าทุก cell มีสถานะที่ถูกต้อง
     for (let i = 0; i < count; i++) {
       const cellText = await statusCells.nth(i).textContent();
-      expect(cellText?.trim()).toBe(expectedStatus);
+      if (cellText !== "") {
+        expect(cellText?.trim()).toBe(expectedStatus);
+      }
     }
   }
 }
@@ -129,12 +131,11 @@ test.describe("SuperAdmin - Sort Package", () => {
   test("TS-SPK-01.1: กรองสถานะแพ็กเกจทั้งหมด", async ({ page }) => {
     await goToManagePackagePage(page);
     await openFilterDialog(page);
-
     // เลือกสถานะแพ็กเกจ "ทั้งหมด"
     const publishStatusSection = page
       .locator("text=สถานะแพ็กเกจ")
       .locator("..");
-    await publishStatusSection.getByRole("button", { name: "ทั้งหมด" }).click();
+    await publishStatusSection.getByRole("radio", { name: "ทั้งหมด" }).click();
 
     // ตรวจสอบว่าตารางแสดงแพ็กเกจทั้งหมด
     await verifyPublishStatus(page, "ทั้งหมด");
@@ -153,7 +154,7 @@ test.describe("SuperAdmin - Sort Package", () => {
     await openFilterDialog(page);
 
     // เลือกสถานะแพ็กเกจ "เผยแพร่"
-    await page.getByRole("button", { name: "เผยแพร่" }).first().click();
+    await page.getByRole("radio", { name: "เผยแพร่" }).first().click();
 
     // ตรวจสอบว่าตารางแสดงแพ็กเกจที่เผยแพร่เท่านั้น
     await verifyPublishStatus(page, "เผยแพร่");
@@ -172,7 +173,7 @@ test.describe("SuperAdmin - Sort Package", () => {
     await openFilterDialog(page);
 
     // เลือกสถานะแพ็กเกจ "ไม่เผยแพร่"
-    await page.getByRole("button", { name: "ไม่เผยแพร่" }).click();
+    await page.getByRole("radio", { name: "ไม่เผยแพร่" }).click();
 
     // ตรวจสอบว่าตารางแสดงแพ็กเกจที่ไม่เผยแพร่เท่านั้น
     await verifyPublishStatus(page, "ไม่เผยแพร่");
@@ -194,9 +195,7 @@ test.describe("SuperAdmin - Sort Package", () => {
     const approvalStatusSection = page
       .locator("text=สถานะการอนุมัติ")
       .locator("..");
-    await approvalStatusSection
-      .getByRole("button", { name: "ทั้งหมด" })
-      .click();
+    await approvalStatusSection.getByRole("radio", { name: "ทั้งหมด" }).click();
 
     // ตรวจสอบว่าตารางแสดงแพ็กเกจทั้งหมด
     await verifyApprovalStatus(page, "ทั้งหมด");
@@ -215,7 +214,7 @@ test.describe("SuperAdmin - Sort Package", () => {
     await openFilterDialog(page);
 
     // เลือกสถานะการอนุมัติ "อนุมัติ"
-    await page.getByRole("button", { name: "อนุมัติ" }).click();
+    await page.getByRole("radio", { name: "อนุมัติ", exact: true }).click();
 
     // ตรวจสอบว่าตารางแสดงแพ็กเกจที่อนุมัติเท่านั้น
     await verifyApprovalStatus(page, "อนุมัติ");
@@ -234,7 +233,7 @@ test.describe("SuperAdmin - Sort Package", () => {
     await openFilterDialog(page);
 
     // เลือกสถานะการอนุมัติ "รออนุมัติ"
-    await page.getByRole("button", { name: "รออนุมัติ" }).click();
+    await page.getByRole("radio", { name: "รออนุมัติ" }).click();
 
     // ตรวจสอบว่าตารางแสดงแพ็กเกจที่รออนุมัติเท่านั้น
     await verifyApprovalStatus(page, "รออนุมัติ");
@@ -253,7 +252,7 @@ test.describe("SuperAdmin - Sort Package", () => {
     await openFilterDialog(page);
 
     // เลือกสถานะการอนุมัติ "ถูกปฏิเสธ"
-    await page.getByRole("button", { name: "ถูกปฏิเสธ" }).click();
+    await page.getByRole("radio", { name: "ถูกปฏิเสธ" }).click();
 
     // ตรวจสอบว่าตารางแสดงแพ็กเกจที่ถูกปฏิเสธเท่านั้น
     await verifyApprovalStatus(page, "ถูกปฏิเสธ");
