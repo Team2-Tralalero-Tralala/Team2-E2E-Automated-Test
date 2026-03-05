@@ -162,11 +162,11 @@ async function fillStoreComplete(page) {
   });
 
   await tagCombo.click();
-  await page.getByRole("option", { name: "Tag-1-Relax" }).click();
+  await page.getByRole("option", { name: "ท่องเที่ยวเชิงเกษตร" }).click();
   await page.keyboard.press("Escape");
 
   await tagCombo.click();
-  await page.getByRole("option", { name: "Tag-2-Culture" }).click();
+  await page.getByRole("option", { name: "อาหารพื้นเมือง" }).click();
   await page.keyboard.press("Escape");
 }
 
@@ -235,6 +235,9 @@ async function saveAndConfirm(page) {
   const modal = page.getByRole("dialog");
   await expect(modal).toBeVisible({ timeout: 15000 });
   await modal.getByRole("button", { name: "ยืนยัน" }).click();
+  await page.waitForLoadState("networkidle");
+  await expect(page.getByText("สำเร็จ")).toBeVisible({ timeout: 15000 });
+  await modal.getByRole("button", { name: "ปิด" }).click();
 }
 
 async function pinMapWhenNoPlaceFound(page) {
@@ -291,7 +294,9 @@ test.describe('Admin - Edit Store (from "pencil" icon)', () => {
     await expect(
       page.getByRole("heading", { name: "จัดการร้านค้า", exact: true })
     ).toBeVisible({ timeout: 15000 });
-    await expect(page.getByText("ป้านกน้อย")).toBeVisible({ timeout: 15000 });
+    await expect(
+      page.getByRole("link", { name: "ป้านกน้อย", exact: true })
+    ).toBeVisible({ timeout: 15000 });
   });
 
   test("TS-ES-02.2: กรอกข้อมูลไม่ครบถ้วนหลายจุด", async ({ page }) => {
@@ -317,29 +322,33 @@ test.describe('Admin - Edit Store (from "pencil" icon)', () => {
       .getByRole("combobox", { name: "ค้นหาแท็ก เช่น เดินป่า ทะเล ภูเขา" })
       .click();
     await page.waitForTimeout(1000);
-    await expect(page.getByRole("option", { name: "Tag-1-Relax" })).toBeVisible({
+    await expect(page.getByRole("option", { name: "ท่องเที่ยวเชิงเกษตร" })).toBeVisible({
       timeout: 15000,
     });
-    await page.getByRole("option", { name: "Tag-1-Relax" }).click();
+    await page.getByRole("option", { name: "ท่องเที่ยวเชิงเกษตร" }).click();
     await page.keyboard.press("Escape");
 
     await page
       .getByRole("combobox", { name: "ค้นหาแท็ก เช่น เดินป่า ทะเล ภูเขา" })
       .click();
     await page.waitForTimeout(1000);
-    await expect(page.getByRole("option", { name: "Tag-2-Culture" })).toBeVisible({
+    await expect(page.getByRole("option", { name: "อาหารพื้นเมือง" })).toBeVisible({
       timeout: 15000,
     });
-    await page.getByRole("option", { name: "Tag-2-Culture" }).click();
+    await page.getByRole("option", { name: "อาหารพื้นเมือง" }).click();
     await page.keyboard.press("Escape");
+
+    // verify chips show up in tag field
+    await selectTag(page, "ท่องเที่ยวเชิงเกษตร");
+    await selectTag(page, "อาหารพื้นเมือง");
 
     // verify chips show up in tag field
     const tagField = await getTagFieldContainer(page);
     const selectedArea = tagField.locator("div.mt-4");
-    await expect(selectedArea.getByText("Tag-1-Relax")).toBeVisible({
+    await expect(selectedArea.getByText("ท่องเที่ยวเชิงเกษตร")).toBeVisible({
       timeout: 15000,
     });
-    await expect(selectedArea.getByText("Tag-2-Culture")).toBeVisible({
+    await expect(selectedArea.getByText("อาหารพื้นเมือง")).toBeVisible({
       timeout: 15000,
     });
     await saveAndConfirm(page);

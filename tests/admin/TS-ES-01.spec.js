@@ -38,6 +38,17 @@ async function assertTagsOptionsPresent(page, tagNames) {
 }
 
 async function selectTag(page, tagName) {
+  const tagField = await getTagFieldContainer(page);
+  const selectedArea = tagField.locator("div.mt-4");
+
+  // Idempotent: if this tag is already selected, don't click option again (it toggles off).
+  if (await selectedArea.getByText(tagName, { exact: true }).count()) {
+    await expect(selectedArea.getByText(tagName, { exact: true })).toBeVisible({
+      timeout: 15000,
+    });
+    return;
+  }
+
   const tagCombo = await getTagCombo(page);
   await tagCombo.click();
   await tagCombo.fill(tagName);
@@ -48,14 +59,13 @@ async function selectTag(page, tagName) {
   await page.keyboard.press("Escape");
   await tagCombo.fill("");
 
-  const tagField = await getTagFieldContainer(page);
-  const selectedArea = tagField.locator("div.mt-4");
-
   // ตรวจว่า "ยังไม่ได้เลือก" หายไป และ chip ของแท็กแสดงขึ้นจริง
   await expect(selectedArea.getByText("ยังไม่ได้เลือก")).not.toBeVisible({
     timeout: 15000,
   });
-  await expect(selectedArea.getByText(tagName)).toBeVisible({ timeout: 15000 });
+  await expect(selectedArea.getByText(tagName, { exact: true })).toBeVisible({
+    timeout: 15000,
+  });
 }
 
 async function clickFirstVisible(locators) {
@@ -169,11 +179,11 @@ async function fillStoreComplete(page) {
   });
 
   await tagCombo.click();
-  await page.getByRole("option", { name: "Tag-1-Relax" }).click();
+  await page.getByRole("option", { name: "ท่องเที่ยวเชิงเกษตร" }).click();
   await page.keyboard.press("Escape");
 
   await tagCombo.click();
-  await page.getByRole("option", { name: "Tag-2-Culture" }).click();
+  await page.getByRole("option", { name: "อาหารพื้นเมือง" }).click();
   await page.keyboard.press("Escape");
 }
 
@@ -245,6 +255,9 @@ async function saveAndConfirm(page) {
   const modal = page.getByRole("dialog");
   await expect(modal).toBeVisible({ timeout: 15000 });
   await modal.getByRole("button", { name: "ยืนยัน" }).click();
+  await page.waitForLoadState("networkidle");
+  await expect(page.getByText("สำเร็จ")).toBeVisible({ timeout: 15000 });
+  await modal.getByRole("button", { name: "ปิด" }).click();
 }
 
 async function pinMapWhenNoPlaceFound(page) {
@@ -298,7 +311,9 @@ test.describe("Admin - Edit Store (from store detail page)", () => {
     await expect(
       page.getByRole("heading", { name: "จัดการร้านค้า", exact: true })
     ).toBeVisible({ timeout: 15000 });
-    await expect(page.getByText("ป้านกน้อย")).toBeVisible({ timeout: 15000 });
+    await expect(
+      page.getByRole("link", { name: "ป้านกน้อย", exact: true })
+    ).toBeVisible({ timeout: 15000 });
   });
 
   test("TS-ES-01.2: กรอกข้อมูลไม่ครบถ้วนหลายจุด", async ({ page }) => {
@@ -318,29 +333,16 @@ test.describe("Admin - Edit Store (from store detail page)", () => {
 
   test("TS-ES-01.4: แก้ไขแท็ก", async ({ page }) => {
     await goToAdminEditStoreFromSidebarManageStore(page);
-
-    // copy behavior from SuperAdmin (TS-EST-02): click combobox -> click option -> Escape
-    await page
-      .getByRole("combobox", { name: "ค้นหาแท็ก เช่น เดินป่า ทะเล ภูเขา" })
-      .click();
-    await page.waitForTimeout(1000);
-    await page.getByRole("option", { name: "Tag-1-Relax" }).click();
-    await page.keyboard.press("Escape");
-
-    await page
-      .getByRole("combobox", { name: "ค้นหาแท็ก เช่น เดินป่า ทะเล ภูเขา" })
-      .click();
-    await page.waitForTimeout(1000);
-    await page.getByRole("option", { name: "Tag-2-Culture" }).click();
-    await page.keyboard.press("Escape");
+    await selectTag(page, "ท่องเที่ยวเชิงเกษตร");
+    await selectTag(page, "อาหารพื้นเมือง");
 
     // verify chips show up in tag field
     const tagField = await getTagFieldContainer(page);
     const selectedArea = tagField.locator("div.mt-4");
-    await expect(selectedArea.getByText("Tag-1-Relax")).toBeVisible({
+    await expect(selectedArea.getByText("ท่องเที่ยวเชิงเกษตร")).toBeVisible({
       timeout: 15000,
     });
-    await expect(selectedArea.getByText("Tag-2-Culture")).toBeVisible({
+    await expect(selectedArea.getByText("อาหารพื้นเมือง")).toBeVisible({
       timeout: 15000,
     });
 
@@ -363,7 +365,9 @@ test.describe("Admin - Edit Store (from store detail page)", () => {
     await expect(
       page.getByRole("heading", { name: "จัดการร้านค้า", exact: true })
     ).toBeVisible({ timeout: 15000 });
-    await expect(page.getByText("ป้านกน้อย")).toBeVisible({ timeout: 15000 });
+    await expect(
+      page.getByRole("link", { name: "ป้านกน้อย", exact: true })
+    ).toBeVisible({ timeout: 15000 });
   });
 });
 

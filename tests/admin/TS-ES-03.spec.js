@@ -94,23 +94,23 @@ async function selectTags(page) {
     .getByRole("combobox", { name: "ค้นหาแท็ก เช่น เดินป่า ทะเล ภูเขา" })
     .click();
   await page.waitForTimeout(1000);
-  await page.getByRole("option", { name: "Tag-1-Relax" }).click();
+  await page.getByRole("option", { name: "ท่องเที่ยวเชิงเกษตร" }).click();
   await page.keyboard.press("Escape");
 
   await page
     .getByRole("combobox", { name: "ค้นหาแท็ก เช่น เดินป่า ทะเล ภูเขา" })
     .click();
   await page.waitForTimeout(1000);
-  await page.getByRole("option", { name: "Tag-2-Culture" }).click();
+  await page.getByRole("option", { name: "อาหารพื้นเมือง" }).click();
   await page.keyboard.press("Escape");
 
   // verify chips show up in tag field
   const tagField = await getTagFieldContainer(page);
   const selectedArea = tagField.locator("div.mt-4");
-  await expect(selectedArea.getByText("Tag-1-Relax")).toBeVisible({
+  await expect(selectedArea.getByText("ท่องเที่ยวเชิงเกษตร")).toBeVisible({
     timeout: 15000,
   });
-  await expect(selectedArea.getByText("Tag-2-Culture")).toBeVisible({
+  await expect(selectedArea.getByText("อาหารพื้นเมือง")).toBeVisible({
     timeout: 15000,
   });
 }
@@ -160,6 +160,9 @@ async function saveAndConfirm(page) {
   const modal = page.getByRole("dialog");
   await expect(modal).toBeVisible({ timeout: 15000 });
   await modal.getByRole("button", { name: "ยืนยัน" }).click();
+  await page.waitForLoadState("networkidle");
+  await expect(page.getByText("สำเร็จ")).toBeVisible({ timeout: 15000 });
+  await modal.getByRole("button", { name: "ปิด" }).click();
 }
 
 async function saveAndCancelInModal(page) {
@@ -192,7 +195,9 @@ test.describe("Admin - Edit Store (save/cancel behaviors)", () => {
     await expect(
       page.getByRole("heading", { name: "จัดการร้านค้า", exact: true })
     ).toBeVisible({ timeout: 15000 });
-    await expect(page.getByText("ป้านกน้อย")).toBeVisible({ timeout: 15000 });
+    await expect(
+      page.getByRole("link", { name: "ป้านกน้อย", exact: true })
+    ).toBeVisible({ timeout: 15000 });
   });
 
   test("TS-ES-03.2: Admin ไม่สามารถแก้ไขร้านค้าได้ เมื่อกรอกข้อมูลไม่ครบถ้วน", async ({

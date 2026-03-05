@@ -215,8 +215,11 @@ test.describe("Tourist - TS-BP-05 Upload slip & confirm booking", () => {
     await expect(page.getByText(/รองรับเฉพาะ|รูปแบบไฟล์ไม่ถูกต้อง/i)).not.toBeVisible();
     await expect(page.getByText(/ไฟล์ที่เลือก/i)).toBeVisible();
     await expect(page.getByRole("button", { name: /ยืนยันการจอง/i })).toBeVisible();
+    
+    await clickConfirmBooking(page);
 
-    // (Optional) Supported PDF check (separate run) — keep it simple here
+    await page.waitForLoadState("networkidle");
+    await expect(page).toHaveURL(/\/payment(\?.*)?$/);
   });
 
   /**
@@ -235,6 +238,7 @@ test.describe("Tourist - TS-BP-05 Upload slip & confirm booking", () => {
 
     await clickConfirmBooking(page);
 
+    await page.waitForLoadState("networkidle");
     await expect(
       page.getByText(/รองรับเฉพาะไฟล์|รูปแบบไฟล์ไม่ถูกต้อง|\.jpg|\.png|\.pdf/i),
     ).toBeVisible();
