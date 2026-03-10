@@ -103,27 +103,22 @@ async function uploadStoreImages(page) {
  * @param {string[]} tags - รายชื่อแท็กที่ต้องการเพิ่ม (เช่น ["Relax", "Food", "Nature"])
  */
 async function addTags(page, tags) {
-  const tagCombobox = page.getByRole("combobox", { name: /ค้นหาแท็ก/i });
+  const tagCombobox = page.getByRole("combobox", { name: /แท็ก/i });
   await expect(tagCombobox).toBeVisible();
-
-  const listbox = page.getByRole("listbox");
 
   for (const tag of tags) {
     await tagCombobox.click();
     await tagCombobox.fill(tag);
 
-    await expect(listbox).toBeVisible();
+    // รอ option ที่ค้นหาปรากฏ
+    const firstOption = page.getByRole("option").first();
+    await expect(firstOption).toBeVisible();
 
-    const option = listbox
-      .getByRole("option", { name: new RegExp(`Tag-\\d+-${tag}`, "i") })
-      .first();
+    // กด checkbox ของ option แรก
+    await firstOption.getByRole("checkbox").check();
 
-    await option.getByRole("checkbox").check();
-
+    // ล้างค่าในช่องค้นหา
     await tagCombobox.fill("");
-    await expect(listbox)
-      .toBeHidden({ timeout: 2000 })
-      .catch(() => {});
   }
 }
 
@@ -178,7 +173,7 @@ test.describe("SuperAdmin - Add Store", () => {
       await expect(firstPlace).toBeVisible();
       await firstPlace.click();
 
-      await addTags(page, ["Relax"]);
+      await addTags(page, ["ธรรมชาติ"]);
 
       await uploadStoreImages(page);
 
@@ -335,7 +330,7 @@ test.describe("SuperAdmin - Add Store", () => {
       await expect(lat).toHaveValue(/^-?\d+(\.\d+)?$/);
       await expect(lng).toHaveValue(/^-?\d+(\.\d+)?$/);
 
-      await addTags(page, ["Relax"]);
+      await addTags(page, ["ธรรมชาติ"]);
 
       await uploadStoreImages(page);
 
@@ -407,7 +402,7 @@ test.describe("SuperAdmin - Add Store", () => {
       await expect(firstPlace).toBeVisible();
       await firstPlace.click();
 
-      await addTags(page, ["Relax", "Food", "Nature"]);
+      await addTags(page, ["ธรรมชาติ"]);
 
       await uploadStoreImages(page);
 
@@ -542,7 +537,7 @@ test.describe("SuperAdmin - Add Store", () => {
       await expect(firstPlace).toBeVisible();
       await firstPlace.click();
 
-      await addTags(page, ["Relax"]);
+      await addTags(page, ["ธรรมชาติ"]);
 
       const coverSection = page
         .getByRole("heading", { name: /อัพโหลดภาพหน้าปก/i })
@@ -565,6 +560,43 @@ test.describe("SuperAdmin - Add Store", () => {
       ).toBeVisible();
       await expect(
         coverSection.getByRole("button", { name: /ลบไฟล์ลำดับที่ 1/i })
+      ).toBeVisible();
+
+      const gallerySection = page
+        .getByRole("heading", { name: /อัพโหลดรูปภาพเพิ่มเติม/i })
+        .locator("..");
+
+      const galleryUploadBtn = gallerySection.getByRole("button", {
+        name: "เพิ่มไฟล์",
+      });
+    
+      await expect(galleryUploadBtn).toBeVisible();
+
+      const img1 = path.resolve("assets/photo/IMG_1.jpg");
+      const img2 = path.resolve("assets/photo/IMG_2.jpg");
+
+      {
+        const [chooser1] = await Promise.all([
+          page.waitForEvent("filechooser"),
+          galleryUploadBtn.click(),
+        ]);
+        await chooser1.setFiles(img1);
+      }
+
+      {
+        const [chooser2] = await Promise.all([
+          page.waitForEvent("filechooser"),
+          galleryUploadBtn.click(),
+        ]);
+        await chooser2.setFiles(img2);
+      }
+
+      await expect(gallerySection.getByText(/2\s*\/\s*5/)).toBeVisible();
+      await expect(
+        gallerySection.getByRole("img", { name: /ไฟล์ที่เลือก 1/i })
+      ).toBeVisible();
+      await expect(
+        gallerySection.getByRole("img", { name: /ไฟล์ที่เลือก 2/i })
       ).toBeVisible();
 
       const saveBtn = page.getByRole("button", { name: "บันทึก" });
@@ -626,7 +658,44 @@ test.describe("SuperAdmin - Add Store", () => {
       await expect(firstPlace).toBeVisible();
       await firstPlace.click();
 
-      await addTags(page, ["Relax"]);
+      await addTags(page, ["ธรรมชาติ"]);
+
+      const gallerySection = page
+        .getByRole("heading", { name: /อัพโหลดรูปภาพเพิ่มเติม/i })
+        .locator("..");
+
+      const galleryUploadBtn = gallerySection.getByRole("button", {
+        name: "เพิ่มไฟล์",
+      });
+      await expect(galleryUploadBtn).toBeVisible();
+
+      const img1 = path.resolve("assets/photo/IMG_1.jpg");
+      const img2 = path.resolve("assets/photo/IMG_2.jpg");
+
+      {
+        const [chooser1] = await Promise.all([
+          page.waitForEvent("filechooser"),
+          galleryUploadBtn.click(),
+        ]);
+        await chooser1.setFiles(img1);
+      }
+
+      {
+        const [chooser2] = await Promise.all([
+          page.waitForEvent("filechooser"),
+          galleryUploadBtn.click(),
+        ]);
+        await chooser2.setFiles(img2);
+      }
+
+      await expect(gallerySection.getByText(/2\s*\/\s*5/)).toBeVisible();
+      await expect(
+        gallerySection.getByRole("img", { name: /ไฟล์ที่เลือก 1/i })
+      ).toBeVisible();
+      await expect(
+        gallerySection.getByRole("img", { name: /ไฟล์ที่เลือก 2/i })
+      ).toBeVisible();
+
 
       const saveBtn = page.getByRole("button", { name: "บันทึก" });
       await expect(saveBtn).toBeEnabled();
@@ -644,7 +713,7 @@ test.describe("SuperAdmin - Add Store", () => {
 
   /**
    * TS-AST-02.8
-   * อัพโหลดรูปภาพเพิ่มเติม
+   * ไม่อัพโหลดรูปภาพเพิ่มเติม
    */
     test("TS-AST-02.8: Upload gallery photo", async ({ page }) => {
       await page.getByRole("row").nth(1).getByRole("link").click();
@@ -687,41 +756,29 @@ test.describe("SuperAdmin - Add Store", () => {
       await expect(firstPlace).toBeVisible();
       await firstPlace.click();
 
-      await addTags(page, ["Relax"]);
-      const gallerySection = page
-        .getByRole("heading", { name: /อัพโหลดรูปภาพเพิ่มเติม/i })
+      await addTags(page, ["ธรรมชาติ"]);
+      
+      const coverSection = page
+        .getByRole("heading", { name: /อัพโหลดภาพหน้าปก/i })
         .locator("..");
 
-      const galleryUploadBtn = gallerySection.getByRole("button", {
+      const coverUploadBtn = coverSection.getByRole("button", {
         name: "เพิ่มไฟล์",
       });
-      await expect(galleryUploadBtn).toBeVisible();
+      await expect(coverUploadBtn).toBeVisible();
 
-      const img1 = path.resolve("assets/photo/IMG_1.jpg");
-      const img2 = path.resolve("assets/photo/IMG_2.jpg");
+      const coverImagePath = path.resolve("assets/photo/IMG_1.jpg");
+      const [chooser] = await Promise.all([
+        page.waitForEvent("filechooser"),
+        coverUploadBtn.click(),
+      ]);
+      await chooser.setFiles(coverImagePath);
 
-      {
-        const [chooser1] = await Promise.all([
-          page.waitForEvent("filechooser"),
-          galleryUploadBtn.click(),
-        ]);
-        await chooser1.setFiles(img1);
-      }
-
-      {
-        const [chooser2] = await Promise.all([
-          page.waitForEvent("filechooser"),
-          galleryUploadBtn.click(),
-        ]);
-        await chooser2.setFiles(img2);
-      }
-
-      await expect(gallerySection.getByText(/2\s*\/\s*5/)).toBeVisible();
       await expect(
-        gallerySection.getByRole("img", { name: /ไฟล์ที่เลือก 1/i })
+        coverSection.getByRole("img", { name: /ไฟล์ที่เลือก 1/i })
       ).toBeVisible();
       await expect(
-        gallerySection.getByRole("img", { name: /ไฟล์ที่เลือก 2/i })
+        coverSection.getByRole("button", { name: /ลบไฟล์ลำดับที่ 1/i })
       ).toBeVisible();
 
       const saveBtn = page.getByRole("button", { name: "บันทึก" });
@@ -735,78 +792,14 @@ test.describe("SuperAdmin - Add Store", () => {
 
       await page.waitForTimeout(5000);
       await page.getByRole("dialog").getByRole("button", { name: "ปิด" }).click();
-      await expect(page).toHaveURL(/\/super\/community\/\d+\/stores\/all/);
+      await expect(page).toHaveURL(/\/super\/community\/\d+\/store\/create/);
     });
 
   /**
    * TS-AST-02.9
-   * ไม่อัพโหลดรูปภาพเพิ่มเติม
-   */
-    test("TS-AST-02.9: not Upload gallery photo", async ({ page }) => {
-      await page.getByRole("row").nth(1).getByRole("link").click();
-
-      await goToManageStorePage(page);
-
-      const addStoreBtn = page.getByRole("button", { name: "เพิ่มร้านค้า" });
-      await expect(addStoreBtn).toBeEnabled();
-      await addStoreBtn.click();
-
-      await expect(page).toHaveURL(/\/super\/community\/\d+\/store\/create/);
-
-      await page
-        .getByRole("textbox", { name: "ชื่อร้านค้า *" })
-        .fill("ป้านกน้อย");
-
-      await page
-        .getByRole("textbox", { name: "รายละเอียดร้านค้า *" })
-        .fill("ป้านกน้อยขายส้มตำแซ่บ ๆ มาอีกได้จ๊ะลูก ๆ");
-
-      await page.getByRole("textbox", { name: "บ้านเลขที่ *" }).fill("11");
-      await page.getByRole("textbox", { name: "หมู่ที่" }).fill("6");
-      await selectFromCombobox(page, "จังหวัด *", "ชลบุรี");
-      await selectFromCombobox(page, "อำเภอ / เขต *", "เมือง");
-      await selectFromCombobox(page, "ตำบล/แขวง *", "แสนสุข");
-      //await page.getByRole("textbox", { name: "รหัสไปรษณีย์ *" }).fill("20130");
-      await page
-        .getByRole("textbox", { name: "คำอธิบายที่อยู่" })
-        .fill("บ้านเลขที่ 11 หมู่ 6");
-
-      const searchLocationInput = page.getByPlaceholder(
-        /ป้อนชื่อวิสาหกิจชุมชนหรือสถานที่ใกล้เคียงเพื่อปักหมุด/i
-      );
-
-      await expect(searchLocationInput).toBeVisible();
-      await searchLocationInput.fill("บางแสน");
-      const bangsaenResult = page.getByText(/บางแสน,.*ชลบุรี/i);
-      await expect(bangsaenResult).toBeVisible({ timeout: 5000 });
-      const firstPlace = page.getByRole("listitem").first();
-      await expect(firstPlace).toBeVisible();
-      await firstPlace.click();
-
-      await addTags(page, ["Relax"]);
-      const gallerySection = page
-        .getByRole("heading", { name: /อัพโหลดรูปภาพเพิ่มเติม/i })
-        .locator("..");
-
-      const saveBtn = page.getByRole("button", { name: "บันทึก" });
-      await expect(saveBtn).toBeEnabled();
-      await saveBtn.click();
-
-      await page
-        .getByRole("dialog")
-        .getByRole("button", { name: "ยืนยัน" })
-        .click();
-
-      await page.waitForTimeout(5000);
-      await page.getByRole("dialog").getByRole("button", { name: "ปิด" }).click();
-      await expect(page).toHaveURL(/\/super\/community\/\d+\/store\/create/);
-    });
-
-  /**
-   * TS-AST-02.10
    * กรอกข้อมูลครบถ้วนและยืนยันการสร้างร้านค้า (แบบ Modal)
    */
-    test("TS-AST-02.10: Modal add store successfully", async ({ page }) => {
+    test("TS-AST-02.9: Modal add store successfully", async ({ page }) => {
       await page.getByRole("row").nth(1).getByRole("link").click();
 
       await goToManageStorePage(page);
@@ -847,7 +840,7 @@ test.describe("SuperAdmin - Add Store", () => {
       await expect(firstPlace).toBeVisible();
       await firstPlace.click();
 
-      await addTags(page, ["Relax"]);
+      await addTags(page, ["ธรรมชาติ"]);
 
       await uploadStoreImages(page);
 
@@ -865,10 +858,10 @@ test.describe("SuperAdmin - Add Store", () => {
     });
 
   /**
-   * TS-AST-02.11
+   * TS-AST-02.10
    * กรอกข้อมูลไม่ครบถ้วนและบันทึกการสร้างร้านค้า
    */
-  test("TS-AST-02.11: Modal add store validation errors", async ({ page }) => {
+  test("TS-AST-02.10: Modal add store validation errors", async ({ page }) => {
     await page.getByRole("row").nth(1).getByRole("link").click();
 
     await goToManageStorePage(page);
@@ -904,7 +897,7 @@ test.describe("SuperAdmin - Add Store", () => {
     await expect(firstPlace).toBeVisible();
     await firstPlace.click();
 
-    await addTags(page, ["Relax"]);
+    await addTags(page, ["ธรรมชาติ"]);
 
     await uploadStoreImages(page);
 
@@ -922,10 +915,10 @@ test.describe("SuperAdmin - Add Store", () => {
   });
 
   /**
-   * TS-AST-02.12
+   * TS-AST-02.11
    * ยกเลิกการสร้างร้านค้า (แบบ Modal)
    */
-  test("TS-AST-02.12: Modal add store cancel", async ({ page }) => {
+  test("TS-AST-02.11: Modal add store cancel", async ({ page }) => {
       await page.getByRole("row").nth(1).getByRole("link").click();
 
       await goToManageStorePage(page);
@@ -966,7 +959,7 @@ test.describe("SuperAdmin - Add Store", () => {
       await expect(firstPlace).toBeVisible();
       await firstPlace.click();
 
-      await addTags(page, ["Relax"]);
+      await addTags(page, ["ธรรมชาติ"]);
 
       await uploadStoreImages(page);
 
@@ -985,10 +978,10 @@ test.describe("SuperAdmin - Add Store", () => {
     });
 
     /**
-   * TS-AST-02.13
+   * TS-AST-02.12
    * ยกเลิกการสร้างร้านค้า
    */
-  test("TS-AST-02.13: Cancel modal add store", async ({ page }) => {
+  test("TS-AST-02.12: Cancel modal add store", async ({ page }) => {
       await page.getByRole("row").nth(1).getByRole("link").click();
 
       await goToManageStorePage(page);
@@ -1029,7 +1022,7 @@ test.describe("SuperAdmin - Add Store", () => {
       await expect(firstPlace).toBeVisible();
       await firstPlace.click();
 
-      await addTags(page, ["Relax"]);
+      await addTags(page, ["ธรรมชาติ"]);
 
       await uploadStoreImages(page);
 

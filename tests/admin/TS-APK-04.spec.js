@@ -3,7 +3,7 @@ import { loginAs } from "../../utils/roles.js";
 
 test.describe("Admin - Package Requests Pagination", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAs(page, "thanakorn");
+    await loginAs(page, "admin");
     await expect(page).toHaveURL(/admin\/community\/own/);
   });
 

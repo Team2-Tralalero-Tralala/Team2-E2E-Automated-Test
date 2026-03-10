@@ -25,7 +25,7 @@ test.describe("SuperAdmin - Create Account", () => {
 
     await expect(searchBox).toBeVisible();
 
-    const keyword = "เดินป่า";
+    const keyword = "แพ็กเกจรออนุมัติ 1";
     await searchBox.fill(keyword);
 
     await searchBox.press("Enter");

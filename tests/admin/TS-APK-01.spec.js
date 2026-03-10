@@ -3,7 +3,7 @@ import { loginAs } from "../../utils/roles.js";
 
 test.describe("Admin - Login Account", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAs(page, "thanakorn");
+    await loginAs(page, "admin");
     await expect(page).toHaveURL(/admin\/community\/own/);
   });
 
@@ -25,7 +25,7 @@ test.describe("Admin - Login Account", () => {
 
     await expect(searchBox).toBeVisible();
 
-    const keyword = "ทำอาหาร";
+    const keyword = "แพ็กเกจรออนุมัติ 1";
     await searchBox.fill(keyword);
 
     await searchBox.press("Enter");

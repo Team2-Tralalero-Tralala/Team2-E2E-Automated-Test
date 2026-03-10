@@ -1,10 +1,10 @@
 import { test, expect } from "@playwright/test";
 import { loginAs } from "../../utils/roles.js";
 
-test.describe("Member - Reports", () => {
+test.describe("Member - Refund Requests", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAs(page, "member1");
-    await expect(page).toHaveURL(/\/member\/home/);
+    await loginAs(page, "member");
+    await expect(page).toHaveURL(/member\/community\/own/);
   });
 
   /**
@@ -16,7 +16,7 @@ test.describe("Member - Reports", () => {
    *  3) กดกรองรายสัปดาห์บนกราฟจำนวนการจองแพ็กเกจ
    */
   test("TS-RP-03.1: Week filter updates booking chart", async ({ page }) => {
-    await loginAs(page, "member1");
+    await loginAs(page, "member");
 
     await page.getByRole("link", { name: /^รายงาน$/ }).click();
     await expect(
@@ -61,7 +61,7 @@ test.describe("Member - Reports", () => {
    *  3) กดกรองรายเดือนบนกราฟจำนวนการจองแพ็กเกจ
    */
   test("TS-RP-03.2: Month filter updates booking chart", async ({ page }) => {
-    await loginAs(page, "member1");
+    await loginAs(page, "member");
 
     await page.getByRole("link", { name: /^รายงาน$/ }).click();
     await expect(
@@ -109,7 +109,7 @@ test.describe("Member - Reports", () => {
    *  3) กดกรองรายปีบนกราฟจำนวนการจองแพ็กเกจ
    */
   test("TS-RP-03.3: Year filter updates booking chart", async ({ page }) => {
-    await loginAs(page, "member1");
+    await loginAs(page, "member");
 
     await page.getByRole("link", { name: /^รายงาน$/ }).click();
     await expect(

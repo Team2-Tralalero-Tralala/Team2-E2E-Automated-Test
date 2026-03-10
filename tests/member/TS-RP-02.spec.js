@@ -18,10 +18,10 @@ async function assertStatCard(page, label, unit) {
   await expect(card.getByText(unit, { exact: true })).toBeVisible();
 }
 
-test.describe("Member - Reports", () => {
+test.describe("Member - Refund Requests", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAs(page, "member1");
-    await expect(page).toHaveURL(/\/member\/home/);
+    await loginAs(page, "member");
+    await expect(page).toHaveURL(/member\/community\/own/);
   });
 
   /**

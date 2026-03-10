@@ -3,9 +3,10 @@ import { loginAs } from "../../utils/roles.js";
 
 test.describe("Member - Refund Requests", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAs(page, "member1");
-    await expect(page).toHaveURL(/\/member\/home/);
+    await loginAs(page, "member");
+    await expect(page).toHaveURL(/member\/community\/own/);
   });
+
 
   /**
    * TC-DRF-05.1
@@ -41,8 +42,8 @@ test.describe("Member - Refund Requests", () => {
 
     await modal.getByRole("button", { name: /^ส่ง$/ }).click();
 
-    await expect(modal).toBeHidden({ timeout: 10000 });
-
+    await modal.getByRole("button", { name: /ยืนยัน/i }).click();
+    await expect(modal).toBeHidden({ timeout: 5000 });
     await expect(
       page.getByText(/บันทึกข้อมูลสำเร็จ|สำเร็จ|success/i)
     ).toBeVisible({ timeout: 15000 });

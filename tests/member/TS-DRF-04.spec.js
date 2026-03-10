@@ -3,9 +3,10 @@ import { loginAs } from "../../utils/roles.js";
 
 test.describe("Member - Refund Requests", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAs(page, "member1");
-    await expect(page).toHaveURL(/\/member\/home/);
+    await loginAs(page, "member");
+    await expect(page).toHaveURL(/member\/community\/own/);
   });
+
 
   /**
    * TC-DRF-04.1

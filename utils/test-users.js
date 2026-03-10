@@ -32,13 +32,13 @@ export const users = {
     redirectTo: "/member/home",
   },
   tourist: {
-    email: "tourist_1",
+    email: "tourist1@example.com",
     password: "hashedpw",
     loginPath: "/guest/login",
     redirectTo: "/tourist/home",
   },
   member: {
-    email: "comm_member_1@example.com",
+    email: "member1@example.com",
     password: "hashedpw",
     loginPath: "/guest/partner/login",
     //redirectTo: "/member/community/own",
