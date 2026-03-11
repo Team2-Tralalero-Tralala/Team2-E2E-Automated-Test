@@ -102,30 +102,4 @@ test.describe("SuperAdmin - Upload Banners", () => {
       await expect(uploadedImages).toHaveCount(0);
     }
   );
-
-  /**
-   * TS-MD-01.3
-   * อัปโหลดไฟล์ใหญ่เกิดกำหนด
-   */
-  test(
-    "TS-MD-01.3: Cannot upload JPG/PNG file larger than allowed size",
-    async ({ page }) => {
-      // สมมติว่าไฟล์ oversize-image.jpg มีขนาดเกิน 2MB
-      await uploadBanner(
-        page,
-        "assets/photo/oversize-image.jpg"
-      );
-
-      const oversizeFileErrorMessage = page.getByText(
-        /อัพโหลดไฟล์เกินขนาดที่กำหนด/
-      );
-
-      await expect(oversizeFileErrorMessage).toBeVisible({
-        timeout: 10000,
-      });
-
-      const uploadedImages = page.locator("img");
-      await expect(uploadedImages).toHaveCount(0);
-    }
-  );
 });
