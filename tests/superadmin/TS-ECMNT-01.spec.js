@@ -472,7 +472,7 @@ async function panMapViaJS(page) {
 // เซตค่าเริ่มต้นหลังจากล็อกอิน เข้ามาให้อยู่หน้า /super/communities
 test.describe("SuperAdmin - Edit Community", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAs(page, "superadmin");
+    await loginAs(page, "SuperAdmin");
     await expect(page).toHaveURL(/super\/communities/);
   });
 
@@ -633,6 +633,19 @@ test.describe("SuperAdmin - Edit Community", () => {
     await uploadCover(page, "assets/photo/communityCover.jpg");
     await uploadProfile(page, "assets/photo/communityProfile.jpg");
     await saveAndCheckResult(page, 'success')
+
+  });
+
+  /**
+   * TS-ECMNT-01.7
+   * ไม่อัพโหลดโลโก้
+  */
+  test("TS-ECMNT-01.7: ไม่อัพโหลดโลโก้", async ({ page }) => {
+    await goToPageEditCommunityDetail(
+      page,
+      8
+    );
+    await openAccordion(page, "ข้อมูลชุมชน");
 
   });
 
@@ -1078,14 +1091,14 @@ test.describe("SuperAdmin - Edit Community", () => {
    * เปิดชุมชน
    */
   test("TS-ECMNT-01.28: เปิดชุมชน", async ({ page }) => {
-    await goToPageEditCommunityDetail(page, 10); 
-    
+    await goToPageEditCommunityDetail(page, 10);
+
     const statusSwitch = page.getByRole("switch");
-    
+
     // ถ้ายังไม่เปิด(unchecked) ให้กดเพื่อเปิด
     // ถ้าเปิดอยู่แล้ว ก็ไม่ต้องกด
     if (await statusSwitch.isChecked() === false) {
-       await statusSwitch.click();
+      await statusSwitch.click();
     }
 
     await saveAndCheckResult(page, 'success');
@@ -1103,13 +1116,13 @@ test.describe("SuperAdmin - Edit Community", () => {
    * ปิดชุมชน
    */
   test("TS-ECMNT-01.29: ปิดชุมชน", async ({ page }) => {
-    await goToPageEditCommunityDetail(page, 10); 
-    
+    await goToPageEditCommunityDetail(page, 10);
+
     const statusSwitch = page.getByRole("switch");
-    
+
     // ถ้ายังเปิดอยู่ (checked) -> ให้กดเพื่อปิด
     if (await statusSwitch.isChecked() === true) {
-       await statusSwitch.click();
+      await statusSwitch.click();
     }
 
     await saveAndCheckResult(page, 'success');
