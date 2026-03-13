@@ -209,7 +209,7 @@ async function panMapViaJS(page) {
 test.describe("Admin - Create Package", () => {
     test.beforeEach(async ({ page }) => {
         await page.context().clearCookies();
-        await loginAs(page, "admin4");
+        await loginAs(page, "Admin1");
         await expect(page).toHaveURL(/admin\/community\/own/);
     });
 
@@ -244,7 +244,10 @@ test.describe("Admin - Create Package", () => {
         await page.getByLabel('ลองจิจูด *').fill('103.985');
 
         await page.getByRole('combobox', { name: /เลือกผู้ดูแล/ }).click();
-        await page.getByRole('option', { name: 'กมล เบอร์ลี่' }).click();
+        // await page.getByRole('option', { name: 'กมล เบอร์ลี่' }).click();
+        const listbox = page.getByRole('listbox');
+        await listbox.getByRole('option').first().click();
+
 
         await page.getByLabel("เปิดรับจำนวน *").fill("20")
         // await page.getByRole('spinbutton', { name: 'เปิดรับจำนวน *' }).fill('10');
@@ -389,76 +392,72 @@ test.describe("Admin - Create Package", () => {
         await page.getByLabel('ลองจิจูด *').fill('103.985');
 
         await page.getByRole('combobox', { name: /เลือกผู้ดูแล/ }).click();
-        await page.getByRole('option', { name: 'กมล เบอร์ลี่' }).click();
+        // await page.getByRole('option', { name: 'กมล เบอร์ลี่' }).click();
+        const listbox = page.getByRole('listbox');
+        await listbox.getByRole('option').first().click();
 
         await page.getByLabel("เปิดรับจำนวน *").fill("20")
         await page.getByLabel("สิ่งอำนวยความสะดวก *").fill("รถรับ-ส่งตลอด 24 ชั่วโมง")
 
-        // วันที่-เวลาที่เริ่ม
-        const startDateBlock = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่เริ่ม \*$/) })
-            .last();
-        await startDateBlock.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^20$/ }).click();
+        // ==========================================
+        // 1. กำหนดการจัดกิจกรรม (Event Schedule)
+        // ==========================================
 
-        const startTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่เริ่ม\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
+        // 1️⃣ วัน/เดือน/ปี ที่เริ่มแพ็กเกจ (ปฏิทินช่องที่ 1 -> ใช้ nth(0))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(0).click();
+        await page.getByRole('gridcell').filter({ hasText: /^25$/ }).first().click();
 
-        await startTime.getByPlaceholder('ชม.').fill('08');
-        await startTime.getByPlaceholder('นาที').fill('00');
+        // 🕐 เวลาที่เริ่ม (เวลาช่องที่ 1 -> ใช้ nth(0))
+        await page.getByText(':').nth(0).click();
+        await page.getByRole('button', { name: '08', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
-        // วันที่-เวลาที่สิ้นสุด
-        const endDate = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่สิ้นสุด \*$/) })
-            .last();
-        await endDate.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^22$/ }).click();
+        // 2️⃣ วัน/เดือน/ปี ที่สิ้นสุดแพ็กเกจ (ปฏิทินช่องที่ 2 -> ใช้ nth(1))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(1).click();
+        await page.getByRole('gridcell').filter({ hasText: /^27$/ }).first().click();
 
-        const endTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่สิ้นสุด\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
+        // 🕑 เวลาที่สิ้นสุด (เวลาช่องที่ 2 -> ใช้ nth(1))
+        await page.getByText(':').nth(1).click();
+        await page.getByRole('button', { name: '18', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
-        await endTime.getByPlaceholder('ชม.').fill('18');
-        await endTime.getByPlaceholder('นาที').fill('00');
 
-        // วันที่-เวลาเปิดจอง 
-        const openDate = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่เปิดจอง \*$/) })
-            .last();
-        await openDate.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^12$/ }).click();
+        // ==========================================
+        // 2. กำหนดการเปิดจองแพ็กเกจ (Booking Schedule)
+        // ==========================================
 
-        const openTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่เปิดจอง\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
+        // 3️⃣ วัน/เดือน/ปี ที่เริ่มเปิดจอง (ปฏิทินช่องที่ 3 -> ใช้ nth(2))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(2).click();
+        await page.getByRole('gridcell').filter({ hasText: /^12$/ }).first().click();
 
-        await openTime.getByPlaceholder('ชม.').fill('09');
-        await openTime.getByPlaceholder('นาที').fill('00');
+        // 🕒 เวลาที่เริ่มเปิดจอง (เวลาช่องที่ 3 -> ใช้ nth(2))
+        await page.getByText(':').nth(2).click();
+        await page.getByRole('button', { name: '08', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
-        // วันที่-เวลาปิดจอง
-        const closeDate = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่ปิดจอง \*$/) })
-            .last();
-        await closeDate.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^19$/ }).click();
+        // 4️⃣ วัน/เดือน/ปี ที่สิ้นสุดการปิดจอง (ปฏิทินช่องที่ 4 -> ใช้ nth(3))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(3).click();
+        await page.getByRole('gridcell').filter({ hasText: /^15$/ }).first().click();
 
-        const closeTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่ปิดจอง\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
-
-        await closeTime.getByPlaceholder('ชม.').fill('23');
-        await closeTime.getByPlaceholder('นาที').fill('59');
+        // 🕓 เวลาที่สิ้นสุดการปิดจอง (เวลาช่องที่ 4 -> ใช้ nth(3))
+        await page.getByText(':').nth(3).click();
+        await page.getByRole('button', { name: '18', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
 
         await page.getByRole('combobox', { name: /ค้นหาแท็ก/ }).click();
-        await page.getByRole('option', { name: 'Tag-1-Relax' }).click();
-        await page.getByRole('option', { name: 'Tag-2-Culture' }).click();
-        await page.keyboard.press('Escape'); // ปิด Dropdown
+        await page.getByRole('option').first().click(); // เลือก option ตัวแรกที่โผล่มา
+        // ถ้าต้องการเลือก 2 อันแรก // await page.getByRole('option').nth(1).click();
+        await page.keyboard.press('Escape');
+
+        // await page.getByRole('combobox', { name: /ค้นหาแท็ก/ }).click();
+        // await page.getByRole('option', { name: 'Tag-1-Relax' }).click();
+        // await page.getByRole('option', { name: 'Tag-2-Culture' }).click();
+        // await page.keyboard.press('Escape'); // ปิด Dropdown
 
         await page.getByLabel("ราคา *").fill("2300")
 
@@ -473,13 +472,13 @@ test.describe("Admin - Create Package", () => {
             "assets/photo/vdo1.mp4",
             "assets/photo/vdo2.mp4",
         ])
-        await page.getByRole('button', { name: 'สร้างแพ็กเกจ' }).click();
+        await page.getByRole('button', { name: 'สร้าง' }).click();
 
         const confirmButton = page.getByRole('button', { name: 'ยืนยัน' });
         await expect(confirmButton).toBeVisible();
         await confirmButton.click();
 
-        const errorDialog = page.getByRole("dialog").filter({ hasText: /ข้อมูลไม่ถูกต้อง|กรุณาระบุ|ข้อผิดพลาด/ });
+        const errorDialog = page.getByRole("dialog").filter({ hasText: /ข้อมูลไม่ครบถ้วน|ข้อมูลไม่ถูกต้อง|กรุณาระบุ|ข้อผิดพลาด/ });
         await expect(errorDialog).toBeVisible();
 
         const closeBtn = errorDialog.getByRole("button", { name: "ปิด" });
@@ -517,76 +516,73 @@ test.describe("Admin - Create Package", () => {
         await page.getByLabel('ลองจิจูด *').fill('103.985');
 
         await page.getByRole('combobox', { name: /เลือกผู้ดูแล/ }).click();
-        await page.getByRole('option', { name: 'กมล เบอร์ลี่' }).click();
+        // await page.getByRole('option', { name: 'กมล เบอร์ลี่' }).click();
+        const listbox = page.getByRole('listbox');
+        await listbox.getByRole('option').first().click();
 
         await page.getByLabel("เปิดรับจำนวน *").fill("20")
         await page.getByLabel("สิ่งอำนวยความสะดวก *").fill("รถรับ-ส่งตลอด 24 ชั่วโมง")
 
-        // วันที่-เวลาที่เริ่ม
-        const startDateBlock = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่เริ่ม \*$/) })
-            .last();
-        await startDateBlock.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^20$/ }).click();
 
-        const startTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่เริ่ม\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
+        // ==========================================
+        // 1. กำหนดการจัดกิจกรรม (Event Schedule)
+        // ==========================================
 
-        await startTime.getByPlaceholder('ชม.').fill('08');
-        await startTime.getByPlaceholder('นาที').fill('00');
+        // 1️⃣ วัน/เดือน/ปี ที่เริ่มแพ็กเกจ (ปฏิทินช่องที่ 1 -> ใช้ nth(0))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(0).click();
+        await page.getByRole('gridcell').filter({ hasText: /^25$/ }).first().click();
 
-        // วันที่-เวลาที่สิ้นสุด
-        const endDate = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่สิ้นสุด \*$/) })
-            .last();
-        await endDate.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^22$/ }).click();
+        // 🕐 เวลาที่เริ่ม (เวลาช่องที่ 1 -> ใช้ nth(0))
+        await page.getByText(':').nth(0).click();
+        await page.getByRole('button', { name: '08', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
-        const endTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่สิ้นสุด\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
+        // 2️⃣ วัน/เดือน/ปี ที่สิ้นสุดแพ็กเกจ (ปฏิทินช่องที่ 2 -> ใช้ nth(1))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(1).click();
+        await page.getByRole('gridcell').filter({ hasText: /^27$/ }).first().click();
 
-        await endTime.getByPlaceholder('ชม.').fill('18');
-        await endTime.getByPlaceholder('นาที').fill('00');
+        // 🕑 เวลาที่สิ้นสุด (เวลาช่องที่ 2 -> ใช้ nth(1))
+        await page.getByText(':').nth(1).click();
+        await page.getByRole('button', { name: '18', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
-        // วันที่-เวลาเปิดจอง
-        const openDate = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่เปิดจอง \*$/) })
-            .last();
-        await openDate.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^12$/ }).click();
 
-        const openTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่เปิดจอง\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
+        // ==========================================
+        // 2. กำหนดการเปิดจองแพ็กเกจ (Booking Schedule)
+        // ==========================================
 
-        await openTime.getByPlaceholder('ชม.').fill('09');
-        await openTime.getByPlaceholder('นาที').fill('00');
+        // 3️⃣ วัน/เดือน/ปี ที่เริ่มเปิดจอง (ปฏิทินช่องที่ 3 -> ใช้ nth(2))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(2).click();
+        await page.getByRole('gridcell').filter({ hasText: /^12$/ }).first().click();
 
-        // วันที่-เวลาปิดจอง
-        const closeDate = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่ปิดจอง \*$/) })
-            .last();
-        await closeDate.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^19$/ }).click();
+        // 🕒 เวลาที่เริ่มเปิดจอง (เวลาช่องที่ 3 -> ใช้ nth(2))
+        await page.getByText(':').nth(2).click();
+        await page.getByRole('button', { name: '08', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
-        const closeTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่ปิดจอง\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
+        // 4️⃣ วัน/เดือน/ปี ที่สิ้นสุดการปิดจอง (ปฏิทินช่องที่ 4 -> ใช้ nth(3))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(3).click();
+        await page.getByRole('gridcell').filter({ hasText: /^15$/ }).first().click();
 
-        await closeTime.getByPlaceholder('ชม.').fill('23');
-        await closeTime.getByPlaceholder('นาที').fill('59');
+        // 🕓 เวลาที่สิ้นสุดการปิดจอง (เวลาช่องที่ 4 -> ใช้ nth(3))
+        await page.getByText(':').nth(3).click();
+        await page.getByRole('button', { name: '18', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
 
         await page.getByRole('combobox', { name: /ค้นหาแท็ก/ }).click();
-        await page.getByRole('option', { name: 'Tag-1-Relax' }).click();
-        await page.getByRole('option', { name: 'Tag-2-Culture' }).click();
-        await page.keyboard.press('Escape'); // ปิด Dropdown
+        await page.getByRole('option').first().click(); // เลือก option ตัวแรกที่โผล่มา
+        // ถ้าต้องการเลือก 2 อันแรก // await page.getByRole('option').nth(1).click();
+        await page.keyboard.press('Escape');
+
+        // await page.getByRole('combobox', { name: /ค้นหาแท็ก/ }).click();
+        // await page.getByRole('option', { name: 'Tag-1-Relax' }).click();
+        // await page.getByRole('option', { name: 'Tag-2-Culture' }).click();
+        // await page.keyboard.press('Escape'); // ปิด Dropdown
 
         await page.getByLabel("ราคา *").fill("2300")
 
@@ -601,13 +597,13 @@ test.describe("Admin - Create Package", () => {
             "assets/photo/vdo1.mp4",
             "assets/photo/vdo2.mp4",
         ])
-        await page.getByRole('button', { name: 'สร้างแพ็กเกจ' }).click();
+        await page.getByRole('button', { name: 'สร้าง' }).click();
 
         const confirmButton = page.getByRole('button', { name: 'ยืนยัน' });
         await expect(confirmButton).toBeVisible();
         await confirmButton.click();
 
-        const errorDialog = page.getByRole("dialog").filter({ hasText: /ข้อมูลไม่ถูกต้อง|กรุณาระบุ|ข้อผิดพลาด/ });
+        const errorDialog = page.getByRole("dialog").filter({ hasText: /ข้อมูลไม่ครบถ้วน|ข้อมูลไม่ถูกต้อง|กรุณาระบุ|ข้อผิดพลาด/ });
         await expect(errorDialog).toBeVisible();
 
         const closeBtn = errorDialog.getByRole("button", { name: "ปิด" });
@@ -762,76 +758,68 @@ test.describe("Admin - Create Package", () => {
         await page.getByLabel('ลองจิจูด *').fill('103.985');
 
         await page.getByRole('combobox', { name: /เลือกผู้ดูแล/ }).click();
-        await page.getByRole('option', { name: 'กมล เบอร์ลี่' }).click();
+        // await page.getByRole('option', { name: 'กมล เบอร์ลี่' }).click();
+        const listbox = page.getByRole('listbox');
+        await listbox.getByRole('option').first().click();
 
         await page.getByLabel("เปิดรับจำนวน *").fill("20")
         await page.getByLabel("สิ่งอำนวยความสะดวก *").fill("รถรับ-ส่งตลอด 24 ชั่วโมง")
 
-        // วันที่และเวลาที่เริ่ม 
-        const startDateBlock = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่เริ่ม \*$/) })
-            .last();
-        await startDateBlock.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^20$/ }).click();
+        // ==========================================
+        // 1. กำหนดการจัดกิจกรรม (Event Schedule)
+        // ==========================================
 
-        const startTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่เริ่ม\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
+        // 1️⃣ วัน/เดือน/ปี ที่เริ่มแพ็กเกจ (ปฏิทินช่องที่ 1 -> ใช้ nth(0))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(0).click();
+        await page.getByRole('gridcell').filter({ hasText: /^25$/ }).first().click();
 
-        await startTime.getByPlaceholder('ชม.').fill('08');
-        await startTime.getByPlaceholder('นาที').fill('00');
+        // 🕐 เวลาที่เริ่ม (เวลาช่องที่ 1 -> ใช้ nth(0))
+        await page.getByText(':').nth(0).click();
+        await page.getByRole('button', { name: '08', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
-        // วันที่-เวลาที่สิ้นสุด 
-        const endDate = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่สิ้นสุด \*$/) })
-            .last();
-        await endDate.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^22$/ }).click();
+        // 2️⃣ วัน/เดือน/ปี ที่สิ้นสุดแพ็กเกจ (ปฏิทินช่องที่ 2 -> ใช้ nth(1))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(1).click();
+        await page.getByRole('gridcell').filter({ hasText: /^27$/ }).first().click();
 
-        const endTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่สิ้นสุด\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
+        // 🕑 เวลาที่สิ้นสุด (เวลาช่องที่ 2 -> ใช้ nth(1))
+        await page.getByText(':').nth(1).click();
+        await page.getByRole('button', { name: '18', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
-        await endTime.getByPlaceholder('ชม.').fill('18');
-        await endTime.getByPlaceholder('นาที').fill('00');
 
-        // วันที่-เวลาเปิดจอง
-        const openDate = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่เปิดจอง \*$/) })
-            .last();
-        await openDate.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^12$/ }).click();
+        // ==========================================
+        // 2. กำหนดการเปิดจองแพ็กเกจ (Booking Schedule)
+        // ==========================================
 
-        const openTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่เปิดจอง\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
+        // 3️⃣ วัน/เดือน/ปี ที่เริ่มเปิดจอง (ปฏิทินช่องที่ 3 -> ใช้ nth(2))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(2).click();
+        await page.getByRole('gridcell').filter({ hasText: /^12$/ }).first().click();
 
-        await openTime.getByPlaceholder('ชม.').fill('09');
-        await openTime.getByPlaceholder('นาที').fill('00');
+        // 🕒 เวลาที่เริ่มเปิดจอง (เวลาช่องที่ 3 -> ใช้ nth(2))
+        await page.getByText(':').nth(2).click();
+        await page.getByRole('button', { name: '08', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
-        // วันที่-เวลาปิดจอง
-        const closeDate = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่ปิดจอง \*$/) })
-            .last();
-        await closeDate.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^19$/ }).click();
+        // 4️⃣ วัน/เดือน/ปี ที่สิ้นสุดการปิดจอง (ปฏิทินช่องที่ 4 -> ใช้ nth(3))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(3).click();
+        await page.getByRole('gridcell').filter({ hasText: /^15$/ }).first().click();
 
-        const closeTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่ปิดจอง\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
-
-        await closeTime.getByPlaceholder('ชม.').fill('23');
-        await closeTime.getByPlaceholder('นาที').fill('59');
+        // 🕓 เวลาที่สิ้นสุดการปิดจอง (เวลาช่องที่ 4 -> ใช้ nth(3))
+        await page.getByText(':').nth(3).click();
+        await page.getByRole('button', { name: '18', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
 
         await page.getByRole('combobox', { name: /ค้นหาแท็ก/ }).click();
-        await page.getByRole('option', { name: 'Tag-1-Relax' }).click();
-        await page.getByRole('option', { name: 'Tag-2-Culture' }).click();
-        await page.keyboard.press('Escape'); // ปิด Dropdown
+        await page.getByRole('option').first().click(); // เลือก option ตัวแรกที่โผล่มา
+        // ถ้าต้องการเลือก 2 อันแรก // await page.getByRole('option').nth(1).click();
+        await page.keyboard.press('Escape');
+
 
         await page.getByLabel("ราคา *").fill("2300")
 
@@ -846,13 +834,13 @@ test.describe("Admin - Create Package", () => {
             "assets/photo/vdo1.mp4",
             "assets/photo/vdo2.mp4",
         ])
-        await page.getByRole('button', { name: 'สร้างแพ็กเกจ' }).click();
+        await page.getByRole('button', { name: 'สร้าง' }).click();
 
         const confirmButton = page.getByRole('button', { name: 'ยืนยัน' });
         await expect(confirmButton).toBeVisible();
         await confirmButton.click();
 
-        const errorDialog = page.getByRole("dialog").filter({ hasText: /ข้อมูลไม่ถูกต้อง|กรุณาระบุ|ข้อผิดพลาด/ });
+        const errorDialog = page.getByRole("dialog").filter({ hasText: /ข้อมูลไม่ครบถ้วน|ข้อมูลไม่ถูกต้อง|กรุณาระบุ|ข้อผิดพลาด/ });
         await expect(errorDialog).toBeVisible();
 
         const closeBtn = errorDialog.getByRole("button", { name: "ปิด" });
@@ -908,71 +896,60 @@ test.describe("Admin - Create Package", () => {
         await page.getByLabel("เปิดรับจำนวน *").fill("20")
         await page.getByLabel("สิ่งอำนวยความสะดวก *").fill("รถรับ-ส่งตลอด 24 ชั่วโมง")
 
-        // วันที่-เวลาที่เริ่มแพ็กเกจ
-        const startDateBlock = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่เริ่ม \*$/) })
-            .last();
-        await startDateBlock.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^20$/ }).click();
+        // ==========================================
+        // 1. กำหนดการจัดกิจกรรม (Event Schedule)
+        // ==========================================
 
-        const startTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่เริ่ม\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
+        // 1️⃣ วัน/เดือน/ปี ที่เริ่มแพ็กเกจ (ปฏิทินช่องที่ 1 -> ใช้ nth(0))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(0).click();
+        await page.getByRole('gridcell').filter({ hasText: /^25$/ }).first().click();
 
-        await startTime.getByPlaceholder('ชม.').fill('08');
-        await startTime.getByPlaceholder('นาที').fill('00');
+        // 🕐 เวลาที่เริ่ม (เวลาช่องที่ 1 -> ใช้ nth(0))
+        await page.getByText(':').nth(0).click();
+        await page.getByRole('button', { name: '08', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
-        // วันที่-เวลาที่สิ้นสุดแพ็กเกจ
-        const endDate = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่สิ้นสุด \*$/) })
-            .last();
-        await endDate.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^22$/ }).click();
+        // 2️⃣ วัน/เดือน/ปี ที่สิ้นสุดแพ็กเกจ (ปฏิทินช่องที่ 2 -> ใช้ nth(1))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(1).click();
+        await page.getByRole('gridcell').filter({ hasText: /^27$/ }).first().click();
 
-        const endTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่สิ้นสุด\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
+        // 🕑 เวลาที่สิ้นสุด (เวลาช่องที่ 2 -> ใช้ nth(1))
+        await page.getByText(':').nth(1).click();
+        await page.getByRole('button', { name: '18', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
-        await endTime.getByPlaceholder('ชม.').fill('18');
-        await endTime.getByPlaceholder('นาที').fill('00');
 
-        // วันที่-เวลาเปิดจอง
-        const openDate = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่เปิดจอง \*$/) })
-            .last();
-        await openDate.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^12$/ }).click();
+        // ==========================================
+        // 2. กำหนดการเปิดจองแพ็กเกจ (Booking Schedule)
+        // ==========================================
 
-        const openTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่เปิดจอง\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
+        // 3️⃣ วัน/เดือน/ปี ที่เริ่มเปิดจอง (ปฏิทินช่องที่ 3 -> ใช้ nth(2))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(2).click();
+        await page.getByRole('gridcell').filter({ hasText: /^12$/ }).first().click();
 
-        await openTime.getByPlaceholder('ชม.').fill('09');
-        await openTime.getByPlaceholder('นาที').fill('00');
+        // 🕒 เวลาที่เริ่มเปิดจอง (เวลาช่องที่ 3 -> ใช้ nth(2))
+        await page.getByText(':').nth(2).click();
+        await page.getByRole('button', { name: '08', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
-        // วันที่-เวลาปิดจอง
-        const closeDate = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่ปิดจอง \*$/) })
-            .last();
-        await closeDate.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^19$/ }).click();
+        // 4️⃣ วัน/เดือน/ปี ที่สิ้นสุดการปิดจอง (ปฏิทินช่องที่ 4 -> ใช้ nth(3))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(3).click();
+        await page.getByRole('gridcell').filter({ hasText: /^15$/ }).first().click();
 
-        const closeTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่ปิดจอง\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
-
-        await closeTime.getByPlaceholder('ชม.').fill('23');
-        await closeTime.getByPlaceholder('นาที').fill('59');
+        // 🕓 เวลาที่สิ้นสุดการปิดจอง (เวลาช่องที่ 4 -> ใช้ nth(3))
+        await page.getByText(':').nth(3).click();
+        await page.getByRole('button', { name: '18', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
 
         await page.getByRole('combobox', { name: /ค้นหาแท็ก/ }).click();
-        await page.getByRole('option', { name: 'Tag-1-Relax' }).click();
-        await page.getByRole('option', { name: 'Tag-2-Culture' }).click();
-        await page.keyboard.press('Escape'); // ปิด Dropdown
+        await page.getByRole('option').first().click(); // เลือก option ตัวแรกที่โผล่มา
+        // ถ้าต้องการเลือก 2 อันแรก // await page.getByRole('option').nth(1).click();
+        await page.keyboard.press('Escape');
 
         await page.getByLabel("ราคา *").fill("2300")
 
@@ -987,13 +964,13 @@ test.describe("Admin - Create Package", () => {
             "assets/photo/vdo1.mp4",
             "assets/photo/vdo2.mp4",
         ])
-        await page.getByRole('button', { name: 'สร้างแพ็กเกจ' }).click();
+        await page.getByRole('button', { name: 'สร้าง' }).click();
 
         const confirmButton = page.getByRole('button', { name: 'ยืนยัน' });
         await expect(confirmButton).toBeVisible();
         await confirmButton.click();
 
-        const errorDialog = page.getByRole("dialog").filter({ hasText: /ข้อมูลไม่ถูกต้อง|กรุณาระบุ|ข้อผิดพลาด/ });
+        const errorDialog = page.getByRole("dialog").filter({ hasText: /ข้อมูลไม่ครบถ้วน|ข้อมูลไม่ถูกต้อง|กรุณาระบุ|ข้อผิดพลาด/ });
         await expect(errorDialog).toBeVisible();
 
         const closeBtn = errorDialog.getByRole("button", { name: "ปิด" });
@@ -1033,75 +1010,67 @@ test.describe("Admin - Create Package", () => {
         await page.getByLabel('ลองจิจูด *').fill('103.985');
 
         await page.getByRole('combobox', { name: /เลือกผู้ดูแล/ }).click();
-        await page.getByRole('option', { name: 'กมล เบอร์ลี่' }).click();
+        // await page.getByRole('option', { name: 'กมล เบอร์ลี่' }).click();
+        const listbox = page.getByRole('listbox');
+        await listbox.getByRole('option').first().click();
 
         await page.getByLabel("สิ่งอำนวยความสะดวก *").fill("รถรับ-ส่งตลอด 24 ชั่วโมง")
 
-        // วันที่-เวลาที่เริ่มแพ็กเกจ
-        const startDateBlock = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่เริ่ม \*$/) })
-            .last();
-        await startDateBlock.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^20$/ }).click();
 
-        const startTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่เริ่ม\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
+        // ==========================================
+        // 1. กำหนดการจัดกิจกรรม (Event Schedule)
+        // ==========================================
 
-        await startTime.getByPlaceholder('ชม.').fill('08');
-        await startTime.getByPlaceholder('นาที').fill('00');
+        // 1️⃣ วัน/เดือน/ปี ที่เริ่มแพ็กเกจ (ปฏิทินช่องที่ 1 -> ใช้ nth(0))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(0).click();
+        await page.getByRole('gridcell').filter({ hasText: /^25$/ }).first().click();
 
-        // วันที่-เวลาที่สิ้นสุดแพ็กเกจ
-        const endDate = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่สิ้นสุด \*$/) })
-            .last();
-        await endDate.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^22$/ }).click();
+        // 🕐 เวลาที่เริ่ม (เวลาช่องที่ 1 -> ใช้ nth(0))
+        await page.getByText(':').nth(0).click();
+        await page.getByRole('button', { name: '08', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
-        const endTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่สิ้นสุด\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
+        // 2️⃣ วัน/เดือน/ปี ที่สิ้นสุดแพ็กเกจ (ปฏิทินช่องที่ 2 -> ใช้ nth(1))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(1).click();
+        await page.getByRole('gridcell').filter({ hasText: /^27$/ }).first().click();
 
-        await endTime.getByPlaceholder('ชม.').fill('18');
-        await endTime.getByPlaceholder('นาที').fill('00');
+        // 🕑 เวลาที่สิ้นสุด (เวลาช่องที่ 2 -> ใช้ nth(1))
+        await page.getByText(':').nth(1).click();
+        await page.getByRole('button', { name: '18', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
-        // วันที่-เวลาเปิดจอง
-        const openDate = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่เปิดจอง \*$/) })
-            .last();
-        await openDate.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^12$/ }).click();
 
-        const openTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่เปิดจอง\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
+        // ==========================================
+        // 2. กำหนดการเปิดจองแพ็กเกจ (Booking Schedule)
+        // ==========================================
 
-        await openTime.getByPlaceholder('ชม.').fill('09');
-        await openTime.getByPlaceholder('นาที').fill('00');
+        // 3️⃣ วัน/เดือน/ปี ที่เริ่มเปิดจอง (ปฏิทินช่องที่ 3 -> ใช้ nth(2))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(2).click();
+        await page.getByRole('gridcell').filter({ hasText: /^12$/ }).first().click();
 
-        // วันที่-เวลาปิดจอง
-        const closeDate = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่ปิดจอง \*$/) })
-            .last();
-        await closeDate.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^19$/ }).click();
+        // 🕒 เวลาที่เริ่มเปิดจอง (เวลาช่องที่ 3 -> ใช้ nth(2))
+        await page.getByText(':').nth(2).click();
+        await page.getByRole('button', { name: '08', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
-        const closeTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่ปิดจอง\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
+        // 4️⃣ วัน/เดือน/ปี ที่สิ้นสุดการปิดจอง (ปฏิทินช่องที่ 4 -> ใช้ nth(3))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(3).click();
+        await page.getByRole('gridcell').filter({ hasText: /^15$/ }).first().click();
 
-        await closeTime.getByPlaceholder('ชม.').fill('23');
-        await closeTime.getByPlaceholder('นาที').fill('59');
+        // 🕓 เวลาที่สิ้นสุดการปิดจอง (เวลาช่องที่ 4 -> ใช้ nth(3))
+        await page.getByText(':').nth(3).click();
+        await page.getByRole('button', { name: '18', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
 
         await page.getByRole('combobox', { name: /ค้นหาแท็ก/ }).click();
-        await page.getByRole('option', { name: 'Tag-1-Relax' }).click();
-        await page.getByRole('option', { name: 'Tag-2-Culture' }).click();
-        await page.keyboard.press('Escape'); // ปิด Dropdown
+        await page.getByRole('option').first().click(); // เลือก option ตัวแรกที่โผล่มา
+        // ถ้าต้องการเลือก 2 อันแรก // await page.getByRole('option').nth(1).click();
+        await page.keyboard.press('Escape');
 
         await page.getByLabel("ราคา *").fill("2300")
 
@@ -1116,13 +1085,13 @@ test.describe("Admin - Create Package", () => {
             "assets/photo/vdo1.mp4",
             "assets/photo/vdo2.mp4",
         ])
-        await page.getByRole('button', { name: 'สร้างแพ็กเกจ' }).click();
+        await page.getByRole('button', { name: 'สร้าง' }).click();
 
         const confirmButton = page.getByRole('button', { name: 'ยืนยัน' });
         await expect(confirmButton).toBeVisible();
         await confirmButton.click();
 
-        const errorDialog = page.getByRole("dialog").filter({ hasText: /ข้อมูลไม่ถูกต้อง|กรุณาระบุ|ข้อผิดพลาด/ });
+        const errorDialog = page.getByRole("dialog").filter({ hasText: /ข้อมูลไม่ครบถ้วน|ข้อมูลไม่ถูกต้อง|กรุณาระบุ|ข้อผิดพลาด/ });
         await expect(errorDialog).toBeVisible();
 
         const closeBtn = errorDialog.getByRole("button", { name: "ปิด" });
@@ -1162,14 +1131,17 @@ test.describe("Admin - Create Package", () => {
         await page.getByLabel('ลองจิจูด *').fill('103.985');
 
         await page.getByRole('combobox', { name: /เลือกผู้ดูแล/ }).click();
-        await page.getByRole('option', { name: 'กมล เบอร์ลี่' }).click();
+        // await page.getByRole('option', { name: 'กมล เบอร์ลี่' }).click();
+        const listbox = page.getByRole('listbox');
+        await listbox.getByRole('option').first().click();
+
         await page.getByLabel("เปิดรับจำนวน *").fill("20")
         await page.getByLabel("สิ่งอำนวยความสะดวก *").fill("รถรับ-ส่งตลอด 24 ชั่วโมง")
 
         await page.getByRole('combobox', { name: /ค้นหาแท็ก/ }).click();
-        await page.getByRole('option', { name: 'Tag-1-Relax' }).click();
-        await page.getByRole('option', { name: 'Tag-2-Culture' }).click();
-        await page.keyboard.press('Escape'); // ปิด Dropdown
+        await page.getByRole('option').first().click(); // เลือก option ตัวแรกที่โผล่มา
+        // ถ้าต้องการเลือก 2 อันแรก // await page.getByRole('option').nth(1).click();
+        await page.keyboard.press('Escape');
 
         await page.getByLabel("ราคา *").fill("2300")
 
@@ -1184,13 +1156,13 @@ test.describe("Admin - Create Package", () => {
             "assets/photo/vdo1.mp4",
             "assets/photo/vdo2.mp4",
         ])
-        await page.getByRole('button', { name: 'สร้างแพ็กเกจ' }).click();
+        await page.getByRole('button', { name: 'สร้าง' }).click();
 
         const confirmButton = page.getByRole('button', { name: 'ยืนยัน' });
         await expect(confirmButton).toBeVisible();
         await confirmButton.click();
 
-        const errorDialog = page.getByRole("dialog").filter({ hasText: /ข้อมูลไม่ถูกต้อง|กรุณาระบุ|ข้อผิดพลาด/ });
+        const errorDialog = page.getByRole("dialog").filter({ hasText: /ข้อมูลไม่ครบถ้วน|ข้อมูลไม่ถูกต้อง|กรุณาระบุ|ข้อผิดพลาด/ });
         await expect(errorDialog).toBeVisible();
 
         const closeBtn = errorDialog.getByRole("button", { name: "ปิด" });
@@ -1267,76 +1239,68 @@ test.describe("Admin - Create Package", () => {
         await page.getByLabel('ลองจิจูด *').fill('103.985');
 
         await page.getByRole('combobox', { name: /เลือกผู้ดูแล/ }).click();
-        await page.getByRole('option', { name: 'กมล เบอร์ลี่' }).click();
+        // await page.getByRole('option', { name: 'กมล เบอร์ลี่' }).click();
+        const listbox = page.getByRole('listbox');
+        await listbox.getByRole('option').first().click();
 
         await page.getByLabel("เปิดรับจำนวน *").fill("20")
         await page.getByLabel("สิ่งอำนวยความสะดวก *").fill("รถรับ-ส่งตลอด 24 ชั่วโมง")
 
-        // วันที่-เวลาที่เริ่มแพ็กเกจ
-        const startDateBlock = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่เริ่ม \*$/) })
-            .last();
-        await startDateBlock.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^20$/ }).click();
 
-        const startTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่เริ่ม\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
+        // ==========================================
+        // 1. กำหนดการจัดกิจกรรม (Event Schedule)
+        // ==========================================
 
-        await startTime.getByPlaceholder('ชม.').fill('08');
-        await startTime.getByPlaceholder('นาที').fill('00');
+        // 1️⃣ วัน/เดือน/ปี ที่เริ่มแพ็กเกจ (ปฏิทินช่องที่ 1 -> ใช้ nth(0))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(0).click();
+        await page.getByRole('gridcell').filter({ hasText: /^25$/ }).first().click();
 
-        // วันที่-เวลาที่สิ้นสุดแพ็กเกจ
-        const endDate = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่สิ้นสุด \*$/) })
-            .last();
-        await endDate.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^22$/ }).click();
+        // 🕐 เวลาที่เริ่ม (เวลาช่องที่ 1 -> ใช้ nth(0))
+        await page.getByText(':').nth(0).click();
+        await page.getByRole('button', { name: '08', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
-        const endTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่สิ้นสุด\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
+        // 2️⃣ วัน/เดือน/ปี ที่สิ้นสุดแพ็กเกจ (ปฏิทินช่องที่ 2 -> ใช้ nth(1))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(1).click();
+        await page.getByRole('gridcell').filter({ hasText: /^27$/ }).first().click();
 
-        await endTime.getByPlaceholder('ชม.').fill('18');
-        await endTime.getByPlaceholder('นาที').fill('00');
+        // 🕑 เวลาที่สิ้นสุด (เวลาช่องที่ 2 -> ใช้ nth(1))
+        await page.getByText(':').nth(1).click();
+        await page.getByRole('button', { name: '18', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
-        // วันที่-เวลาเปิดจอง
-        const openDate = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่เปิดจอง \*$/) })
-            .last();
-        await openDate.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^12$/ }).click();
 
-        const openTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่เปิดจอง\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
+        // ==========================================
+        // 2. กำหนดการเปิดจองแพ็กเกจ (Booking Schedule)
+        // ==========================================
 
-        await openTime.getByPlaceholder('ชม.').fill('09');
-        await openTime.getByPlaceholder('นาที').fill('00');
+        // 3️⃣ วัน/เดือน/ปี ที่เริ่มเปิดจอง (ปฏิทินช่องที่ 3 -> ใช้ nth(2))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(2).click();
+        await page.getByRole('gridcell').filter({ hasText: /^12$/ }).first().click();
 
-        // วันที่-เวลาปิดจอง
-        const closeDate = page.locator('div')
-            .filter({ has: page.getByText(/^วัน\/เดือน\/ปี \(พ\.ศ\.\) ที่ปิดจอง \*$/) })
-            .last();
-        await closeDate.getByRole('button', { name: 'เปิดปฏิทิน' }).click();
-        await page.getByRole('gridcell').filter({ hasText: /^19$/ }).click();
+        // 🕒 เวลาที่เริ่มเปิดจอง (เวลาช่องที่ 3 -> ใช้ nth(2))
+        await page.getByText(':').nth(2).click();
+        await page.getByRole('button', { name: '08', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
-        const closeTime = page.locator('div')
-            .filter({ has: page.getByText(/^เวลาที่ปิดจอง\*$/) })
-            .filter({ has: page.getByPlaceholder('ชม.') })
-            .last();
+        // 4️⃣ วัน/เดือน/ปี ที่สิ้นสุดการปิดจอง (ปฏิทินช่องที่ 4 -> ใช้ nth(3))
+        await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(3).click();
+        await page.getByRole('gridcell').filter({ hasText: /^15$/ }).first().click();
 
-        await closeTime.getByPlaceholder('ชม.').fill('23');
-        await closeTime.getByPlaceholder('นาที').fill('59');
+        // 🕓 เวลาที่สิ้นสุดการปิดจอง (เวลาช่องที่ 4 -> ใช้ nth(3))
+        await page.getByText(':').nth(3).click();
+        await page.getByRole('button', { name: '18', exact: true }).first().click();
+        await page.getByRole('button', { name: '00', exact: true }).last().click();
+        await page.keyboard.press('Escape'); // ปิดกล่องเวลา
 
 
         await page.getByRole('combobox', { name: /ค้นหาแท็ก/ }).click();
-        await page.getByRole('option', { name: 'Tag-1-Relax' }).click();
-        await page.getByRole('option', { name: 'Tag-2-Culture' }).click();
-        await page.keyboard.press('Escape'); // ปิด Dropdown
+        await page.getByRole('option').first().click(); // เลือก option ตัวแรกที่โผล่มา
+        // ถ้าต้องการเลือก 2 อันแรก // await page.getByRole('option').nth(1).click();
+        await page.keyboard.press('Escape');
 
         await uploadCoverImage(page, "assets/photo/pic1.jpg");
 
@@ -1349,13 +1313,13 @@ test.describe("Admin - Create Package", () => {
             "assets/photo/vdo1.mp4",
             "assets/photo/vdo2.mp4",
         ])
-        await page.getByRole('button', { name: 'สร้างแพ็กเกจ' }).click();
+        await page.getByRole('button', { name: 'สร้าง' }).click();
 
         const confirmButton = page.getByRole('button', { name: 'ยืนยัน' });
         await expect(confirmButton).toBeVisible();
         await confirmButton.click();
 
-        const errorDialog = page.getByRole("dialog").filter({ hasText: /ข้อมูลไม่ถูกต้อง|กรุณาระบุ|ข้อผิดพลาด/ });
+        const errorDialog = page.getByRole("dialog").filter({ hasText: /ข้อมูลไม่ครบถ้วน|ข้อมูลไม่ถูกต้อง|กรุณาระบุ|ข้อผิดพลาด/ });
         await expect(errorDialog).toBeVisible();
 
         const closeBtn = errorDialog.getByRole("button", { name: "ปิด" });
@@ -1560,6 +1524,69 @@ test.describe("Admin - Create Package", () => {
             page.waitForURL(/admin\/packages\/all/, { timeout: 600000 }), // เพิ่ม timeout 600วิ เผื่ออัปโหลดไฟล์นาน
         ]);
     });
+
+
+    // /**
+    // * TS-CPK-01.100
+    // * ทอสอบปฏิทิน
+    // */
+    // test("TS-CPK-01.100: ทอสอบปฏิทิน", async ({ page }) => {
+    //     await goToCreatePackagePage(page);
+
+    //     await page.getByRole('button', { name: 'ฉบับร่าง' }).first().click();
+    //     await page.getByRole('button', { name: 'เผยแพร่', exact: true }).click();
+        
+    //     // ==========================================
+    //     // 1. กำหนดการจัดกิจกรรม (Event Schedule)
+    //     // ==========================================
+
+    //     // 1️⃣ วัน/เดือน/ปี ที่เริ่มแพ็กเกจ (ปฏิทินช่องที่ 1 -> ใช้ nth(0))
+    //     await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(0).click();
+    //     await page.getByRole('gridcell').filter({ hasText: /^25$/ }).first().click();
+
+    //     // 🕐 เวลาที่เริ่ม (เวลาช่องที่ 1 -> ใช้ nth(0))
+    //     await page.getByText(':').nth(0).click();
+    //     await page.getByRole('button', { name: '08', exact: true }).first().click();
+    //     await page.getByRole('button', { name: '00', exact: true }).last().click();
+    //     await page.keyboard.press('Escape'); // ปิดกล่องเวลา
+
+    //     // 2️⃣ วัน/เดือน/ปี ที่สิ้นสุดแพ็กเกจ (ปฏิทินช่องที่ 2 -> ใช้ nth(1))
+    //     await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(1).click();
+    //     await page.getByRole('gridcell').filter({ hasText: /^27$/ }).first().click();
+
+    //     // 🕑 เวลาที่สิ้นสุด (เวลาช่องที่ 2 -> ใช้ nth(1))
+    //     await page.getByText(':').nth(1).click();
+    //     await page.getByRole('button', { name: '18', exact: true }).first().click();
+    //     await page.getByRole('button', { name: '00', exact: true }).last().click();
+    //     await page.keyboard.press('Escape'); // ปิดกล่องเวลา
+
+
+    //     // ==========================================
+    //     // 2. กำหนดการเปิดจองแพ็กเกจ (Booking Schedule)
+    //     // ==========================================
+
+    //     // 3️⃣ วัน/เดือน/ปี ที่เริ่มเปิดจอง (ปฏิทินช่องที่ 3 -> ใช้ nth(2))
+    //     await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(2).click();
+    //     await page.getByRole('gridcell').filter({ hasText: /^12$/ }).first().click();
+
+    //     // 🕒 เวลาที่เริ่มเปิดจอง (เวลาช่องที่ 3 -> ใช้ nth(2))
+    //     await page.getByText(':').nth(2).click();
+    //     await page.getByRole('button', { name: '08', exact: true }).first().click();
+    //     await page.getByRole('button', { name: '00', exact: true }).last().click();
+    //     await page.keyboard.press('Escape'); // ปิดกล่องเวลา
+
+    //     // 4️⃣ วัน/เดือน/ปี ที่สิ้นสุดการปิดจอง (ปฏิทินช่องที่ 4 -> ใช้ nth(3))
+    //     await page.getByRole('button', { name: 'เปิดปฏิทิน' }).nth(3).click();
+    //     await page.getByRole('gridcell').filter({ hasText: /^15$/ }).first().click();
+
+    //     // 🕓 เวลาที่สิ้นสุดการปิดจอง (เวลาช่องที่ 4 -> ใช้ nth(3))
+    //     await page.getByText(':').nth(3).click();
+    //     await page.getByRole('button', { name: '18', exact: true }).first().click();
+    //     await page.getByRole('button', { name: '00', exact: true }).last().click();
+    //     await page.keyboard.press('Escape'); // ปิดกล่องเวลา
+
+    // });
+
 
 });
 
