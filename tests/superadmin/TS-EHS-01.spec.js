@@ -215,7 +215,7 @@ export async function uploadHomestayGallery(page, filesRelativePaths = []) {
 
 test.describe("SuperAdmin - Edit Homestay", () => {
     test.beforeEach(async ({ page }) => {
-        await loginAs(page, "superadmin");
+        await loginAs(page, "SuperAdmin");
         await expect(page).toHaveURL(/super\/communities/);
     });
 
@@ -247,10 +247,15 @@ test.describe("SuperAdmin - Edit Homestay", () => {
 
         await page.getByLabel('คำอธิบายที่อยู่').fill('บ้านเลขที่ 100/89 หมู่ 2');
 
+        // await page.getByRole('combobox', { name: /ค้นหาแท็ก/ }).click();
+        // await page.getByRole('option', { name: 'Tag-1-Relax' }).click();
+        // await page.getByRole('option', { name: 'Tag-2-Culture' }).click();
+        // await page.keyboard.press('Escape'); // ปิด Dropdown
+        
         await page.getByRole('combobox', { name: /ค้นหาแท็ก/ }).click();
-        await page.getByRole('option', { name: 'Tag-1-Relax' }).click();
-        await page.getByRole('option', { name: 'Tag-2-Culture' }).click();
-        await page.keyboard.press('Escape'); // ปิด Dropdown
+        await page.getByRole('option').first().click(); // เลือก option ตัวแรกที่โผล่มา
+        // ถ้าต้องการเลือก 2 อันแรก // await page.getByRole('option').nth(1).click();
+        await page.keyboard.press('Escape');
 
         await page.getByRole('button', { name: 'บันทึก' }).click();
 
@@ -282,7 +287,7 @@ test.describe("SuperAdmin - Edit Homestay", () => {
         await expect(confirmButton).toBeVisible();
         await confirmButton.click();
 
-        const errorDialog = page.getByRole("dialog").filter({ hasText: /ข้อมูลไม่ถูกต้อง|กรุณาระบุ|ข้อผิดพลาด/ });
+        const errorDialog = page.getByRole("dialog").filter({ hasText: /ข้อมูลไม่ครบถ้วน|ข้อมูลไม่ถูกต้อง|กรุณาระบุ|ข้อผิดพลาด/ });
         await expect(errorDialog).toBeVisible();
 
         const closeBtn = errorDialog.getByRole("button", { name: "ปิด" });
@@ -422,13 +427,13 @@ test.describe("SuperAdmin - Edit Homestay", () => {
         await expect(confirmButton).toBeVisible();
         await confirmButton.click();
 
-        // const errorDialog = page.getByRole("dialog").filter({ hasText: /ข้อมูลไม่ถูกต้อง|กรุณาระบุ|ข้อผิดพลาด/ });
-        // await expect(errorDialog).toBeVisible();
+        const errorDialog = page.getByRole("dialog").filter({ hasText: /ข้อมูลไม่ครบถ้วน|ข้อมูลไม่ถูกต้อง|กรุณาระบุ|ข้อผิดพลาด/ });
+        await expect(errorDialog).toBeVisible();
 
-        // const closeBtn = errorDialog.getByRole("button", { name: "ปิด" });
-        // if (await closeBtn.isVisible()) {
-        //     await closeBtn.click();
-        // }
+        const closeBtn = errorDialog.getByRole("button", { name: "ปิด" });
+        if (await closeBtn.isVisible()) {
+            await closeBtn.click();
+        }
     });
 
     /**
@@ -466,13 +471,13 @@ test.describe("SuperAdmin - Edit Homestay", () => {
         await expect(confirmButton).toBeVisible();
         await confirmButton.click
 
-        // const errorDialog = page.getByRole("dialog").filter({ hasText: /ข้อมูลไม่ถูกต้อง|กรุณาระบุ|ข้อผิดพลาด/ });
-        // await expect(errorDialog).toBeVisible();
+        const errorDialog = page.getByRole("dialog").filter({ hasText: /ข้อมูลไม่ครบถ้วน|ข้อมูลไม่ถูกต้อง|กรุณาระบุ|ข้อผิดพลาด/ });
+        await expect(errorDialog).toBeVisible();
 
-        // const closeBtn = errorDialog.getByRole("button", { name: "ปิด" });
-        // if (await closeBtn.isVisible()) {
-        //     await closeBtn.click();
-        // }
+        const closeBtn = errorDialog.getByRole("button", { name: "ปิด" });
+        if (await closeBtn.isVisible()) {
+            await closeBtn.click();
+        }
 
     });
 

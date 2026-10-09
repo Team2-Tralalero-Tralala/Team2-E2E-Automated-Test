@@ -3,7 +3,7 @@ import { loginAs } from "../../utils/roles.js";
 
 test.describe("TC-DP-01 - ผู้ใช้งาน Tourist ต้องการดูรายละเอียดแพ็กเกจในหน้าจอผลลัพธ์การค้นหา", () => {
   test.beforeEach(async ({ page }) => {
-    await loginAs(page, "tourist");
+    await loginAs(page, "Tourist1");
     await expect(page).toHaveURL(/tourist\/home/);
   });
 
@@ -12,8 +12,8 @@ test.describe("TC-DP-01 - ผู้ใช้งาน Tourist ต้องกา
    * ผู้ใช้งานล็อกอินเข้าสู่ระบบ
    */
   test("TC-DP-01.1: ผู้ใช้งานล็อกอินเข้าสู่ระบบ", async ({ page }) => {
-    const keyword = "ทะเล";
-    const targetPackageName = /ล่องเรือ/;
+    const keyword = "แพ็กเกจ";
+    const targetPackageName = /แพ็กเกจ/;
 
     await page.getByRole("textbox", { name: "ค้นหาแพ็กเกจกิจกรรม:" }).click();
     await page.getByRole("textbox", { name: "ค้นหาแพ็กเกจกิจกรรม:" }).fill(keyword);
@@ -49,11 +49,11 @@ test.describe("TC-DP-01 - ผู้ใช้งาน Tourist ต้องกา
    */
   test("TC-DP-01.2: ผู้ใช้งานไม่ได้ล็อกอินเข้าสู่ระบบ", async ({ page }) => {
     // Logout ก่อนเพราะ beforeEach ล็อกอินมาให้แล้ว
-    await page.getByRole("button", { name: "ณเดชน์ กล้าหาญ Profile" }).click();
+    await page.getByRole("button", { name: "Tourist 1 Profile" }).click();
     await page.getByText("ออกจากระบบ").click();
 
-    const keyword = "ทะเล";
-    const targetPackageName = /ล่องเรือ/;
+    const keyword = "แพ็กเกจ";
+    const targetPackageName = /แพ็กเกจ/;
 
     await page.getByRole("textbox", { name: "ค้นหาแพ็กเกจกิจกรรม:" }).click();
     await page.getByRole("textbox", { name: "ค้นหาแพ็กเกจกิจกรรม:" }).fill(keyword);

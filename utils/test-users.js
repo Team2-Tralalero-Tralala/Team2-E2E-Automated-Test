@@ -55,4 +55,28 @@ export const users = {
     loginPath: "/guest/partner/login",
     //redirectTo: "/member/community/own",
   },
+  SuperAdmin: {
+    email: "superadmin@example.com",
+    password: "hashedpw",
+    loginPath: "/guest/partner/login",
+    redirectTo: "/super/communities",
+  },
+  Admin1: {
+    email: "admin1@example.com",
+    password: "hashedpw",
+    loginPath: "/guest/partner/login",
+    redirectTo: "/admin/community/own",
+  },
+  Tourist1: {
+    email: "tourist1@example.com",
+    password: "hashedpw",
+    loginPath: "/guest/login",
+    redirectTo: "/tourist/home",
+  },
+  Member1: {
+    email: "member1@example.com",
+    password: "hashedpw",
+    loginPath: "/guest/partner/login",
+    //redirectTo: "/member/community/own",
+  },
 };
